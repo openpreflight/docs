@@ -1,5 +1,6 @@
 ---
 title: "ADR 004: Docker executor, remote engine, opt-in forks"
+description: "Decision: optional docker run executor, remote engine via CI_DOCKER_HOST, and opt-in fork PRs."
 sidebar:
   order: 4
 ---

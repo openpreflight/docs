@@ -1,5 +1,6 @@
 ---
 title: "ADR 003: Our GitHub App, not Coolify's GitHub connector"
+description: "Decision: checks come from a GitHub App you register, not Coolify's GitHub connector."
 sidebar:
   order: 3
 ---

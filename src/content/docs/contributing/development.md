@@ -1,5 +1,6 @@
 ---
 title: "Development"
+description: "Local Go build, test, and run loop — no network or credentials required for tests."
 sidebar:
   order: 1
 ---

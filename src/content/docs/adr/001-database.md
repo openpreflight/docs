@@ -1,5 +1,6 @@
 ---
 title: "ADR 001: SQLite in-process, secrets encrypted at rest"
+description: "Decision: SQLite in-process with AES-256-GCM encrypted secret columns, pure Go, no CGO."
 sidebar:
   order: 1
 ---

@@ -1,5 +1,6 @@
 ---
 title: "Deployment"
+description: "Compose mounts, DOCKER_GID, reverse-proxy notes, Coolify install-worker, and rotating CI_SECRET_KEY."
 sidebar:
   order: 3
 ---
@@ -57,13 +58,13 @@ has one webhook URL; repointing it steals Coolify's deploys. See
 ## After first boot
 
 1. Complete setup (admin password + public base URL) if you did not bootstrap.
-2. Register a GitHub App (permissions in the README) and paste it under
-   **GitHub Apps**.
-3. Optionally add a Coolify instance (team token) as a repo-picker source, or
-   to install this worker.
-4. Enable bindings. Only enabled private repos you trust: a pipeline runs the
-   repo's own commands in this process, or in a sibling container when
-   `runtime:` is set.
+   See [Quickstart](/start/quickstart/).
+2. [Register a GitHub App](/setup/github-app/) and paste it under **GitHub Apps**.
+3. Optionally [add a Coolify instance](/setup/coolify/) (team token) as a
+   repo-picker source, or to install this worker.
+4. [Enable bindings](/setup/bindings/). Only enable private repos you trust: a
+   pipeline runs the repo's own commands in this process, or in a sibling
+   container when `runtime:` is set.
 
 ## Rotating `CI_SECRET_KEY`
 

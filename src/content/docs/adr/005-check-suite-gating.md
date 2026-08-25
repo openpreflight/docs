@@ -1,5 +1,6 @@
 ---
 title: "ADR 005: Check-suite-driven gating at single-server scale"
+description: "Decision: gate on the check suite and immutable SHA at single-server scale, not on push."
 sidebar:
   order: 5
 ---

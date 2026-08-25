@@ -1,10 +1,13 @@
 ---
 title: "Configuration"
+description: "Environment variables the process needs to start, and the Settings row that lives in SQLite afterwards."
 sidebar:
   order: 2
 ---
 Two layers. The process reads a handful of env vars so it can start. Everything
-else is a row in SQLite, edited in the UI or over the JSON API.
+else is a row in SQLite, edited in the UI or over the JSON API. For a
+procedural first run, see [Quickstart](/start/quickstart/). Pipeline file
+semantics are also covered under [Pipelines](/using/pipelines/).
 
 ## Environment
 

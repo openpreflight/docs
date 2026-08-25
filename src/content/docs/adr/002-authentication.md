@@ -1,5 +1,6 @@
 ---
 title: "ADR 002: Local admin, opaque sessions"
+description: "Decision: a single local admin with opaque sessions, bcrypt passwords, and CSRF on browser writes."
 sidebar:
   order: 2
 ---

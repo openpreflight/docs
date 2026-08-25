@@ -37,8 +37,9 @@ npm ci
 npm run dev
 ```
 
-`npm run build` produces `dist/`, and CI builds it on every push and pull
-request via [.github/workflows/ci.yml](.github/workflows/ci.yml).
+`npm run build` produces `dist/`. After a build, `npm run check-links` asserts
+every splash CTA route exists and no built HTML links to a missing internal
+path. CI runs both.
 
 ## Writing
 

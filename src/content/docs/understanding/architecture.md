@@ -1,5 +1,6 @@
 ---
 title: "Architecture"
+description: "One Go process is both configurator and worker: packages, the webhook-to-Check-Run path, and what is deliberately absent."
 sidebar:
   order: 1
 ---
@@ -60,7 +61,12 @@ that database. See [configuration.md](/start/configuration/).
 
 `GET /runs/{id}` is the Check Run `details_url`. GitHub never fetches it — the
 reader's browser does — so it needs a session unless the binding opted into
-shareable logs.
+shareable logs. See [Logs](/using/logs/).
+
+GitHub's **Redeliver** button reuses the delivery id, so dedup applies only
+while a job is in flight; redelivering a finished delivery starts a new job,
+which is what makes it useful for debugging. `check_run.rerequested` is
+honoured only for this App's own checks.
 
 ## Why this shape
 

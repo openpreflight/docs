@@ -1,1 +1,16 @@
+/* Brand tokens aligned with the Go UI (internal/web/styles/input.css):
+   accent greens #2f6f4f / #7cc79c, warmer neutrals, terminal-adjacent. */
 @import "tailwindcss";
+
+:root {
+  --sl-color-accent-low: #d8ebe1;
+  --sl-color-accent: #2f6f4f;
+  --sl-color-accent-high: #1e4a34;
+  --sl-font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+}
+
+:root[data-theme="dark"] {
+  --sl-color-accent-low: #1a2e24;
+  --sl-color-accent: #7cc79c;
+  --sl-color-accent-high: #b6e4c8;
+}
