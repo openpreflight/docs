@@ -1,0 +1,39 @@
+---
+title: openpreflight
+description: Self-hosted GitHub Check Runs CI for private repos. One Go binary, one SQLite file.
+template: splash
+hero:
+  tagline: A small CI provider for private repos. One Go binary that configures itself in a web UI and runs your install/test/build on the exact commit, reporting one Check Run with full logs.
+  actions:
+    - text: Quickstart
+      link: /start/quickstart/
+      icon: right-arrow
+    - text: View on GitHub
+      link: https://github.com/openpreflight/openpreflight
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+<CardGrid>
+  <Card title="Start here" icon="rocket">
+    [Quickstart](/start/quickstart/) gets the binary running and through the
+    first-boot wizard. [Configuration](/start/configuration/) is the full
+    environment reference.
+  </Card>
+  <Card title="Set it up" icon="setting">
+    [Register a GitHub App](/setup/github-app/) — only an App can create Check
+    Runs. Then [enable repos](/setup/bindings/); the bindings table is the
+    allow-list.
+  </Card>
+  <Card title="Use it" icon="document">
+    [Pipelines](/using/pipelines/) is the `.ci.yml` contract and its resolution
+    order. [Logs](/using/logs/) and the [API](/using/api/) cover the rest.
+  </Card>
+  <Card title="Understand it" icon="open-book">
+    [Architecture](/understanding/architecture/) explains the one-process shape.
+    The [decisions](/adr/005-check-suite-gating/) record why it gates on the
+    check suite rather than on push.
+  </Card>
+</CardGrid>

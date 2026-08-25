@@ -1,0 +1,60 @@
+# openpreflight docs
+
+The documentation site, published at **https://docs.openpreflight.xyz**.
+Astro + Starlight + Tailwind v4.
+
+This repository is the source of truth for the documentation. The markdown
+under `src/content/docs/` is hand-authored and committed — nothing is
+generated, and nothing is synced in from
+[openpreflight/openpreflight](https://github.com/openpreflight/openpreflight).
+
+## Layout
+
+```text
+src/content/docs/
+  index.mdx           the splash page
+  start/              quickstart, configuration
+  setup/              github-app, coolify, bindings
+  using/              pipelines, logs, api
+  understanding/      architecture, security-model, deployment
+  contributing/       development
+  adr/                the numbered decision records
+```
+
+Each directory is a sidebar group, and every group is `autogenerate`d in
+`astro.config.mjs`. Adding a page needs no config change:
+
+1. Drop the markdown into the right directory.
+2. Give it `title:` and `sidebar: { order: N }` frontmatter.
+
+Removing a page is a `git rm`. Renaming one changes its URL, so leave a
+redirect if the old path was linked publicly.
+
+## Local development
+
+```bash
+npm ci
+npm run dev
+```
+
+`npm run build` produces `dist/`, and CI builds it on every push and pull
+request via [.github/workflows/ci.yml](.github/workflows/ci.yml).
+
+## Writing
+
+- Links between pages are site routes, not file paths — `/start/quickstart/`,
+  not `../start/quickstart.md`.
+- Links to files that live in the code repo (`README.md`, `SECURITY.md`,
+  `examples/.ci.yml`) are absolute GitHub URLs.
+- A doc that describes behaviour should say what the binary actually does. When
+  a change in
+  [openpreflight/openpreflight](https://github.com/openpreflight/openpreflight)
+  changes behaviour, the docs change belongs in a pull request here that lands
+  alongside it.
+
+## Deployment
+
+Cloudflare Pages. Root directory is the repository root, build command
+`npm run build`, output `dist`.
+
+MIT licensed.
