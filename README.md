@@ -1,3 +1,17 @@
+<div align="center">
+  <picture>
+    <source
+      media="(prefers-color-scheme: dark)"
+      srcset="https://openpreflight.xyz/banner-dark.png"
+    />
+    <img
+      src="https://openpreflight.xyz/banner-light.png"
+      alt="openpreflight — a small CI provider for private repos. One Go binary, one SQLite file, one Check Run per commit."
+      width="880"
+    />
+  </picture>
+</div>
+
 # openpreflight docs
 
 The documentation site, published at **https://docs.openpreflight.xyz**.
