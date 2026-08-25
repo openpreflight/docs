@@ -10,7 +10,7 @@ that argues it in full.
 
 ## Why a GitHub App and not OAuth?
 
-Only a GitHub App can create Check Runs — user and OAuth tokens are refused.
+Only a GitHub App can create Check Runs. User and OAuth tokens are refused.
 An App also has exactly one webhook URL, which is why Coolify's own GitHub
 connector cannot do this job: its webhook belongs to Coolify's deploy
 pipeline and its manifest has no `checks` permission.
@@ -20,7 +20,7 @@ See [Register a GitHub App](/setup/github-app/) and
 
 ## Why is Coolify optional?
 
-Coolify is a supported deployment target and an optional repository source —
+Coolify is a supported deployment target and an optional repository source,
 not the product, and not required for checks. Skip it and everything else
 works the same: checks still come from a GitHub App you register, and jobs
 still run here or on any Docker engine you point `CI_DOCKER_HOST` at.

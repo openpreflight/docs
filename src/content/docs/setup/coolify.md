@@ -1,10 +1,10 @@
 ---
 title: "Coolify"
-description: "Add Coolify as an optional deployment target and repository picker — not required for checks to work."
+description: "Add Coolify as an optional deployment target and repository picker. Not required for checks to work."
 sidebar:
   order: 2
 ---
-Coolify is a supported deployment target and an optional repo source — **not
+Coolify is a supported deployment target and an optional repo source. **Not
 the product, and not required**. Add a team-scoped API token and you get server
 inventory, a repository picker, and a one-click **Install this worker**. Skip it
 entirely and everything else works the same: the checks come from a

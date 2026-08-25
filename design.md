@@ -3,7 +3,7 @@ version: 1
 name: openpreflight
 description: >
   Shared visual system for openpreflight.xyz (marketing) and docs.openpreflight.xyz.
-  Self-hosted GitHub Check Runs CI — technical, calm, product-first. Not generic SaaS marketing.
+  Self-hosted GitHub Check Runs CI: technical, calm, product-first. Not generic SaaS marketing.
 principle: brand atoms are sacred · Check Run is the hero artifact · copy stays concrete
 
 colors:
@@ -29,7 +29,7 @@ colors:
   on-accent-dark: "#102018"
   # Atmosphere (website hero / rivelle surfaces)
   atmosphere: "radial forest bloom at 28% primary over a soft olive grid"
-  primary-oklch: "oklch(0.45 0.08 155)" # forest — prefer hex tokens above for product chrome
+  primary-oklch: "oklch(0.45 0.08 155)" # forest; prefer hex tokens above for product chrome
 
 typography:
   display: { fontFamily: "Inter", weight: 600, tracking: "-0.04em", lineHeight: 1.0 }
@@ -53,7 +53,7 @@ components:
       short horizontal runway, plus a caret above the apex. No wordmark inside the favicon.
   check-run-panel:
     description: >
-      The product's only hero artifact — monospace Check Run output (pass greens, muted sep).
+      The product's only hero artifact: monospace Check Run output (pass greens, muted sep).
       Prefer this over stock dashboard mockups when the page needs a product visual.
   cta-primary:
     background: "{colors.accent}"
@@ -64,13 +64,13 @@ components:
     radius: "{spacing.radius-md}"
 ---
 
-# openpreflight — design system
+# openpreflight: design system
 
 ## Overview
 
 openpreflight is a **small self-hosted CI provider** for private GitHub repos: one Go binary,
 one SQLite file, one Check Run per commit. The sites should feel like a finished developer
-product — calm forest greens, warm olive neutrals, monospace for program output — not a
+product: calm forest greens, warm olive neutrals, monospace for program output. Not a
 startup pitch deck.
 
 **Key characteristics**
@@ -78,19 +78,19 @@ startup pitch deck.
 - Forest green accent (`#2f6f4f` / `#7cc79c` dark), never purple, never cool SaaS blue as the brand.
 - Inter for UI and display; **JetBrains Mono** for kickers, code, and the Check Run panel.
 - Soft olive-tinted ground (`#f7f8f5` / `#121412`), not pure white or stark cold gray.
-- Elevation via hairline borders and light atmospheric bloom — no heavy multi-layer shadows, no glow.
+- Elevation via hairline borders and light atmospheric bloom. No heavy multi-layer shadows, no glow.
 - Copy is technical and specific; no fabricated customer logos, fake stats, or invented pricing tiers.
 
 ## Brand voice
 
 - Short, concrete sentences. Name the mechanism (HMAC, Check Run, SQLite, GitHub App).
-- Prefer “what it does” over “transform your workflow.”
+- Prefer "what it does" over "transform your workflow."
 - The wordmark is lowercase: **openpreflight**.
 
 ## Mark / favicon
 
 The mark is a **runway-check** on forest green: a checkstroke that finishes as a short runway,
-with a caret at the apex (preflight / takeoff). Favicon and apple-touch use the mark only —
+with a caret at the apex (preflight / takeoff). Favicon and apple-touch use the mark only.
 Starlight/docs may show mark + title text separately.
 
 ## Website (marketing)
@@ -115,7 +115,7 @@ Starlight/docs may show mark + title text separately.
 
 ## Don't
 
-- Don't use Inter-only pages with no mono voice — the product is terminal-adjacent.
+- Don't use Inter-only pages with no mono voice. The product is terminal-adjacent.
 - Don't put cards, stats strips, or logo clouds in the hero.
-- Don't introduce a second accent (coral, violet, electric blue) for “interest.”
-- Don't fabricate testimonials, pricing, or “used by” logos.
+- Don't introduce a second accent (coral, violet, electric blue) for "interest."
+- Don't fabricate testimonials, pricing, or "used by" logos.

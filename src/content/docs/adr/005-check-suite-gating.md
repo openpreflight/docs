@@ -13,7 +13,7 @@ The worker has always listened to `check_suite` and `check_run` and nothing
 else. `internal/webhook.Parse` handles `check_suite` (`requested`,
 `rerequested`) and `check_run` (`rerequested`); `push` and `pull_request` fall
 through to the skip branch. That was never written down, so the most
-consequential decision in the trigger path was the easiest one to undo — adding
+consequential decision in the trigger path was the easiest one to undo. Adding
 a `push` case looks like a feature, not a reversal.
 
 The model has prior art. Zuul gates on the commit, queues work against an
@@ -26,7 +26,7 @@ SQLite file, one server.
 Two duplicate-check bugs also came out of leaving the invariant unstated. The
 handler deduped on `delivery_id` and cancelled on `(repo, ref)`, so a commit
 arriving on a second ref, or a rerequest landing while a job ran, produced two
-concurrent jobs — and two Check Runs with the same name on the same commit.
+concurrent jobs, and two Check Runs with the same name on the same commit.
 Branch protection then reads whichever finished last.
 
 ## Decision
@@ -45,7 +45,7 @@ Branch protection then reads whichever finished last.
   returns, while the `cancelled` status is written later by the job's own
   goroutine, so a partial unique index over the in-flight statuses would
   intermittently reject the follow-up insert. `check_suite_id` is recorded on
-  the job for traceability but is not the key — it can be absent from a payload,
+  the job for traceability but is not the key. It can be absent from a payload,
   and a missing id must not weaken the invariant.
 - **`ev.Action` decides what a second delivery means.** `requested` is GitHub
   asking twice and is answered `already queued`. `rerequested` is a human
@@ -57,14 +57,14 @@ Branch protection then reads whichever finished last.
 
 ## Consequences
 
-- The ceiling is real and worth stating: no build matrices, no dependency
+- The ceiling is real: no build matrices, no dependency
   caching, no fan-out across machines, no cross-repo dependent pipelines. A
   queue depth of one server is the design, not a limitation to be worked around.
 - Per-step Check Runs are rejected while the executor runs steps sequentially in
   one shell and one workspace. GitHub renders a Re-run button per check run, and
   a step that cannot be re-run alone must not advertise one. If the Docker
   executor ([ADR 004](/adr/004-docker-executor/)) later makes steps independently
-  schedulable, this is the decision to revisit — the recorded `check_suite_id`
+  schedulable, this is the decision to revisit. The recorded `check_suite_id`
   is what makes that cheap.
 - A local `check_suites` table is rejected. Suites cannot be created through the
   API and GitHub computes suite status from the runs inside them, so a local

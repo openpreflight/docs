@@ -17,7 +17,7 @@ App. Full environment and settings detail lives in
   only when a job has no `runtime:` and runs as a process
 - A reachable Docker engine (`CI_DOCKER_HOST` or a mounted `docker.sock`) if
   you use `runtime:` or opt into fork PRs
-- Optionally, a Coolify API token — inventory, the repo picker, and
+- Optionally, a Coolify API token for inventory, the repo picker, and
   install-worker
 
 ## Run it
@@ -29,7 +29,7 @@ docker compose up --build
 ```
 
 `CI_SECRET_KEY` is required; the process refuses to start without it. Keep it
-forever — losing it makes stored PEMs and tokens unreadable. See
+forever. Losing it makes stored PEMs and tokens unreadable. See
 [Configuration](/start/configuration/) for the full env table and key rotation.
 
 Compose, volumes, and reverse-proxy notes are in
@@ -75,7 +75,7 @@ View full logs →
 `GET /runs/{job-id}` on your instance. That page requires a session by
 default; a binding can opt into shareable logs. See [Logs](/using/logs/).
 
-If nothing resolves to run, the check reports **skipped** rather than failed —
-that is intentional. See [Pipelines](/using/pipelines/) and
+If nothing resolves to run, the check reports **skipped** rather than failed.
+That is intentional. See [Pipelines](/using/pipelines/) and
 [Troubleshooting](/using/troubleshooting/).
 

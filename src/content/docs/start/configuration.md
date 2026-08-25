@@ -19,8 +19,8 @@ semantics are also covered under [Pipelines](/using/pipelines/).
 | `CI_BOOTSTRAP_ADMIN_PASSWORD` | no | Creates the `admin` user on first boot so a headless deploy can be driven over the API. Ignored once a user exists. |
 | `CI_DOCKER_HOST` | no | Docker engine for `runtime:` and fork PRs. Falls back to `DOCKER_HOST`, then the engine default (typically the mounted socket). |
 | `LISTEN_ADDR` | no | Default `:8080`. |
-| `DATA_DIR` | no | Default `/data` — `ci.db` and `logs/`. Must be a persistent volume. |
-| `WORKSPACE_DIR` | no | Default `/workspace` — per-job checkouts, disposable. |
+| `DATA_DIR` | no | Default `/data`: `ci.db` and `logs/`. Must be a persistent volume. |
+| `WORKSPACE_DIR` | no | Default `/workspace`: per-job checkouts, disposable. |
 
 There is no `GITHUB_APP_ID` and no `CI_ALLOWED_REPOS`. Those live in
 `github_apps` and `repo_bindings`.
@@ -44,7 +44,7 @@ Single row, `id = 1`. Changed from **Settings** in the UI or
 | Field | Default | Purpose |
 |---|---|---|
 | `public_base_url` | empty (or seeded from env) | Webhook URLs and Check Run `details_url` |
-| `default_check_name` | `openpreflight` | Check Run name unless the App or binding overrides. New installs only — an existing database keeps the name it already has, because GitHub matches a required status check by name and renaming one strands its branch protection rule |
+| `default_check_name` | `openpreflight` | Check Run name unless the App or binding overrides. New installs only. An existing database keeps the name it already has, because GitHub matches a required status check by name and renaming one strands its branch protection rule |
 | `default_pipeline_file` | `.ci.yml` | Path in the repo |
 | `default_timeout_seconds` | `900` | Per-job timeout |
 | `max_concurrent_jobs` | `1` | Runner concurrency |
@@ -85,6 +85,6 @@ Resolution order, highest first:
 
 1. the repo's pipeline file
 2. the binding's command overrides
-3. Node defaults inferred from `package.json` — `npm ci` / `pnpm` / `yarn` by
+3. Node defaults inferred from `package.json`: `npm ci` / `pnpm` / `yarn` by
    lockfile, then `test` and `build` **only if those scripts exist**
 4. nothing to run → the check is reported as **skipped**, not failed

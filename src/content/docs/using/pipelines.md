@@ -35,7 +35,7 @@ Highest first:
 
 1. the repo's pipeline file
 2. the binding's command overrides
-3. Node defaults inferred from `package.json` — `npm ci` / `pnpm` / `yarn` by
+3. Node defaults inferred from `package.json`: `npm ci` / `pnpm` / `yarn` by
    lockfile, then `test` and `build` **only if those scripts exist**
 4. nothing to run → the check is reported as **skipped**, not failed
 

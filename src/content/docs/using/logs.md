@@ -11,7 +11,7 @@ Check Run carries a truncated tail; the full log is on the details page.
 ## Details URL
 
 `GET /runs/{job-id}` is the `details_url` GitHub links to. **GitHub never
-fetches it — the reader's browser does**, so it requires a session by default.
+fetches it. The reader's browser does**, so it requires a session by default.
 A binding can opt into shareable logs, which makes that one job's page readable
 by anyone holding the link. The same rule applies to
 `GET /api/v1/jobs/{id}/logs`. Job ids are random UUIDs, but treat such a link as

@@ -19,7 +19,7 @@ material is `CI_SECRET_KEY`; rotation is documented in
 ## Clone credentials
 
 The clone credential is passed to git through `GIT_CONFIG_*` environment
-variables as **Basic `x-access-token`** — GitHub's git endpoint wants Basic,
+variables as **Basic `x-access-token`**. GitHub's git endpoint wants Basic,
 not the REST API's Bearer. It never enters the remote URL, `.git/config`, or a
 command line, and the remote is removed before any pipeline step runs.
 

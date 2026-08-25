@@ -17,9 +17,9 @@ Compose maps `8080:8080` and three mounts:
 
 | Volume | Mount | Must persist |
 |---|---|---|
-| `ci-data` | `/data` | yes — `ci.db`, encrypted secrets, job history, logs |
+| `ci-data` | `/data` | yes: `ci.db`, encrypted secrets, job history, logs |
 | `ci-workspace` | `/workspace` | no, but a volume keeps checkouts off the container's writable layer |
-| host socket | `/var/run/docker.sock` | no — needed for `runtime:` and fork PRs |
+| host socket | `/var/run/docker.sock` | no; needed for `runtime:` and fork PRs |
 
 `group_add: ${DOCKER_GID:-998}` puts uid 10001 in the socket's group. On the
 host, `DOCKER_GID` is usually `stat -f %g /var/run/docker.sock` (macOS) or

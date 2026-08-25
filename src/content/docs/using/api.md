@@ -1,6 +1,6 @@
 ---
 title: "API"
-description: "JSON API routes for setup, settings, Coolify, GitHub Apps, bindings, and jobs — plus the public webhook and health endpoints."
+description: "JSON API routes for setup, settings, Coolify, GitHub Apps, bindings, and jobs, plus the public webhook and health endpoints."
 sidebar:
   order: 3
 ---

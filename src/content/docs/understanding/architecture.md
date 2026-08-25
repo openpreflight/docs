@@ -56,11 +56,11 @@ that database. See [configuration.md](/start/configuration/).
 5. The runner mints an installation token from the payload's installation id,
    creates the Check Run, fetches that commit (fork PRs fall back to
    `refs/pull/N/head`), detaches, strips the remote, runs the pipeline under a
-   timeout — `docker run` when `runtime` is set or the job is a fork, otherwise
-   a local process — completes the Check Run, keeps the full log locally.
+   timeout: `docker run` when `runtime` is set or the job is a fork, otherwise
+   a local process. It completes the Check Run and keeps the full log locally.
 
-`GET /runs/{id}` is the Check Run `details_url`. GitHub never fetches it — the
-reader's browser does — so it needs a session unless the binding opted into
+`GET /runs/{id}` is the Check Run `details_url`. GitHub never fetches it. The
+reader's browser does, so it needs a session unless the binding opted into
 shareable logs. See [Logs](/using/logs/).
 
 GitHub's **Redeliver** button reuses the delivery id, so dedup applies only
@@ -70,16 +70,16 @@ honoured only for this App's own checks.
 
 ## Why this shape
 
-- [ADR 001](/adr/001-database/) — SQLite in-process, secrets encrypted at rest.
-- [ADR 002](/adr/002-authentication/) — local admin + opaque sessions, not GitHub OAuth.
-- [ADR 003](/adr/003-github-app/) — our GitHub App, not Coolify's GitHub connector.
-- [ADR 004](/adr/004-docker-executor/) — `runtime:` is `docker run`; fork PRs stay off until that works.
-- [ADR 005](/adr/005-check-suite-gating/) — `check_suite`/`check_run` only, one Check Run per job, one live run per commit.
+- [ADR 001](/adr/001-database/): SQLite in-process, secrets encrypted at rest.
+- [ADR 002](/adr/002-authentication/): local admin + opaque sessions, not GitHub OAuth.
+- [ADR 003](/adr/003-github-app/): our GitHub App, not Coolify's GitHub connector.
+- [ADR 004](/adr/004-docker-executor/): `runtime:` is `docker run`; fork PRs stay off until that works.
+- [ADR 005](/adr/005-check-suite-gating/): `check_suite`/`check_run` only, one Check Run per job, one live run per commit.
 
 ### Prior art
 
 The trigger model is Zuul's, at a single server's scale: gate on the commit,
 queue against an immutable SHA, attach logs to the run, write the result back to
-the forge. Zuul's architecture — ZooKeeper, Nodepool, Ansible, a scheduler apart
-from its executors — is explicitly not adopted. [ADR 005](/adr/005-check-suite-gating/)
+the forge. Zuul's architecture (ZooKeeper, Nodepool, Ansible, a scheduler apart
+from its executors) is explicitly not adopted. [ADR 005](/adr/005-check-suite-gating/)
 records what is borrowed, what is rejected, and where the ceiling is.

@@ -4,7 +4,7 @@ The documentation site, published at **https://docs.openpreflight.xyz**.
 Astro + Starlight + Tailwind v4.
 
 This repository is the source of truth for the documentation. The markdown
-under `src/content/docs/` is hand-authored and committed — nothing is
+under `src/content/docs/` is hand-authored and committed. Nothing is
 generated, and nothing is synced in from
 [openpreflight/openpreflight](https://github.com/openpreflight/openpreflight).
 
@@ -43,7 +43,7 @@ path. CI runs both.
 
 ## Writing
 
-- Links between pages are site routes, not file paths — `/start/quickstart/`,
+- Links between pages are site routes, not file paths: `/start/quickstart/`,
   not `../start/quickstart.md`.
 - Links to files that live in the code repo (`README.md`, `SECURITY.md`,
   `examples/.ci.yml`) are absolute GitHub URLs.

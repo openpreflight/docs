@@ -1,6 +1,6 @@
 ---
 title: "Troubleshooting"
-description: "Common failure modes — process won't start, no Check Run, skipped checks, fork PRs, Docker socket errors — with the page that owns each fix."
+description: "Common failure modes (process won't start, no Check Run, skipped checks, fork PRs, Docker socket errors) and the page that owns each fix."
 sidebar:
   order: 4
 ---
@@ -14,7 +14,7 @@ here invents a failure mode; every entry is already documented elsewhere.
 refuses to boot by design.
 
 **Fix:** Generate a key (`openssl rand -base64 48`), set it as an env var /
-secret, and restart. Keep it forever — losing it makes stored PEMs and tokens
+secret, and restart. Keep it forever. Losing it makes stored PEMs and tokens
 unreadable.
 
 See [Configuration](/start/configuration/).
@@ -42,7 +42,7 @@ See [Enable repos](/setup/bindings/) and
 
 ## Check reports skipped, not failed
 
-**Cause:** Nothing resolved to run — no pipeline file, no binding command
+**Cause:** Nothing resolved to run: no pipeline file, no binding command
 overrides, and no `package.json` scripts that the Node defaults would pick up.
 
 **Fix:** Commit a [pipeline](/using/pipelines/) (or set binding overrides).

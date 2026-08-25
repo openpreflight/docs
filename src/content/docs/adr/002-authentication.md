@@ -25,7 +25,7 @@ Login issues an opaque 32-byte session token stored in SQLite (14-day TTL):
 - Browser: `ci_session` HttpOnly cookie, `Secure` behind HTTPS,
   `SameSite=Lax`. Cookie writes require a CSRF token (`ci_csrf` cookie +
   form field / `X-CSRF-Token`).
-- CLI: the same token as `Authorization: Bearer …` from `POST /api/v1/login`.
+- CLI: the same token as `Authorization: Bearer <token>` from `POST /api/v1/login`.
   Bearer callers have no ambient cookie, so CSRF is skipped.
 
 There are no separate API tokens, no GitHub OAuth for the UI, and no roles.
