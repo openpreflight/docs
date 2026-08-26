@@ -16,7 +16,7 @@ export default defineConfig({
     starlight({
       title: 'openpreflight',
       description:
-        'Self-hosted GitHub Check Runs CI for private repos. One Go binary, one SQLite file.',
+        'A small CI provider for private repos. One Go binary, one SQLite file: register a GitHub App, enable your repos, and get one Check Run per commit.',
       logo: {
         light: './src/assets/logo-light.svg',
         dark: './src/assets/logo-dark.svg',
