@@ -2,7 +2,7 @@
 title: "Enable repos"
 description: "Enable the private repos that should receive Check Runs; the bindings table is the allow-list."
 sidebar:
-  order: 3
+  order: 2
 ---
 **Repos** → pick the CI App, optionally pick a Coolify instance as the source of
 the repo list, then check the repositories to run checks for. Unchecking a repo

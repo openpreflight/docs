@@ -77,9 +77,16 @@ See [Pipelines](/using/pipelines/).
 **Cause:** `DOCKER_GID` does not match the host socket's group. The image runs
 as uid 10001 and joins that group via Compose `group_add`.
 
-**Fix:** On the host, set `DOCKER_GID` to
-`stat -c %g /var/run/docker.sock` (Linux) or
-`stat -f %g /var/run/docker.sock` (macOS), then recreate the container.
+**Fix:** Read the gid the container sees, then set `DOCKER_GID` to it and
+recreate the container:
+
+```bash
+docker compose exec openpreflight stat -c %g /var/run/docker.sock
+```
+
+On Docker Desktop the answer is `0`. Do not use the host's `stat` on macOS:
+`/var/run/docker.sock` is a symlink into `~/.docker`, so it reports a group
+that means nothing inside the container.
 
 See [Deployment](/understanding/deployment/).
 
