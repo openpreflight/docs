@@ -72,7 +72,6 @@ Single row, `id = 1`. Changed from **Settings** in the UI or
 | `default_timeout_seconds` | `900` | Per-job timeout |
 | `max_concurrent_jobs` | `1` | Jobs this process runs at once. See above |
 | `max_log_bytes` | 10 MiB | The log stops growing at this size; the run continues |
-| `max_workspace_bytes` | 1 GiB | Accepted and stored, **not enforced**. No code reads it; a large checkout is not stopped |
 | `log_retention_days` | `14` | Prune old logs and job rows |
 | `default_runtime` | empty | Docker image used when a fork job's pipeline has no `runtime:` |
 | `skip_fork_prs` | `true` | Fork PRs are ignored. Saving `false` requires Docker plus `default_runtime`. |

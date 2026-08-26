@@ -1,6 +1,6 @@
 ---
 title: "FAQ"
-description: "Short answers on GitHub Apps, Coolify, check-suite gating, GitHub Enterprise, monorepos, dogfooding, and what v1 commits to."
+description: "Short answers on GitHub Apps, Coolify, check-suite gating, GitHub Enterprise, monorepos, dogfooding, and what v1 leaves out."
 sidebar:
   order: 4
 ---
@@ -90,28 +90,3 @@ check, it does not publish artifacts.
 Nothing stops it from checking a public repo, incidentally. The repository's
 visibility is read from the webhook payload but never gates anything; "private
 repos" is what it is aimed at, not a restriction it enforces.
-
-## What does v1 commit to?
-
-Concretely, as of 1.0.0:
-
-- **Releases are tagged `vMAJOR.MINOR.PATCH`** and published as an image
-  (`ghcr.io/openpreflight/openpreflight`, tagged full version, major.minor, and
-  `latest`) plus linux/amd64 and linux/arm64 binaries.
-- **The JSON API is `/api/v1/`.** A breaking change to it would be `/api/v2/`,
-  not a change under the existing prefix. The surface is in
-  [API](/using/api/).
-- **`default_check_name` does not change on an existing database.** GitHub
-  matches a required status check by name, so renaming a live install's check
-  would strand its branch protection rule. New installs get the current
-  default; existing ones keep what they have.
-- **Migrations are append-only and there is no rollback.** Once a version has
-  booted against your database, downgrading is not supported. See
-  [Operations](/understanding/operations/).
-- **`CI_SECRET_KEY` stays the key.** No release will make an existing key
-  unreadable without a documented rotation path.
-
-TODO(vatsal): decide and state the actual compatibility promise for 1.x —
-whether minor releases may change settings defaults, remove settings fields, or
-change the pipeline file schema, and what deprecation notice a breaking change
-gets.

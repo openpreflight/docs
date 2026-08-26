@@ -61,25 +61,28 @@ will fail its next `test` with a decryption error rather than at boot.
 
 **Nothing in progress survives.** There is no checkpointing: a job that was
 half way through `npm test` does not resume, and there is no partial result.
+What differs is how it is recorded, and that depends on how the process died.
 
-On the next boot the runner requeues anything left `in_progress` and runs it
-again from the beginning — a fresh clone and every step. That is the usual
-outcome of a redeploy, an upgrade, a crash, or `docker compose restart`.
+**On a signal** — `docker compose stop`, `restart`, a redeploy, an upgrade,
+Ctrl-C. The process stops accepting requests, then waits up to 30 seconds for
+every running job to notice the cancelled context, write itself `cancelled`,
+and mark its Check Run cancelled. A cancelled job is **not** retried.
 
-The exception is a job that notices the cancelled context before the process
-exits. That one finishes as `cancelled`, and a cancelled job is **not**
-retried. Which of the two happens is a race between the job unwinding and the
-process exiting, and the process does not wait for the runner, so the requeue
-is the common case and the cancel is the rare one.
+**On a kill** — SIGKILL, an OOM, a crash, or a job still unwinding when the 30
+seconds run out. The row is left `in_progress`, and the next boot requeues it
+and runs it again from the beginning: a fresh clone and every step.
+
+Compose sets `stop_grace_period: 30s` to match the wait. Shortening it means the
+runtime kills the process mid-cancel and you get the second case instead.
 
 Practical consequences:
 
-- A requeued job opens a **new** Check Run rather than reusing the one the
-  interrupted attempt created, so the commit collects a second check with the
-  same name. Branch protection reads the newer one.
-- A job cancelled by a restart leaves a cancelled check that nothing will retry
-  on its own. Re-run it from the job page (`POST /api/v1/jobs/{id}/rerun`) or
-  use GitHub's **Re-run**.
+- A restart normally leaves a **cancelled** check that nothing will retry on its
+  own. Re-run it from the job page (`POST /api/v1/jobs/{id}/rerun`) or use
+  GitHub's **Re-run**.
+- A requeued job — the kill case — opens a **new** Check Run rather than
+  reusing the one the interrupted attempt created, so the commit collects a
+  second check with the same name. Branch protection reads the newer one.
 - Deploy when the queue is empty if you care. `GET /api/v1/jobs` shows what is
   queued or running.
 
@@ -121,6 +124,9 @@ The policy that follows from that:
 An hourly pass prunes expired sessions, then deletes job rows and their log
 files older than `log_retention_days` (default 14). Queued and running jobs are
 never pruned. Nothing else is cleaned up automatically — see
-[Configuration](/start/configuration/) for the settings that govern it, and
-note that `max_workspace_bytes` is stored but not enforced, so a checkout large
-enough to fill the disk will fill it.
+[Configuration](/start/configuration/) for the settings that govern it.
+
+There is no cap on checkout size. A per-job workspace is removed when the job
+ends, but a repository large enough to fill the disk will fill it while it
+runs. Size `WORKSPACE_DIR` for your largest checkout times
+`max_concurrent_jobs`.
