@@ -7,13 +7,19 @@ sidebar:
 The image is a static Go binary plus `git`, Node, and `docker-cli`. It runs as
 uid 10001. `tini` is the entrypoint so pipeline shells get reaped.
 
+Two compose files ship. `compose.prod.yaml` pulls the published image and needs
+no checkout; `compose.yaml` is `build: .` and is the contributor path.
+
 ```bash
+curl -O https://raw.githubusercontent.com/openpreflight/openpreflight/main/compose.prod.yaml
 export CI_SECRET_KEY="$(openssl rand -base64 48)"   # required, keep it forever
 export CI_PUBLIC_BASE_URL="https://ci.example.com"  # optional seed
-docker compose up --build
+docker compose -f compose.prod.yaml up -d
 ```
 
-Compose maps `8080:8080` and three mounts:
+Set `OPENPREFLIGHT_VERSION` to pin a release; the default is `latest`.
+
+Both files map `8080:8080` and take three mounts:
 
 | Volume | Mount | Must persist |
 |---|---|---|
@@ -21,10 +27,24 @@ Compose maps `8080:8080` and three mounts:
 | `ci-workspace` | `/workspace` | no, but a volume keeps checkouts off the container's writable layer |
 | host socket | `/var/run/docker.sock` | no; needed for `runtime:` and fork PRs |
 
-`group_add: ${DOCKER_GID:-998}` puts uid 10001 in the socket's group. On the
-host, `DOCKER_GID` is usually `stat -f %g /var/run/docker.sock` (macOS) or
-`stat -c %g /var/run/docker.sock` (Linux). Job containers never receive that
-socket; see [ADR 004](/adr/004-docker-executor/).
+`group_add: ${DOCKER_GID:-998}` puts uid 10001 in the socket's group. The value
+you need is the gid **the container sees**, which is not always what the host
+reports. Read it from inside:
+
+```bash
+docker compose exec openpreflight stat -c %g /var/run/docker.sock
+```
+
+On Linux with a native engine that matches the host's
+`stat -c %g /var/run/docker.sock`, and the default of `998` is often already
+right. On Docker Desktop it is **`0`**: the socket is `root:root` inside the
+VM, and the host path is a symlink into `~/.docker`, so the host's `stat`
+reports an unrelated group. Set `DOCKER_GID=0` there and recreate the
+container.
+
+Nothing else needs this. The service boots and reports checks with an
+unreachable socket; only `runtime:` jobs and fork PRs fail. Job containers
+never receive that socket; see [ADR 004](/adr/004-docker-executor/).
 
 To run jobs on another Docker engine (including a Coolify server's), set
 `CI_DOCKER_HOST` (else `DOCKER_HOST`) to that daemon. That is Docker's remote
@@ -60,11 +80,11 @@ has one webhook URL; repointing it steals Coolify's deploys. See
 1. Complete setup (admin password + public base URL) if you did not bootstrap.
    See [Quickstart](/start/quickstart/).
 2. [Register a GitHub App](/setup/github-app/) and paste it under **GitHub Apps**.
-3. Optionally [add a Coolify instance](/setup/coolify/) (team token) as a
-   repo-picker source, or to install this worker.
-4. [Enable bindings](/setup/bindings/). Only enable private repos you trust: a
+3. [Enable bindings](/setup/bindings/). Only enable private repos you trust: a
    pipeline runs the repo's own commands in this process, or in a sibling
    container when `runtime:` is set.
+4. Optionally [add a Coolify instance](/setup/coolify/) (team token) as a
+   repo-picker source, or to install this worker.
 
 ## Rotating `CI_SECRET_KEY`
 
@@ -85,4 +105,5 @@ Copy `/data` (or the `ci-data` volume) and keep `CI_SECRET_KEY` with it. The
 database without the key is not enough to recover PEMs and tokens. The key
 without the database is not enough to recover configuration.
 
-Redeploys interrupt in-flight jobs; on start the runner requeues them.
+Procedure, restore, upgrades, and what a redeploy does to a running job are in
+[Operations](/understanding/operations/).

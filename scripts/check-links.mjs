@@ -12,12 +12,13 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const dist = join(root, 'dist');
 
 const SITE_DEFAULT_DESCRIPTION =
-  'Self-hosted GitHub Check Runs CI for private repos. One Go binary, one SQLite file.';
+  'A small CI provider for private repos. One Go binary, one SQLite file: register a GitHub App, enable your repos, and get one Check Run per commit.';
 
 const required = [
   'index.html',
   'start/quickstart/index.html',
   'start/configuration/index.html',
+  'start/comparison/index.html',
   'start/faq/index.html',
   'setup/github-app/index.html',
   'setup/coolify/index.html',
@@ -29,6 +30,7 @@ const required = [
   'understanding/architecture/index.html',
   'understanding/security-model/index.html',
   'understanding/deployment/index.html',
+  'understanding/operations/index.html',
   'contributing/development/index.html',
   'adr/005-check-suite-gating/index.html',
   'favicon.svg',

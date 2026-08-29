@@ -9,6 +9,23 @@ else is a row in SQLite, edited in the UI or over the JSON API. For a
 procedural first run, see [Quickstart](/start/quickstart/). Pipeline file
 semantics are also covered under [Pipelines](/using/pipelines/).
 
+## One job at a time, by default
+
+`max_concurrent_jobs` defaults to **1**. A fresh install runs one job at a
+time; a second commit waits for the first to finish. There is no env var for
+it — it is a settings row, so it can only be changed after the process is up,
+under **Settings** or `PATCH /api/v1/settings`.
+
+Size for that before you install. One binary on one box with a serial runner
+suits a handful of repos that push a few times an hour. It does not suit a
+busy monorepo, and it is not a scheduler: raising the number raises how many
+jobs this one process runs at once, on this one machine. Jobs never spread
+across hosts. Every concurrent job also holds its own checkout under
+`WORKSPACE_DIR` and its own log under `DATA_DIR`, so disk scales with the
+number too.
+
+The UI caps the field at 32. The API does not.
+
 ## Environment
 
 | Variable | Required | Purpose |
@@ -24,6 +41,12 @@ semantics are also covered under [Pipelines](/using/pipelines/).
 
 There is no `GITHUB_APP_ID` and no `CI_ALLOWED_REPOS`. Those live in
 `github_apps` and `repo_bindings`.
+
+`DOCKER_GID` is not in the table because the process never reads it. It is a
+Compose variable: it puts uid 10001 in the docker socket's group so `runtime:`
+jobs and fork PRs can reach the engine. The default of `998` suits a typical
+Linux docker group and does **not** work on Docker Desktop, where the socket is
+gid 0 inside the container. See [Deployment](/understanding/deployment/).
 
 Generate a key with:
 
@@ -47,9 +70,8 @@ Single row, `id = 1`. Changed from **Settings** in the UI or
 | `default_check_name` | `openpreflight` | Check Run name unless the App or binding overrides. New installs only. An existing database keeps the name it already has, because GitHub matches a required status check by name and renaming one strands its branch protection rule |
 | `default_pipeline_file` | `.ci.yml` | Path in the repo |
 | `default_timeout_seconds` | `900` | Per-job timeout |
-| `max_concurrent_jobs` | `1` | Runner concurrency |
-| `max_log_bytes` | 10 MiB | Cap on the on-disk log |
-| `max_workspace_bytes` | 1 GiB | Checkout size cap |
+| `max_concurrent_jobs` | `1` | Jobs this process runs at once. See above |
+| `max_log_bytes` | 10 MiB | The log stops growing at this size; the run continues |
 | `log_retention_days` | `14` | Prune old logs and job rows |
 | `default_runtime` | empty | Docker image used when a fork job's pipeline has no `runtime:` |
 | `skip_fork_prs` | `true` | Fork PRs are ignored. Saving `false` requires Docker plus `default_runtime`. |
@@ -88,3 +110,6 @@ Resolution order, highest first:
 3. Node defaults inferred from `package.json`: `npm ci` / `pnpm` / `yarn` by
    lockfile, then `test` and `build` **only if those scripts exist**
 4. nothing to run → the check is reported as **skipped**, not failed
+
+Backups, upgrades, and what a restart does to a running job are in
+[Operations](/understanding/operations/).

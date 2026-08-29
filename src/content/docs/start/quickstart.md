@@ -22,18 +22,35 @@ App. Full environment and settings detail lives in
 
 ## Run it
 
+`compose.prod.yaml` is standalone: it pulls the published image, so there is
+nothing to clone.
+
 ```bash
-export CI_SECRET_KEY="$(openssl rand -base64 48)"   # required, keep it forever
-export CI_PUBLIC_BASE_URL="https://ci.example.com"  # optional seed
+curl -O https://raw.githubusercontent.com/openpreflight/openpreflight/main/compose.prod.yaml
+export CI_SECRET_KEY="$(openssl rand -base64 48)"
+docker compose -f compose.prod.yaml up -d
+```
+
+`CI_SECRET_KEY` is the only variable you must set; the process refuses to start
+without it. Keep it forever. Losing it makes stored PEMs and tokens unreadable.
+Everything else either has a default or is asked for in the wizard. See
+[Configuration](/start/configuration/) for the full env table and key rotation.
+
+Pin a version with `OPENPREFLIGHT_VERSION=1.0.0` rather than editing the file.
+
+To build from source instead — this is the contributor path, and `compose.yaml`
+is `build: .`, so it needs the checkout:
+
+```bash
+git clone https://github.com/openpreflight/openpreflight
+cd openpreflight
+export CI_SECRET_KEY="$(openssl rand -base64 48)"
 docker compose up --build
 ```
 
-`CI_SECRET_KEY` is required; the process refuses to start without it. Keep it
-forever. Losing it makes stored PEMs and tokens unreadable. See
-[Configuration](/start/configuration/) for the full env table and key rotation.
-
-Compose, volumes, and reverse-proxy notes are in
-[Deployment](/understanding/deployment/).
+If you use `runtime:` or fork PRs, you also need `DOCKER_GID`. See
+[Deployment](/understanding/deployment/), which covers compose, volumes, the
+docker socket, and reverse-proxy notes.
 
 ## First boot
 
@@ -47,10 +64,10 @@ wizard. It is ignored once a user exists.
 ## Setup order
 
 1. [Register a GitHub App](/setup/github-app/) and paste it under **GitHub Apps**.
-2. Optionally [add a Coolify instance](/setup/coolify/) as a repo-picker source
-   or to install this worker.
-3. [Enable repo bindings](/setup/bindings/). The bindings table is the
+2. [Enable repo bindings](/setup/bindings/). The bindings table is the
    allow-list.
+3. Optionally [add a Coolify instance](/setup/coolify/) as a repo-picker source
+   or to install this worker.
 
 Then commit a [pipeline](/using/pipelines/) (or rely on Node defaults) and push.
 

@@ -1,6 +1,7 @@
 node_modules/
 dist/
 .astro/
+graphify-out/
 .env
 .env.production
 .DS_Store

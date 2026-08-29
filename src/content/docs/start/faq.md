@@ -1,12 +1,13 @@
 ---
 title: "FAQ"
-description: "Short answers to why a GitHub App is required, why Coolify is optional, why gating is on the check suite, and what v1 deliberately leaves out."
+description: "Short answers on GitHub Apps, Coolify, check-suite gating, GitHub Enterprise, monorepos, dogfooding, and what v1 leaves out."
 sidebar:
-  order: 3
+  order: 4
 ---
 
-Positioning questions the homepage raises; each answer links the page or ADR
-that argues it in full.
+Positioning questions the homepage raises, and the ones people ask before
+installing. Each answer links the page or ADR that argues it in full. For how
+this sits against other CI, see [Comparison](/start/comparison/).
 
 ## Why a GitHub App and not OAuth?
 
@@ -44,3 +45,48 @@ engine via `CI_DOCKER_HOST`, not Coolify's API as a job runner.
 
 See [Architecture](/understanding/architecture/) and the homepage's "What it
 isn't" list.
+
+## Does it work with GitHub Enterprise Server?
+
+The plumbing is there and it has not been tested against a real instance.
+
+Each App row carries an **API URL**, which defaults to
+`https://api.github.com` and is the field to change for Enterprise. The git
+origin is derived from it, so `https://ghe.example.com/api/v3` clones from
+`https://ghe.example.com`. Nothing else in the request path assumes
+github.com.
+
+What is untested is everything specific to a GHE deployment: its certificate
+chain, its API version skew, and Check Runs behaviour on older releases. If you
+try it, an issue saying which version and what broke is useful.
+
+## Does it work for monorepos?
+
+It runs, but it will run everything on every push.
+
+There is no path filter. A binding matches a repo and optionally a branch list
+(exact names, or a `release/*` prefix), and that is the whole filter. A commit
+touching one directory runs the same `install`, `test`, and `build` as a commit
+touching all of them.
+
+A plan is also exactly three steps in a fixed order, so the usual monorepo
+answer — one job per affected package, in parallel — has nothing to express
+itself with. Combined with `max_concurrent_jobs` defaulting to 1, a busy
+monorepo is the case this is worst at. Do the path filtering inside your own
+`test` command, or use a tool built for it; see
+[Comparison](/start/comparison/).
+
+## Does the project use itself for CI?
+
+No. `openpreflight/openpreflight` runs GitHub Actions — `ci.yml` for vet, test,
+and a Docker build, and `release.yml` on a `v*` tag.
+
+Two reasons, both honest. Dogfooding needs a permanently reachable HTTPS
+instance and a GitHub App registered against the org, which is infrastructure
+the project does not run yet. And releases have to build multi-arch images and
+attach binaries, which is not something this tool does at all — it reports a
+check, it does not publish artifacts.
+
+Nothing stops it from checking a public repo, incidentally. The repository's
+visibility is read from the webhook payload but never gates anything; "private
+repos" is what it is aimed at, not a restriction it enforces.
