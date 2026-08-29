@@ -1,6 +1,6 @@
 ---
 title: "FAQ"
-description: "Short answers on GitHub Apps, Coolify, check-suite gating, GitHub Enterprise, monorepos, dogfooding, and what v1 leaves out."
+description: "Short answers on the v1.0.0 release, GitHub Apps, Coolify, check-suite gating, GitHub Enterprise, monorepos, dogfooding, and what v1 leaves out."
 sidebar:
   order: 4
 ---
@@ -8,6 +8,14 @@ sidebar:
 Positioning questions the homepage raises, and the ones people ask before
 installing. Each answer links the page or ADR that argues it in full. For how
 this sits against other CI, see [Comparison](/start/comparison/).
+
+## Is v1 released?
+
+Yes. [v1.0.0](https://github.com/openpreflight/openpreflight/releases/tag/v1.0.0)
+was tagged 29 August 2026. The
+[changelog](https://github.com/openpreflight/openpreflight/blob/v1.0.0/CHANGELOG.md)
+is the feature list. [What is deliberately not in v1](#what-is-deliberately-not-in-v1)
+is still the product boundary — those things are out of scope, not unfinished.
 
 ## Why a GitHub App and not OAuth?
 
@@ -81,11 +89,11 @@ monorepo is the case this is worst at. Do the path filtering inside your own
 No. `openpreflight/openpreflight` runs GitHub Actions — `ci.yml` for vet, test,
 and a Docker build, and `release.yml` on a `v*` tag.
 
-Two reasons, both honest. Dogfooding needs a permanently reachable HTTPS
-instance and a GitHub App registered against the org, which is infrastructure
-the project does not run yet. And releases have to build multi-arch images and
-attach binaries, which is not something this tool does at all — it reports a
-check, it does not publish artifacts.
+A public demo instance at [ci.openpreflight.xyz](https://ci.openpreflight.xyz)
+runs Check Runs for [`openpreflight/demo`](https://github.com/openpreflight/demo).
+That is proof the binary works, not CI for this repository. Releases have to
+build multi-arch images and attach binaries, which this tool does not do — it
+reports a check, it does not publish artifacts.
 
 Nothing stops it from checking a public repo, incidentally. The repository's
 visibility is read from the webhook payload but never gates anything; "private

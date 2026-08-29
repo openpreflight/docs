@@ -36,7 +36,9 @@ without it. Keep it forever. Losing it makes stored PEMs and tokens unreadable.
 Everything else either has a default or is asked for in the wizard. See
 [Configuration](/start/configuration/) for the full env table and key rotation.
 
-Pin a version with `OPENPREFLIGHT_VERSION=1.0.0` rather than editing the file.
+**v1.0.0** is the tagged v1 release. Linux binaries are on the
+[GitHub Release](https://github.com/openpreflight/openpreflight/releases/tag/v1.0.0).
+Pin the image with `OPENPREFLIGHT_VERSION=1.0.0` rather than editing the file.
 
 To build from source instead — this is the contributor path, and `compose.yaml`
 is `build: .`, so it needs the checkout:
