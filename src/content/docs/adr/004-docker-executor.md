@@ -40,7 +40,9 @@ UUID" job API. The remote-host path is whatever Docker already understands
 
 - The worker image ships `docker-cli`. Compose mounts `/var/run/docker.sock`
   and adds the socket's group (`DOCKER_GID`) so uid 10001 can talk to the
-  engine. Job containers still do not see that socket.
+  engine. Job containers still do not see that socket. Volume sources passed
+  to `docker run` are host paths: `/proc/self/mountinfo` (or `CI_WORKSPACE_HOST`)
+  translates `WORKSPACE_DIR` when this process is a container.
 - Operators who never set `runtime:` and never enable fork PRs still run as
   before, as a process.
 - A Coolify API token cannot replace `CI_DOCKER_HOST`. Remote jobs are Docker

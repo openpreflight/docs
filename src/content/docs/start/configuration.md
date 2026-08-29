@@ -35,6 +35,7 @@ The UI caps the field at 32. The API does not.
 | `CI_PUBLIC_BASE_URL` | no | Seeds the public base URL on first boot only; the UI owns it afterwards. |
 | `CI_BOOTSTRAP_ADMIN_PASSWORD` | no | Creates the `admin` user on first boot so a headless deploy can be driven over the API. Ignored once a user exists. |
 | `CI_DOCKER_HOST` | no | Docker engine for `runtime:` and fork PRs. Falls back to `DOCKER_HOST`, then the engine default (typically the mounted socket). |
+| `CI_WORKSPACE_HOST` | no | Host path that corresponds to `WORKSPACE_DIR`, used as the `docker run -v` source. Needed only when mount-table translation is wrong (unusual volume drivers, or a remote engine). |
 | `LISTEN_ADDR` | no | Default `:8080`. |
 | `DATA_DIR` | no | Default `/data`: `ci.db` and `logs/`. Must be a persistent volume. |
 | `WORKSPACE_DIR` | no | Default `/workspace`: per-job checkouts, disposable. |

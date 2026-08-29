@@ -72,6 +72,20 @@ need process execution.
 
 See [Pipelines](/using/pipelines/).
 
+## `runtime:` job has an empty `/work`
+
+**Cause:** The worker is a container using the host `docker.sock`. `docker run
+-v /workspace/…:/work` is interpreted on the **host**, where that path does
+not hold the checkout. `npm ci` then fails with a missing `package-lock.json`
+(or the job looks like it cloned nothing).
+
+**Fix:** Upgrade to a build that rewrites the volume source from
+`/proc/self/mountinfo`. If that still misses, set `CI_WORKSPACE_HOST` to the
+host directory mounted at `WORKSPACE_DIR` and recreate the container.
+
+See [Deployment](/understanding/deployment/) and
+[Configuration](/start/configuration/).
+
 ## Permission denied on the docker socket
 
 **Cause:** `DOCKER_GID` does not match the host socket's group. The image runs

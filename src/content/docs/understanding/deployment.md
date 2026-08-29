@@ -42,6 +42,13 @@ VM, and the host path is a symlink into `~/.docker`, so the host's `stat`
 reports an unrelated group. Set `DOCKER_GID=0` there and recreate the
 container.
 
+When this process is itself a container and `docker.sock` is the host engine,
+`docker run -v` must use the **host** path for `WORKSPACE_DIR` (the directory
+behind `/workspace` in `/proc/self/mountinfo`). The worker rewrites that
+itself. If a `runtime:` job logs `runtime … via docker` then fails because
+`package-lock.json` is missing, the rewrite missed: set `CI_WORKSPACE_HOST`
+to the host directory mounted at `WORKSPACE_DIR` and recreate.
+
 Nothing else needs this. The service boots and reports checks with an
 unreachable socket; only `runtime:` jobs and fork PRs fail. Job containers
 never receive that socket; see [ADR 004](/adr/004-docker-executor/).
