@@ -15,8 +15,7 @@ fetches it. The reader's browser does**, so it requires a session by default.
 A binding can opt into shareable logs, which makes that one job's page readable
 by anyone holding the link. The same rule applies to
 `GET /api/v1/jobs/{id}/logs`. Job ids are random UUIDs, but treat such a link as
-a secret. Live examples (real Check Runs on a self-hosted instance) are on the
-[marketing site demo section](https://openpreflight.xyz/#demo).
+a secret.
 
 Retention and size caps are settings; see
 [Configuration](/start/configuration/).

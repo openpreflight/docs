@@ -35,19 +35,27 @@ with a test that would have failed before the change.
 
 ## UI / CSS
 
-Templates live in `internal/web/templates`. Styles are Tailwind, compiled into
-`internal/web/static/app.css` and embedded at build time. There is no SPA and
-almost no JavaScript.
+Pages are **templ** plus copied [shadcn-templ](https://shadcn-templ.com/)
+components under `internal/web/components`. Styles are Tailwind v4 (nova / olive,
+forest green tokens), compiled into `internal/web/assets/css/output.css` and
+embedded at build time. There is no SPA. JavaScript is the official shadcn-templ
+bundle (`GET /components/{bundle}`) plus a small theme script (system / light /
+dark). Form posts stay native.
 
-After editing templates or `internal/web/styles/input.css`:
+The authenticated layout is the shadcn Sidebar (Workspace / Setup / Settings)
+with Inset breadcrumbs. Login and setup are a centered card (`max-w-[440px]`).
+Do not add HTMX, Alpine, React, Vue, or DaisyUI. After editing `*.templ` or
+`internal/web/assets/css/globals.css`:
 
 ```bash
+templ generate ./internal/web/...
 cd internal/web && npm ci && npm run css
 ```
 
-The Dockerfile always rebuilds CSS in a Node stage so a forgotten `npm run css`
-cannot ship stale styles. Local `go run` uses whatever is already in
-`static/app.css`.
+The Dockerfile always rebuilds CSS in a Node stage and runs `templ generate`
+in the Go stage so a forgotten local generate cannot ship stale markup.
+Local `go run` uses whatever is already in `assets/css/output.css` and the
+committed `*_templ.go` files.
 
 ## Layout
 

@@ -89,9 +89,9 @@ monorepo is the case this is worst at. Do the path filtering inside your own
 No. `openpreflight/openpreflight` runs GitHub Actions — `ci.yml` for vet, test,
 and a Docker build, and `release.yml` on a `v*` tag.
 
-A public demo instance at [ci.openpreflight.xyz](https://ci.openpreflight.xyz)
-runs Check Runs for [`openpreflight/demo`](https://github.com/openpreflight/demo).
-That is proof the binary works, not CI for this repository. Releases have to
+A self-hosted instance at [ci.openpreflight.xyz](https://ci.openpreflight.xyz)
+can check public repos the same way it checks private ones. That is proof the
+binary works, not CI for this repository. Releases have to
 build multi-arch images and attach binaries, which this tool does not do — it
 reports a check, it does not publish artifacts.
 

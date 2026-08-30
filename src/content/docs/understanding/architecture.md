@@ -24,7 +24,7 @@ Browser / CLI ──session/Bearer──► api │                ├── git
 |---|---|
 | `cmd/server` | Load env, open SQLite, rotate secrets if asked, bootstrap admin, serve HTTP, start the runner |
 | `internal/api` | Routes, session/CSRF, HTML and JSON from the same handlers |
-| `internal/web` | Server-rendered templates; Tailwind compiled into `static/app.css` |
+| `internal/web` | Server-rendered templ + copied shadcn-templ components; Tailwind compiled into `assets/css/output.css` |
 | `internal/store` | SQLite (`modernc.org/sqlite`), migrations, bindings, jobs |
 | `internal/secret` | Seal/open secret columns |
 | `internal/config` | Process env only: listen addr, dirs, `CI_SECRET_KEY`, `CI_DOCKER_HOST` |
