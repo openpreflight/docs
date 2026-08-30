@@ -1,0 +1,4 @@
+runtime: node:22
+install: npm ci
+test: npm run build && npm run check-links
+timeout: 15m
