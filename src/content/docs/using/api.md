@@ -70,6 +70,7 @@ aliases that mirror `PATCH` / `DELETE` for the HTML UI are omitted.
 | `GET` | `/api/v1/jobs` | List jobs |
 | `GET` | `/api/v1/jobs/{id}` | Job detail |
 | `GET` | `/api/v1/jobs/{id}/logs` | Full log (session, or shareable opt-in) |
+| `GET` | `/api/v1/jobs/{id}/logs/stream` | Live log (SSE; session, or shareable opt-in) |
 | `POST` | `/api/v1/jobs/{id}/rerun` | New job, new Check Run |
 | `POST` | `/api/v1/jobs/{id}/cancel` | Cancel a running job |
 
