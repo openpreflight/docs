@@ -1,6 +1,6 @@
 ---
 title: "Register a GitHub App"
-description: "Register a GitHub App: the permissions, events, and webhook URL openpreflight needs, and why an App is required."
+description: "Create a GitHub App with GitHub's review screen, or paste credentials. Permissions, events, and webhook URL."
 sidebar:
   order: 1
 ---
@@ -11,9 +11,25 @@ pipeline and its manifest has no `checks` permission. Coolify is used here for
 server inventory and as a repository picker; the checks come from an App you
 register. See [ADR 003](/adr/003-github-app/).
 
-## Create the App on GitHub
+Set the **public base URL** in Settings first so GitHub can reach the callback
+and the webhook.
 
-GitHub → Settings → Developer settings → **GitHub Apps** → New GitHub App.
+## Create with GitHub
+
+On the **GitHub Apps** page, **Create with GitHub**. GitHub shows a review
+screen with the permissions this worker needs (`checks: write`,
+`contents: read`, `metadata: read`; Check suite and Check run events). Confirm
+it; we store the App ID, slug, PEM, and webhook secret GitHub returns, and
+point the webhook at `{public base URL}/webhook/{slug}`.
+
+The PEM and the webhook secret are encrypted at rest and never shown again.
+
+This path is github.com only. GitHub Enterprise: paste credentials (below).
+
+## Advanced — paste credentials
+
+GitHub → Settings → Developer settings → **GitHub Apps** → New GitHub App,
+then paste name, slug, App ID, webhook secret, and PEM.
 
 | Setting | Value |
 |---|---|
@@ -23,11 +39,8 @@ GitHub → Settings → Developer settings → **GitHub Apps** → New GitHub Ap
 | Subscribe to events | Check suite, Check run |
 
 Generate a private key, install the App on the account or org that owns the
-repos, then add it under **GitHub Apps** in openpreflight: name, slug, App ID,
-webhook secret, PEM. Test mints an App JWT and lists installations.
-
-The PEM and the webhook secret are encrypted at rest and never shown again.
-The API returns a redacted marker, not the value.
+repos, then add it under **GitHub Apps** in openpreflight. Test mints an App
+JWT and lists installations.
 
 ## After the App is registered
 

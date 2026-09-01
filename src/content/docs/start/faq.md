@@ -48,9 +48,10 @@ See [ADR 005](/adr/005-check-suite-gating/).
 
 ## What is deliberately not in v1?
 
-No GitHub Actions YAML, no `actions/runner`, no creating GitHub Apps for you,
-no matrices, caches, or artifacts. Jobs on another machine use a Docker
-engine via `CI_DOCKER_HOST`, not Coolify's API as a job runner.
+No GitHub Actions YAML, no `actions/runner`, no matrices, caches, or
+artifacts. Jobs on another machine use a Docker engine via `CI_DOCKER_HOST`,
+not Coolify's API as a job runner. A GitHub App can be created with GitHub's
+review screen, or pasted.
 
 See [Architecture](/understanding/architecture/) and the homepage's "What it
 isn't" list.
@@ -64,6 +65,8 @@ Each App row carries an **API URL**, which defaults to
 origin is derived from it, so `https://ghe.example.com/api/v3` clones from
 `https://ghe.example.com`. Nothing else in the request path assumes
 github.com.
+
+Create with GitHub is github.com only. GitHub Enterprise: paste credentials.
 
 What is untested is everything specific to a GHE deployment: its certificate
 chain, its API version skew, and Check Runs behaviour on older releases. If you

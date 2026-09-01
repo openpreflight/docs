@@ -48,6 +48,8 @@ aliases that mirror `PATCH` / `DELETE` for the HTML UI are omitted.
 |---|---|---|
 | `GET` | `/api/v1/github-apps` | List Apps |
 | `POST` | `/api/v1/github-apps` | Create (`{ name, slug, app_id, pem, webhook_secret }`) |
+| `POST` | `/api/v1/github-apps/manifest/start` | Start GitHub App manifest (session + CSRF) |
+| `GET` | `/api/v1/github-apps/manifest/callback` | Manifest redirect (`code` + `state`) |
 | `PATCH` | `/api/v1/github-apps/{id}` | Update App |
 | `POST` | `/api/v1/github-apps/{id}/test` | App JWT + installations |
 | `GET` | `/api/v1/github-apps/{id}/repos` | Installations + repositories |
