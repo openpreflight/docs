@@ -15,7 +15,8 @@ Yes. [v1.0.0](https://github.com/openpreflight/openpreflight/releases/tag/v1.0.0
 was tagged 29 August 2026. The
 [changelog](https://github.com/openpreflight/openpreflight/blob/v1.0.0/CHANGELOG.md)
 is the feature list. [What is deliberately not in v1](#what-is-deliberately-not-in-v1)
-is still the product boundary — those things are out of scope, not unfinished.
+is still the product boundary. Those things are out of scope rather than
+unfinished.
 
 ## Why a GitHub App and not OAuth?
 
@@ -78,7 +79,7 @@ touching one directory runs the same `install`, `test`, and `build` as a commit
 touching all of them.
 
 A plan is also exactly three steps in a fixed order, so the usual monorepo
-answer — one job per affected package, in parallel — has nothing to express
+answer (one job per affected package, in parallel) has nothing to express
 itself with. Combined with `max_concurrent_jobs` defaulting to 1, a busy
 monorepo is the case this is worst at. Do the path filtering inside your own
 `test` command, or use a tool built for it; see
@@ -86,14 +87,14 @@ monorepo is the case this is worst at. Do the path filtering inside your own
 
 ## Does the project use itself for CI?
 
-No. `openpreflight/openpreflight` runs GitHub Actions — `ci.yml` for vet, test,
+No. `openpreflight/openpreflight` runs GitHub Actions: `ci.yml` for vet, test,
 and a Docker build, and `release.yml` on a `v*` tag.
 
 A self-hosted instance at [ci.openpreflight.xyz](https://ci.openpreflight.xyz)
 can check public repos the same way it checks private ones. That is proof the
 binary works, not CI for this repository. Releases have to
-build multi-arch images and attach binaries, which this tool does not do — it
-reports a check, it does not publish artifacts.
+build multi-arch images and attach binaries, which this tool does not do. It
+reports a check; publishing artifacts is somebody else's job.
 
 Nothing stops it from checking a public repo, incidentally. The repository's
 visibility is read from the webhook payload but never gates anything; "private

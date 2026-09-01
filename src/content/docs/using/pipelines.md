@@ -36,8 +36,8 @@ Highest first:
 1. the repo's pipeline file
 2. the binding's command overrides
 3. Node defaults inferred from `package.json`: `npm ci` / `pnpm` / `yarn` by
-   lockfile, then `test` and `build` **only if those scripts exist**
-4. nothing to run → the check is reported as **skipped**, not failed
+   lockfile, then `test` and `build`, but only if those scripts exist
+4. nothing to run → the check is reported as skipped rather than failed
 
 A step that fails stops the run; later steps are reported as skipped.
 

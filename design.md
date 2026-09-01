@@ -68,7 +68,7 @@ components:
 
 ## Overview
 
-openpreflight is a **small self-hosted CI provider** for private GitHub repos: one Go binary,
+openpreflight is a small self-hosted CI provider for private GitHub repos: one Go binary,
 one SQLite file, one Check Run per commit. The sites should feel like a finished developer
 product: calm forest greens, warm olive neutrals, monospace for program output. Not a
 startup pitch deck.

@@ -4,7 +4,7 @@ description: "Get the binary running, through the first-boot wizard, and ready f
 sidebar:
   order: 1
 ---
-Get the binary running, through the first-boot wizard, and ready for a GitHub
+This is the shortest path from an empty box to a process waiting for a GitHub
 App. Full environment and settings detail lives in
 [Configuration](/start/configuration/).
 
@@ -40,8 +40,8 @@ Everything else either has a default or is asked for in the wizard. See
 [GitHub Release](https://github.com/openpreflight/openpreflight/releases/tag/v1.0.0).
 Pin the image with `OPENPREFLIGHT_VERSION=1.0.0` rather than editing the file.
 
-To build from source instead — this is the contributor path, and `compose.yaml`
-is `build: .`, so it needs the checkout:
+To build from source instead (the contributor path, where `compose.yaml` is
+`build: .` and needs the checkout):
 
 ```bash
 git clone https://github.com/openpreflight/openpreflight
@@ -94,7 +94,7 @@ View full logs →
 `GET /runs/{job-id}` on your instance. That page requires a session by
 default; a binding can opt into shareable logs. See [Logs](/using/logs/).
 
-If nothing resolves to run, the check reports **skipped** rather than failed.
+If nothing resolves to run, the check reports skipped rather than failed.
 That is intentional. See [Pipelines](/using/pipelines/) and
 [Troubleshooting](/using/troubleshooting/).
 

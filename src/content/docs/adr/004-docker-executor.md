@@ -27,7 +27,7 @@ UUID" job API. The remote-host path is whatever Docker already understands
   CLI flags.
 - Empty `runtime` keeps the process executor (Node/git in this image).
 - If `runtime` is set (or the job is a fork) and the engine is unreachable,
-  the job **fails**. There is no silent fallback to the process executor.
+  the job fails outright. There is no silent fallback to the process executor.
 - `CI_DOCKER_HOST` (else `DOCKER_HOST`) is how jobs run on another Docker
   engine, including a Coolify server's. Installing *this* worker onto Coolify
   is a separate call: `POST /api/v1/applications/dockercompose` with
