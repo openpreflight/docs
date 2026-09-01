@@ -11,9 +11,9 @@ semantics are also covered under [Pipelines](/using/pipelines/).
 
 ## One job at a time, by default
 
-`max_concurrent_jobs` defaults to **1**. A fresh install runs one job at a
+`max_concurrent_jobs` defaults to 1. A fresh install runs one job at a
 time; a second commit waits for the first to finish. There is no env var for
-it — it is a settings row, so it can only be changed after the process is up,
+it. It is a settings row, so it can only be changed after the process is up,
 under **Settings** or `PATCH /api/v1/settings`.
 
 Size for that before you install. One binary on one box with a serial runner
@@ -46,7 +46,7 @@ There is no `GITHUB_APP_ID` and no `CI_ALLOWED_REPOS`. Those live in
 `DOCKER_GID` is not in the table because the process never reads it. It is a
 Compose variable: it puts uid 10001 in the docker socket's group so `runtime:`
 jobs and fork PRs can reach the engine. The default of `998` suits a typical
-Linux docker group and does **not** work on Docker Desktop, where the socket is
+Linux docker group and does not work on Docker Desktop, where the socket is
 gid 0 inside the container. See [Deployment](/understanding/deployment/).
 
 Generate a key with:
@@ -55,8 +55,8 @@ Generate a key with:
 openssl rand -base64 48
 ```
 
-To rotate: set `CI_SECRET_KEY` to the **new** key and `CI_SECRET_KEY_OLD` to
-the previous one, start once, confirm the log line `re-sealed secret columns`,
+To rotate: set `CI_SECRET_KEY` to the new key and `CI_SECRET_KEY_OLD` to the
+previous one, start once, confirm the log line `re-sealed secret columns`,
 then unset `CI_SECRET_KEY_OLD` and restart. A row that opens with neither key
 fails startup.
 
@@ -83,7 +83,7 @@ Per repo, highest first at run time: **binding → App → settings**.
 
 A binding can override branches, check name, pipeline file, timeout,
 install/test/build commands, and whether logs are shareable. The bindings
-table **is** the allow-list: a signed webhook for a repo with no enabled
+table is itself the allow-list: a signed webhook for a repo with no enabled
 binding is dropped.
 
 ## Pipeline file
@@ -109,8 +109,8 @@ Resolution order, highest first:
 1. the repo's pipeline file
 2. the binding's command overrides
 3. Node defaults inferred from `package.json`: `npm ci` / `pnpm` / `yarn` by
-   lockfile, then `test` and `build` **only if those scripts exist**
-4. nothing to run → the check is reported as **skipped**, not failed
+   lockfile, then `test` and `build`, but only if those scripts exist
+4. nothing to run → the check is reported as skipped rather than failed
 
 Backups, upgrades, and what a restart does to a running job are in
 [Operations](/understanding/operations/).

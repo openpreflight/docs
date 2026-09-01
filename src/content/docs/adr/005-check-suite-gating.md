@@ -31,35 +31,36 @@ Branch protection then reads whichever finished last.
 
 ## Decision
 
-- **Trigger on `check_suite` and `check_run` only.** Never `push`, never
-  `pull_request`. GitHub creates the suite; a suite is the unit of work and it
-  is already scoped to one commit and one App. `push` would fire for refs no
-  one is reviewing, and `pull_request` would fire on metadata edits that do not
-  change the tree.
-- **One Check Run per job.** Steps are rendered as a table in that run's
-  `output.summary` (`internal/queue/summary.go`), not as separate runs. One run
-  means one required-status entry in a user's branch protection, and adding a
-  step never breaks it.
-- **One live run per `(github_app_id, repo, sha)`.** Enforced in the handler,
-  not by a database constraint: `Runner.CancelJob` cancels the context and
+- Trigger on `check_suite` and `check_run` only, never `push` and never
+  `pull_request`. GitHub creates the suite, and a suite is already scoped to one
+  commit and one App, which makes it the natural unit of work. `push` would fire
+  for refs no one is reviewing, and `pull_request` would fire on metadata edits
+  that do not change the tree.
+- One Check Run per job. Steps are rendered as a table in that run's
+  `output.summary` (`internal/queue/summary.go`) rather than as separate runs.
+  One run means one required-status entry in a user's branch protection, so
+  adding a step never breaks it.
+- One live run per `(github_app_id, repo, sha)`, enforced in the handler rather
+  than by a database constraint. `Runner.CancelJob` cancels the context and
   returns, while the `cancelled` status is written later by the job's own
   goroutine, so a partial unique index over the in-flight statuses would
   intermittently reject the follow-up insert. `check_suite_id` is recorded on
-  the job for traceability but is not the key. It can be absent from a payload,
+  the job for traceability but is not the key: it can be absent from a payload,
   and a missing id must not weaken the invariant.
-- **`ev.Action` decides what a second delivery means.** `requested` is GitHub
-  asking twice and is answered `already queued`. `rerequested` is a human
-  pressing Re-run and supersedes the run in flight.
-- **Zuul is the referenced model, not the implementation.** Suite/run semantics,
-  immutable SHA, explicit gating, queueing, logs on the run, result written back
-  to GitHub. No ZooKeeper, no Nodepool, no Ansible, no multi-tenant config, no
-  second scheduler.
+- `ev.Action` decides what a second delivery means. `requested` is GitHub asking
+  twice and is answered `already queued`. `rerequested` is a human pressing
+  Re-run and supersedes the run in flight.
+- Zuul is the referenced model, not the implementation. Borrowed: suite and run
+  semantics, the immutable SHA, explicit gating, queueing, logs on the run, and
+  the result written back to GitHub. Not borrowed: ZooKeeper, Nodepool, Ansible,
+  multi-tenant config, or a second scheduler.
 
 ## Consequences
 
-- The ceiling is real: no build matrices, no dependency
-  caching, no fan-out across machines, no cross-repo dependent pipelines. A
-  queue depth of one server is the design, not a limitation to be worked around.
+- The ceiling is real: no build matrices, no dependency caching, no fan-out
+  across machines, no cross-repo dependent pipelines. A queue depth of one
+  server is something this design chose, so treat it as the shape of the tool
+  rather than as a gap to route around.
 - Per-step Check Runs are rejected while the executor runs steps sequentially in
   one shell and one workspace. GitHub renders a Re-run button per check run, and
   a step that cannot be re-run alone must not advertise one. If the Docker

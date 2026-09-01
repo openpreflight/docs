@@ -4,8 +4,8 @@ description: "How secrets at rest, clone credentials, job environments, fork PRs
 sidebar:
   order: 2
 ---
-How secrets, clone credentials, job environments, and sessions are handled.
-For reporting a vulnerability, see
+What is encrypted, what a job can see, what a clone credential is allowed to
+touch, and what a link to a log page grants. For reporting a vulnerability, see
 [SECURITY.md](https://github.com/openpreflight/openpreflight/blob/main/SECURITY.md)
 in the code repository.
 

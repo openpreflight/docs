@@ -6,7 +6,7 @@
     />
     <img
       src="https://openpreflight.xyz/banner-light.png"
-      alt="openpreflight — A small CI provider for private repos. One Go binary, one SQLite file: register a GitHub App, enable your repos, and get one Check Run per commit."
+      alt="openpreflight: a small CI provider for private repos. One Go binary, one SQLite file: register a GitHub App, enable your repos, and get one Check Run per commit."
       width="880"
     />
   </picture>

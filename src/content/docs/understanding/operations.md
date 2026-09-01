@@ -21,8 +21,8 @@ whatever holds your other secrets, not next to the backup.
 
 ## Backup
 
-SQLite runs in WAL mode, so a live `ci.db` is not a complete copy on its own —
-recent writes sit in `ci.db-wal`. Stopping the container checkpoints the WAL
+SQLite runs in WAL mode, so a live `ci.db` is not a complete copy on its own.
+Recent writes sit in `ci.db-wal`. Stopping the container checkpoints the WAL
 and leaves a single consistent file, which is why the cold copy below is the
 one to use. There is no `sqlite3` binary in the image.
 
@@ -59,28 +59,28 @@ will fail its next `test` with a decryption error rather than at boot.
 
 ## What a restart does to a running job
 
-**Nothing in progress survives.** There is no checkpointing: a job that was
-half way through `npm test` does not resume, and there is no partial result.
-What differs is how it is recorded, and that depends on how the process died.
+Nothing in progress survives. There is no checkpointing: a job that was half
+way through `npm test` does not resume, and there is no partial result. What
+differs is how it is recorded, and that depends on how the process died.
 
-**On a signal** — `docker compose stop`, `restart`, a redeploy, an upgrade,
-Ctrl-C. The process stops accepting requests, then waits up to 30 seconds for
-every running job to notice the cancelled context, write itself `cancelled`,
-and mark its Check Run cancelled. A cancelled job is **not** retried.
+On a signal (`docker compose stop`, `restart`, a redeploy, an upgrade, Ctrl-C)
+the process stops accepting requests, then waits up to 30 seconds for every
+running job to notice the cancelled context, write itself `cancelled`, and mark
+its Check Run cancelled. A cancelled job is never retried.
 
-**On a kill** — SIGKILL, an OOM, a crash, or a job still unwinding when the 30
-seconds run out. The row is left `in_progress`, and the next boot requeues it
-and runs it again from the beginning: a fresh clone and every step.
+On a kill (SIGKILL, an OOM, a crash, or a job still unwinding when the 30
+seconds run out) the row is left `in_progress`. The next boot requeues it and
+runs it again from the beginning: a fresh clone and every step.
 
 Compose sets `stop_grace_period: 30s` to match the wait. Shortening it means the
 runtime kills the process mid-cancel and you get the second case instead.
 
 Practical consequences:
 
-- A restart normally leaves a **cancelled** check that nothing will retry on its
+- A restart normally leaves a cancelled check that nothing will retry on its
   own. Re-run it from the job page (`POST /api/v1/jobs/{id}/rerun`) or use
-  GitHub's **Re-run**.
-- A requeued job — the kill case — opens a **new** Check Run rather than
+  GitHub's Re-run button.
+- A requeued job, which is the kill case, opens a fresh Check Run rather than
   reusing the one the interrupted attempt created, so the commit collects a
   second check with the same name. Branch protection reads the newer one.
 - Deploy when the queue is empty if you care. `GET /api/v1/jobs` shows what is
@@ -109,21 +109,19 @@ runs in its own transaction and is recorded in `schema_migrations`, so every
 boot applies exactly what is missing and nothing twice. There is no separate
 migrate command and no flag to skip it: opening the database runs them.
 
-The policy that follows from that:
-
-- **Applied migrations are never edited.** A schema change is a new entry.
-- **There are no down migrations.** Once a version has booted against your
-  database, an older binary may not understand the schema it left behind.
-  Rolling back a release is not supported, and the way out of a bad upgrade is
-  the backup you took before it.
-- **A failed migration aborts the boot.** The transaction rolls back and the
-  process exits rather than serving against a half-applied schema.
+Three things follow from that. Applied migrations are never edited; a schema
+change is always a new entry. There are no down migrations, because once a
+version has booted against your database an older binary may not understand the
+schema it left behind, so rolling back a release is unsupported and the way out
+of a bad upgrade is the backup you took before it. And a failed migration
+aborts the boot: the transaction rolls back and the process exits rather than
+serving against a half-applied schema.
 
 ## What gets deleted on its own
 
 An hourly pass prunes expired sessions, then deletes job rows and their log
 files older than `log_retention_days` (default 14). Queued and running jobs are
-never pruned. Nothing else is cleaned up automatically — see
+never pruned. Nothing else is cleaned up automatically. See
 [Configuration](/start/configuration/) for the settings that govern it.
 
 There is no cap on checkout size. A per-job workspace is removed when the job

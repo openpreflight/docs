@@ -28,7 +28,7 @@ Both files map `8080:8080` and take three mounts:
 | host socket | `/var/run/docker.sock` | no; needed for `runtime:` and fork PRs |
 
 `group_add: ${DOCKER_GID:-998}` puts uid 10001 in the socket's group. The value
-you need is the gid **the container sees**, which is not always what the host
+you need is the gid the container sees, which is not always what the host
 reports. Read it from inside:
 
 ```bash
@@ -37,13 +37,13 @@ docker compose exec openpreflight stat -c %g /var/run/docker.sock
 
 On Linux with a native engine that matches the host's
 `stat -c %g /var/run/docker.sock`, and the default of `998` is often already
-right. On Docker Desktop it is **`0`**: the socket is `root:root` inside the
+right. On Docker Desktop it is `0`: the socket is `root:root` inside the
 VM, and the host path is a symlink into `~/.docker`, so the host's `stat`
 reports an unrelated group. Set `DOCKER_GID=0` there and recreate the
 container.
 
 When this process is itself a container and `docker.sock` is the host engine,
-`docker run -v` must use the **host** path for `WORKSPACE_DIR` (the directory
+`docker run -v` must use the host path for `WORKSPACE_DIR` (the directory
 behind `/workspace` in `/proc/self/mountinfo`). The worker rewrites that
 itself. If a `runtime:` job logs `runtime … via docker` then fails because
 `package-lock.json` is missing, the rewrite missed: set `CI_WORKSPACE_HOST`
@@ -70,7 +70,7 @@ API, not Coolify's. Coolify tokens cannot start `docker run`.
 - Health check: `GET /health` (the image already defines one). A 503 means the
   process cannot read SQLite.
 
-**Inspect → Install this worker** calls
+Inspect → Install this worker calls
 `POST /api/v1/applications/dockercompose` with `instant_deploy: false`. Set
 `CI_SECRET_KEY` on the new application before the first start, attach this
 repository if the compose file `build: .`s, and make sure the service user can
@@ -78,8 +78,8 @@ talk to that host's docker socket (same `DOCKER_GID` problem as Compose). The
 API token for that call needs permission to create applications; inventory
 still works with read-only.
 
-Do **not** point Coolify's own GitHub connector webhook at this service. An App
-has one webhook URL; repointing it steals Coolify's deploys. See
+Never point Coolify's own GitHub connector webhook at this service. An App has
+one webhook URL, and repointing it steals Coolify's deploys. See
 [ADR 003](/adr/003-github-app/).
 
 ## After first boot

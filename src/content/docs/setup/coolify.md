@@ -4,9 +4,9 @@ description: "Add Coolify as an optional deployment target and repository picker
 sidebar:
   order: 3
 ---
-Coolify is a supported deployment target and an optional repo source. **Not
-the product, and not required**. Add a team-scoped API token and you get server
-inventory, a repository picker, and a one-click **Install this worker**. Skip it
+Coolify is a supported deployment target and an optional repo source. It is
+not the product, and checks do not need it. Add a team-scoped API token and you
+get server inventory, a repository picker, and a one-click Install this worker. Skip it
 entirely and everything else works the same: the checks come from a
 [GitHub App you register](/setup/github-app/), and jobs run here or on any
 Docker engine you point `CI_DOCKER_HOST` at.
@@ -21,13 +21,13 @@ Get a token from Coolify's **Security → API Tokens** (older versions: **Keys &
 Tokens**). Read-only is enough for inventory. Creating this worker as a Coolify
 application needs a token that can write applications.
 
-- **Test** calls `/api/v1/teams/current` and `/api/v1/servers` and labels the
-  row with the team it can see.
-- **Inspect** can also create the compose application (`instant_deploy: false`)
-  so you can set `CI_SECRET_KEY` before the first start.
+- Test calls `/api/v1/teams/current` and `/api/v1/servers` and labels the row
+  with the team it can see.
+- Inspect can also create the compose application (`instant_deploy: false`) so
+  you can set `CI_SECRET_KEY` before the first start.
 
-Do **not** point Coolify's GitHub connector webhook at this service: an App has
-one webhook URL, and repointing it would steal Coolify's deploys.
+Never point Coolify's GitHub connector webhook at this service: an App has one
+webhook URL, and repointing it would steal Coolify's deploys.
 
 ## Deploying the worker on Coolify
 

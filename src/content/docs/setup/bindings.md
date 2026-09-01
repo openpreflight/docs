@@ -8,7 +8,7 @@ sidebar:
 the repo list, then check the repositories to run checks for. Unchecking a repo
 removes its binding.
 
-The bindings table **is** the allow-list. A webhook for a repo with no enabled
+The bindings table is itself the allow-list. A webhook for a repo with no enabled
 binding is acknowledged and dropped, however valid its signature. Only enable
 private repos you trust: a pipeline runs the repo's own commands, either in
 this process or in a `docker run` container when `runtime:` is set.
