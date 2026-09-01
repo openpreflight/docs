@@ -67,11 +67,17 @@ aliases that mirror `PATCH` / `DELETE` for the HTML UI are omitted.
 
 | Method | Path | Purpose |
 |---|---|---|
-| `GET` | `/api/v1/jobs` | List jobs |
+| `GET` | `/api/v1/jobs` | List jobs (`repo`, `status`, `limit`, `offset`) |
 | `GET` | `/api/v1/jobs/{id}` | Job detail |
 | `GET` | `/api/v1/jobs/{id}/logs` | Full log (session, or shareable opt-in) |
 | `POST` | `/api/v1/jobs/{id}/rerun` | New job, new Check Run |
 | `POST` | `/api/v1/jobs/{id}/cancel` | Cancel a running job |
+
+`GET /api/v1/jobs` returns `{ "jobs": [...] }`, newest first. Omit `repo` and
+`status` to list every job. `repo` is an exact `owner/name`. `status` must be
+one of `queued`, `in_progress`, `success`, `failure`, `skipped`, `cancelled`,
+`error`; any other value is `400`. `limit` defaults to 100 (max 500). `offset`
+skips that many rows.
 
 ## Public
 
