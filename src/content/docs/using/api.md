@@ -58,7 +58,7 @@ aliases that mirror `PATCH` / `DELETE` for the HTML UI are omitted.
 | Method | Path | Purpose |
 |---|---|---|
 | `GET` | `/api/v1/bindings` | List bindings |
-| `PUT` | `/api/v1/bindings` | Upsert one repo binding |
+| `PUT` | `/api/v1/bindings` | Upsert one repo binding (`paths` optional) |
 | `POST` | `/api/v1/bindings/bulk` | Picker checkboxes |
 | `POST` | `/api/v1/bindings/{id}/toggle` | Enable / disable |
 | `DELETE` | `/api/v1/bindings/{id}` | Remove binding |

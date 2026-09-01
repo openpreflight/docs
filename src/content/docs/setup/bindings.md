@@ -18,6 +18,7 @@ this process or in a `docker run` container when `runtime:` is set.
 Per binding you can override:
 
 - the branch list
+- path patterns (`frontend/**`; empty means every path)
 - the check name
 - the pipeline file path
 - the timeout
