@@ -81,10 +81,11 @@ Single row, `id = 1`. Changed from **Settings** in the UI or
 
 Per repo, highest first at run time: **binding → App → settings**.
 
-A binding can override branches, check name, pipeline file, timeout,
-install/test/build commands, and whether logs are shareable. The bindings
-table is itself the allow-list: a signed webhook for a repo with no enabled
-binding is dropped.
+A binding can override branches, paths, check name, pipeline file, timeout,
+install/test/build commands, and whether logs are shareable. Empty paths means
+every path. A complete file list with no match skips (Check Run `skipped`)
+before clone. The bindings table is itself the allow-list: a signed webhook for
+a repo with no enabled binding is dropped.
 
 ## Pipeline file
 

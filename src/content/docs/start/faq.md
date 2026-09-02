@@ -74,19 +74,14 @@ try it, an issue saying which version and what broke is useful.
 
 ## Does it work for monorepos?
 
-It runs, but it will run everything on every push.
+A binding can list path patterns (`frontend/**`, comma or newline). Empty
+paths is every path, as before. When the file list for the SHA is complete
+and nothing matches, the job is **skipped** (Check Run conclusion `skipped`)
+before clone, so required checks do not hang. If GitHub truncates the list
+(300 files) or the commits API errors, the job still runs.
 
-There is no path filter. A binding matches a repo and optionally a branch list
-(exact names, or a `release/*` prefix), and that is the whole filter. A commit
-touching one directory runs the same `install`, `test`, and `build` as a commit
-touching all of them.
-
-A plan is also exactly three steps in a fixed order, so the usual monorepo
-answer (one job per affected package, in parallel) has nothing to express
-itself with. Combined with `max_concurrent_jobs` defaulting to 1, a busy
-monorepo is the case this is worst at. Do the path filtering inside your own
-`test` command, or use a tool built for it; see
-[Comparison](/start/comparison/).
+It is still one job and three steps, not a matrix of jobs per directory.
+Woodpecker still wins for fan-out; see [Comparison](/start/comparison/).
 
 ## Does the project use itself for CI?
 

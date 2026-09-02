@@ -29,7 +29,8 @@ Bitbucket, and Forgejo.
 
 Pick Woodpecker if you want steps that are not install/test/build, matrix
 builds, artifacts between steps, more than one machine running jobs, or a forge
-that is not GitHub.
+that is not GitHub. A binding path filter here skips one Check Run when no
+file matches; it is not a matrix of jobs per directory.
 
 Pick openpreflight if the server-plus-agent split is more than you want to
 run for a handful of private repos, and a Check Run that says pass or fail with
