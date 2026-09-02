@@ -14,7 +14,7 @@ semantics are also covered under [Pipelines](/using/pipelines/).
 `max_concurrent_jobs` defaults to 1. A fresh install runs one job at a
 time; a second commit waits for the first to finish. There is no env var for
 it. It is a settings row, so it can only be changed after the process is up,
-under **Settings** or `PATCH /api/v1/settings`.
+under **Settings → Runner** or `PATCH /api/v1/settings`.
 
 Size for that before you install. One binary on one box with a serial runner
 suits a handful of repos that push a few times an hour. It does not suit a
@@ -62,8 +62,8 @@ fails startup.
 
 ## Settings (database)
 
-Single row, `id = 1`. Changed from **Settings** in the UI or
-`PATCH /api/v1/settings`.
+Single row, `id = 1`. Changed from **Settings** in the UI (Configuration,
+Runner, Logs, Admin as their own pages) or `PATCH /api/v1/settings`.
 
 | Field | Default | Purpose |
 |---|---|---|
