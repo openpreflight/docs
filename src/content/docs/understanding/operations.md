@@ -2,7 +2,7 @@
 title: "Operations"
 description: "Backup and restore of ci.db and logs, what a restart does to a running job, the upgrade procedure, and the schema migration policy."
 sidebar:
-  order: 4
+  order: 5
 ---
 Everything worth keeping is `DATA_DIR` plus `CI_SECRET_KEY`. Neither is much
 use without the other. Nothing else on the box holds state.
