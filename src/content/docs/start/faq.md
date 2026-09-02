@@ -1,6 +1,6 @@
 ---
 title: "FAQ"
-description: "Short answers on the v1.0.0 release, GitHub Apps, Coolify, check-suite gating, GitHub Enterprise, monorepos, dogfooding, and what v1 leaves out."
+description: "Short answers on the current release, GitHub Apps, Coolify, check-suite gating, GitHub Enterprise, monorepos, dogfooding, and what is out of scope."
 sidebar:
   order: 4
 ---
@@ -9,12 +9,13 @@ Positioning questions the homepage raises, and the ones people ask before
 installing. Each answer links the page or ADR that argues it in full. For how
 this sits against other CI, see [Comparison](/start/comparison/).
 
-## Is v1 released?
+## What is the current release?
 
-Yes. [v1.0.0](https://github.com/openpreflight/openpreflight/releases/tag/v1.0.0)
-was tagged 29 August 2026. The
-[changelog](https://github.com/openpreflight/openpreflight/blob/v1.0.0/CHANGELOG.md)
-is the feature list. [What is deliberately not in v1](#what-is-deliberately-not-in-v1)
+**v2.0.0** is out (2 September 2026). Linux binaries are on the
+[GitHub Release](https://github.com/openpreflight/openpreflight/releases/tag/v2.0.0).
+The [changelog](https://github.com/openpreflight/openpreflight/blob/v2.0.0/CHANGELOG.md)
+is the feature list. [v1.0.0](https://github.com/openpreflight/openpreflight/releases/tag/v1.0.0)
+was the first tagged release (29 August 2026). [What is out of scope](#what-is-out-of-scope)
 is still the product boundary. Those things are out of scope rather than
 unfinished.
 
@@ -46,7 +47,7 @@ decision, not extend it.
 
 See [ADR 005](/adr/005-check-suite-gating/).
 
-## What is deliberately not in v1?
+## What is out of scope?
 
 No GitHub Actions YAML, no `actions/runner`, no matrices, caches, or
 artifacts. Jobs on another machine use a Docker engine via `CI_DOCKER_HOST`,
