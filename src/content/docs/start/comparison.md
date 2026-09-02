@@ -62,7 +62,7 @@ the marketplace, or want GitHub to own the scheduling.
 Pick openpreflight if you do not want Actions minutes involved at all, do
 not want a runner registered against your org, and would rather the whole CI
 surface be a thing you can read in an afternoon. The scope note in
-[what is not in v1](/start/faq/) is the honest boundary.
+[what is out of scope](/start/faq/#what-is-out-of-scope) is the honest boundary.
 
 ## Jenkins
 

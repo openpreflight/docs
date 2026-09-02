@@ -15,8 +15,8 @@
 # openpreflight docs
 
 The documentation site, published at **https://docs.openpreflight.xyz**.
-Astro + Starlight + Tailwind v4. It describes **v1.0.0**
-([GitHub Release](https://github.com/openpreflight/openpreflight/releases/tag/v1.0.0)).
+Astro + Starlight + Tailwind v4. It describes **v2.0.0**
+([GitHub Release](https://github.com/openpreflight/openpreflight/releases/tag/v2.0.0)).
 
 This repository is the source of truth for the documentation. The markdown
 under `src/content/docs/` is hand-authored and committed. Nothing is
