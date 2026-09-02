@@ -16,7 +16,7 @@ and the webhook.
 
 ## Create with GitHub
 
-On the **GitHub Apps** page, **Create with GitHub**. GitHub shows a review
+On **GitHub Apps**, **Add an App**, then **Create with GitHub**. GitHub shows a review
 screen with the permissions this worker needs (`checks: write`,
 `contents: read`, `metadata: read`; Check suite and Check run events). Confirm
 it; we store the App ID, slug, PEM, and webhook secret GitHub returns, and

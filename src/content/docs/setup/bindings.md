@@ -4,9 +4,11 @@ description: "Enable the private repos that should receive Check Runs; the bindi
 sidebar:
   order: 2
 ---
-**Repos** → pick the CI App, optionally pick a Coolify instance as the source of
-the repo list, then check the repositories to run checks for. Unchecking a repo
-removes its binding.
+**Repos** is the allow-list. **Pick repositories** (`/repos/pick`) chooses the
+CI App, optionally a Coolify instance as the source of the repo list, then
+checks the repositories to run. Unchecking a repo removes its binding.
+**Add a binding** (`/repos/new`) is the same form filled in by owner/name.
+**Edit** is the same form on its own page (`/repos/{id}/edit`).
 
 The bindings table is itself the allow-list. A webhook for a repo with no enabled
 binding is acknowledged and dropped, however valid its signature. Only enable
