@@ -80,13 +80,10 @@ plainly: a fork PR is an invitation to run a stranger's code on your server. On
 a hosted CI provider that risk is someone else's to absorb. Here it is yours,
 so the default is no.
 
-Be aware of what the skip looks like from GitHub's side: the delivery is
-answered `202 ignored` at the webhook, before a job exists, so **no Check Run is
-created at all**. That is different from a path-filter skip, which does create a
-completed Check Run with a `skipped` conclusion. If the check name is a
-*required* check on your branch protection, a fork pull request will therefore
-sit unmergeable with no check to explain why. The same is true when fork PRs are
-enabled but no Docker engine is reachable.
+The skip is reported, not silent. A refused fork pull request still gets a Check
+Run, completed with a `skipped` conclusion, whose summary says which setting
+refused it and what to change. That matters when the check name is a *required*
+check: branch protection needs an answer, and an absent check is not one.
 
 An operator who wants fork checks has two settings to change, and both are
 required:
