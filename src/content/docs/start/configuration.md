@@ -73,19 +73,30 @@ Runner, Logs, Admin as their own pages) or `PATCH /api/v1/settings`.
 | `default_timeout_seconds` | `900` | Per-job timeout |
 | `max_concurrent_jobs` | `1` | Jobs this process runs at once. See above |
 | `max_log_bytes` | 10 MiB | The log stops growing at this size; the run continues |
+| `max_workspace_bytes` | 1 GiB | Checkout plus whatever the build writes. Measured after clone and between steps; over the limit fails the job rather than filling the disk. `0` disables the check |
 | `log_retention_days` | `14` | Prune old logs and job rows |
 | `default_runtime` | empty | Docker image used when a fork job's pipeline has no `runtime:` |
-| `skip_fork_prs` | `true` | Fork PRs are ignored. Saving `false` requires Docker plus `default_runtime`. |
+| `skip_fork_prs` | `true` | Fork PRs are not run. The Check Run still completes as `skipped` so a required check resolves. Saving `false` requires Docker plus `default_runtime` |
 
 ## Binding overrides
 
 Per repo, highest first at run time: **binding → App → settings**.
 
 A binding can override branches, paths, check name, pipeline file, timeout,
-install/test/build commands, and whether logs are shareable. Empty paths means
-every path. A complete file list with no match skips (Check Run `skipped`)
-before clone. The bindings table is itself the allow-list: a signed webhook for
-a repo with no enabled binding is dropped.
+install/test/build commands, whether logs are shareable, and
+`on_empty_pipeline`. The bindings table is itself the allow-list: a signed
+webhook for a repo with no enabled binding is dropped.
+
+Empty paths means every path. A complete file list with no match skips (Check
+Run `skipped`) before clone; a truncated or failed list fails open and runs. See
+[Path filters](/setup/path-filters/) for the pattern syntax and the diagnostics.
+
+`on_empty_pipeline` is `skip` (the default) or `fail`, and decides what happens
+when a pipeline resolves to no steps at all. That is usually a configuration
+mistake rather than an intention, and it used to be indistinguishable from a
+path-filter skip. Every skip now records a `skip_reason` on the job:
+`path_filter`, `no_pipeline`, or one of `fork_disabled` / `fork_no_docker` /
+`fork_no_runtime`.
 
 ## Pipeline file
 

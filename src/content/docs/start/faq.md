@@ -79,7 +79,21 @@ A binding can list path patterns (`frontend/**`, comma or newline). Empty
 paths is every path, as before. When the file list for the SHA is complete
 and nothing matches, the job is **skipped** (Check Run conclusion `skipped`)
 before clone, so required checks do not hang. If GitHub truncates the list
-(300 files) or the commits API errors, the job still runs.
+(300 files) or the commits API errors, the job still runs and says so.
+
+The log and the Check Run carry the decision, so a filter that is too narrow is
+visible rather than a mystery:
+
+```
+Changed files: 18
+Matched files: 4
+Filter: src/**
+Result: RUN
+```
+
+One caveat worth knowing: the file list is the **head commit's**, not a pull
+request's full diff. See [Path filters](/setup/path-filters/) for the pattern
+syntax, why exclusions are not supported, and a monorepo example.
 
 It is still one job and three steps, not a matrix of jobs per directory.
 Woodpecker still wins for fan-out; see [Comparison](/start/comparison/).

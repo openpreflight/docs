@@ -60,7 +60,7 @@ aliases that mirror `PATCH` / `DELETE` for the HTML UI are omitted.
 | Method | Path | Purpose |
 |---|---|---|
 | `GET` | `/api/v1/bindings` | List bindings |
-| `PUT` | `/api/v1/bindings` | Upsert one repo binding (`paths` optional) |
+| `PUT` | `/api/v1/bindings` | Upsert one repo binding (`paths`, `on_empty_pipeline` optional) |
 | `POST` | `/api/v1/bindings/bulk` | Picker checkboxes |
 | `POST` | `/api/v1/bindings/{id}/toggle` | Enable / disable |
 | `DELETE` | `/api/v1/bindings/{id}` | Remove binding |
@@ -74,12 +74,18 @@ aliases that mirror `PATCH` / `DELETE` for the HTML UI are omitted.
 | `GET` | `/api/v1/jobs/{id}/logs` | Full log (session, or shareable opt-in) |
 | `GET` | `/api/v1/jobs/{id}/logs/stream` | Live log (SSE; session, or shareable opt-in) |
 | `POST` | `/api/v1/jobs/{id}/rerun` | New job, new Check Run |
-| `POST` | `/api/v1/jobs/{id}/cancel` | Cancel a running job |
+| `POST` | `/api/v1/jobs/{id}/cancel` | Cancel a running job. Docker jobs are stopped engine-side, not just detached from |
 
 `GET /api/v1/jobs` returns `{ "jobs": [...] }`, newest first. Omit `repo` and
 `status` to list every job. `repo` is an exact `owner/name`. `status` must be
 one of `queued`, `in_progress`, `success`, `failure`, `skipped`, `cancelled`,
-`error`; any other value is `400`. `limit` defaults to 100 (max 500). `offset`
+`error`; any other value is `400`.
+
+A job carries `skip_reason` when its status is `skipped`, so the kinds of skip
+are distinguishable: `path_filter` (a filter matched nothing, intentional),
+`no_pipeline` (nothing resolved to run, usually a mistake), and
+`fork_disabled` / `fork_no_docker` / `fork_no_runtime` (a fork pull request the
+current policy will not run). It is empty otherwise. `limit` defaults to 100 (max 500). `offset`
 skips that many rows.
 
 ## Public
