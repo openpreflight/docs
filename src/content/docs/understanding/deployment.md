@@ -59,7 +59,9 @@ API, not Coolify's. Coolify tokens cannot start `docker run`.
 
 ## Coolify (or any reverse proxy)
 
-- Give the service a public HTTPS URL. GitHub must reach `POST /webhook/{slug}`.
+- Give the service a public HTTPS URL. GitHub must reach `POST /webhook/{slug}`;
+  see [Networking](/understanding/networking/) for why, and what to do when you
+  have no public IP.
 - Point the domain at this container's port 8080.
 - Set `CI_SECRET_KEY` as a secret / env var on the application, not in git.
 - Optionally set `CI_PUBLIC_BASE_URL` to the public origin for first boot, and

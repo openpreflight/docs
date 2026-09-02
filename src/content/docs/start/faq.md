@@ -1,6 +1,6 @@
 ---
 title: "FAQ"
-description: "Short answers on the current release, GitHub Apps, Coolify, check-suite gating, GitHub Enterprise, monorepos, dogfooding, and what is out of scope."
+description: "Short answers on the current release, GitHub Apps, Coolify, check-suite gating, GitHub Enterprise, monorepos, whether the project checks itself, and what is out of scope."
 sidebar:
   order: 4
 ---
@@ -11,9 +11,9 @@ this sits against other CI, see [Comparison](/start/comparison/).
 
 ## What is the current release?
 
-**v2.0.0** is out (2 September 2026). Linux binaries are on the
-[GitHub Release](https://github.com/openpreflight/openpreflight/releases/tag/v2.0.0).
-The [changelog](https://github.com/openpreflight/openpreflight/blob/v2.0.0/CHANGELOG.md)
+**v2.0.2** is out (2 September 2026). Linux binaries are on the
+[GitHub Release](https://github.com/openpreflight/openpreflight/releases/tag/v2.0.2).
+The [changelog](https://github.com/openpreflight/openpreflight/blob/v2.0.2/CHANGELOG.md)
 is the feature list. [v1.0.0](https://github.com/openpreflight/openpreflight/releases/tag/v1.0.0)
 was the first tagged release (29 August 2026). [What is out of scope](#what-is-out-of-scope)
 is still the product boundary. Those things are out of scope rather than
@@ -86,14 +86,18 @@ Woodpecker still wins for fan-out; see [Comparison](/start/comparison/).
 
 ## Does the project use itself for CI?
 
-No. `openpreflight/openpreflight` runs GitHub Actions: `ci.yml` for vet, test,
-and a Docker build, and `release.yml` on a `v*` tag.
+Yes. All three product repositories — the binary, the website, and these docs —
+commit a `.ci.yml` and get their repository checks from a self-hosted instance
+at [ci.openpreflight.xyz](https://ci.openpreflight.xyz). A push to
+`openpreflight/openpreflight` runs `go vet ./...` and `go test ./...` there, and
+the Check Run on the commit comes from a GitHub App we registered like any other
+operator would.
 
-A self-hosted instance at [ci.openpreflight.xyz](https://ci.openpreflight.xyz)
-can check public repos the same way it checks private ones. That is proof the
-binary works, not CI for this repository. Releases have to
-build multi-arch images and attach binaries, which this tool does not do. It
-reports a check; publishing artifacts is somebody else's job.
+GitHub Actions is kept for exactly one workflow: `release.yml`, on a `v*` tag.
+That builds multi-architecture images and attaches binaries to the release.
+Publishing artifacts is not something this tool does, and it is not on the
+roadmap — it reports a check. Splitting the two that way is the honest division
+of labour, not a gap.
 
 Nothing stops it from checking a public repo, incidentally. The repository's
 visibility is read from the webhook payload but never gates anything; "private
