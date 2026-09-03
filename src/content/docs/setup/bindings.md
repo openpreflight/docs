@@ -28,11 +28,15 @@ Per binding you can override:
 - whether logs are shareable
 
 At run time, precedence is **binding → App → settings**. See
-[Configuration](/start/configuration/) for the settings row and pipeline
-resolution order.
+[How configuration resolves](/setup/resolution/) for the full order, what the
+inferred defaults are, and the dry run that tells you which layer won for a
+real commit before you push one.
 
 ## After bindings are enabled
 
-Commit a [pipeline](/using/pipelines/) (or rely on Node defaults from
-`package.json`). Push to an allowed branch; the worker reports one Check Run
-with full [logs](/using/logs/).
+Commit a [pipeline](/using/pipelines/), or rely on the defaults inferred from
+`package.json`, `go.mod`, `Cargo.toml` or `pyproject.toml`. Before pushing,
+**Test configuration** on the binding form runs a
+[dry run](/setup/resolution/) and shows exactly what that commit would do. Then
+push to an allowed branch; the worker reports one Check Run with full
+[logs](/using/logs/).

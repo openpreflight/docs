@@ -32,11 +32,35 @@ which always runs in a container.
 |---|---|
 | `.ci.yml` (or your `pipeline_file`) | The repository's own pipeline file |
 | `binding commands` | The install/test/build fields on the binding |
-| `Node defaults from package.json` | Inferred, because neither of the above was set |
+| `Node defaults from package.json`, `Go defaults from go.mod`, … | Inferred, because neither of the above was set |
 
 If a run did something you did not expect, this is the field to read first. A
 pipeline file that is present but unparsed, or a binding override you forgot,
 both show up here.
+
+## Where every value came from
+
+**Plan from** says where the *commands* came from. It cannot say that the
+timeout came from settings while the image came from `.ci.yml`, and mixed
+provenance is normal — a file that sets only `runtime:` supplies the executor
+while the commands come from somewhere else entirely.
+
+So the run page carries a per-value table too:
+
+| Value | Resolved to | From |
+|---|---|---|
+| `pipeline_file` | `.ci.yml` | settings |
+| `timeout` | `3m0s` | `.ci.yml` |
+| `runtime` | `node:22` | `.ci.yml` |
+| `test` | `go test ./...` | Go defaults from go.mod |
+
+It is recorded when the plan is resolved, so it says what applied to **this**
+commit rather than what would apply today — which is the distinction you want
+when the configuration has changed since. `GET /api/v1/jobs/{id}` returns the
+same list as `plan_origins`.
+
+To ask the same question about a commit that has not run, use the dry run:
+[How configuration resolves](/setup/resolution/).
 
 ## The repository page
 
@@ -44,7 +68,10 @@ both show up here.
 with duration and the reason it did not pass, and its recent runs. Reach it from
 the repo cards on the overview, or from **Repos**.
 
-`/repos/{id}/edit` is the form for changing any of it.
+`/repos/{id}/edit` is the form for changing any of it, and **Dry run**
+(`/repos/{id}/resolve`) answers what a given branch, tag or commit would do
+before anything is pushed. It writes no Check Run and queues nothing. See
+[How configuration resolves](/setup/resolution/).
 
 ## Reading a skipped run
 

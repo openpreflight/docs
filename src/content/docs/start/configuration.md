@@ -121,9 +121,15 @@ Resolution order, highest first:
 
 1. the repo's pipeline file
 2. the binding's command overrides
-3. Node defaults inferred from `package.json`: `npm ci` / `pnpm` / `yarn` by
-   lockfile, then `test` and `build`, but only if those scripts exist
+3. defaults inferred from the project's own files — `package.json`, `go.mod`,
+   `Cargo.toml`, `pyproject.toml` / `requirements.txt`, first match wins
 4. nothing to run → the check is reported as skipped rather than failed
+
+To find out which layer won for an actual commit, without pushing one, use the
+dry run at Repos → **Dry run** or
+`POST /api/v1/bindings/{id}/resolve`. It reports every resolved value with the
+layer that supplied it. See
+[How configuration resolves](/setup/resolution/).
 
 Backups, upgrades, and what a restart does to a running job are in
 [Operations](/understanding/operations/).
