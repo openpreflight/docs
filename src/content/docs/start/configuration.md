@@ -91,7 +91,8 @@ Empty paths means every path. A complete file list with no match skips (Check
 Run `skipped`) before clone; a truncated or failed list fails open and runs. See
 [Path filters](/setup/path-filters/) for the pattern syntax and the diagnostics.
 
-`on_empty_pipeline` is `skip` (the default) or `fail`, and decides what happens
+`on_empty_pipeline` is `skip` (the default) or `fail`, set on the binding form or
+over the API, and decides what happens
 when a pipeline resolves to no steps at all. That is usually a configuration
 mistake rather than an intention, and it used to be indistinguishable from a
 path-filter skip. Every skip now records a `skip_reason` on the job:
