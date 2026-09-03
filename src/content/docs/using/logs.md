@@ -2,7 +2,7 @@
 title: "Logs"
 description: "Where full job logs live, how the run page tails them, and when a binding makes a log page shareable."
 sidebar:
-  order: 2
+  order: 3
 ---
 Full logs are written to `/data/logs/<job-id>.log`, capped by `max_log_bytes`
 (10 MiB by default) and pruned after `log_retention_days` (14 by default). The

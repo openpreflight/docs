@@ -2,7 +2,7 @@
 title: "API"
 description: "JSON API routes for setup, settings, Coolify, GitHub Apps, bindings, and jobs, plus the public webhook and health endpoints."
 sidebar:
-  order: 3
+  order: 4
 ---
 
 Everything except `/health`, `/webhook/{slug}` and a shareable `/runs/{id}`

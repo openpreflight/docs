@@ -2,7 +2,7 @@
 title: "Troubleshooting"
 description: "Common failure modes (process won't start, no Check Run, skipped checks, fork PRs, Docker socket errors) and the page that owns each fix."
 sidebar:
-  order: 4
+  order: 5
 ---
 
 Symptom → cause → fix, with a link to the page that owns the detail. Nothing
