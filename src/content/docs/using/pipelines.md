@@ -35,11 +35,21 @@ Highest first:
 
 1. the repo's pipeline file
 2. the binding's command overrides
-3. Node defaults inferred from `package.json`: `npm ci` / `pnpm` / `yarn` by
-   lockfile, then `test` and `build`, but only if those scripts exist
+3. defaults inferred from the project's own files — `package.json` (Node),
+   `go.mod` (Go), `Cargo.toml` (Rust), `pyproject.toml` / `requirements.txt`
+   (Python), first match wins
 4. nothing to run → the check is reported as skipped rather than failed
 
+The commands resolve as a block: a pipeline file that sets any of `install`,
+`test` or `build` supplies all three, so you cannot set `test` in the file and
+inherit `install` from the binding. `runtime` and `timeout` resolve
+independently.
+
 A step that fails stops the run; later steps are reported as skipped.
+
+To see which layer won for a real commit — including the inferred commands and
+the exact image — use the dry run:
+[How configuration resolves](/setup/resolution/).
 
 Defaults for the pipeline file path, timeout, and check name live in
 [Configuration](/start/configuration/).
