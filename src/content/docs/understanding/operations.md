@@ -1,6 +1,6 @@
 ---
 title: "Operations"
-description: "Backup and restore of ci.db and logs, what a restart does to a running job, the upgrade procedure, and the schema migration policy."
+description: "Backup and restore of ci.db and logs, what a restart does to a running job, health and status checks, the upgrade procedure, and the versioning policy."
 sidebar:
   order: 5
 ---
@@ -102,6 +102,52 @@ In-flight jobs are interrupted the same way any restart interrupts them.
 `ci-data` and `ci-workspace` are named volumes and survive; nothing in the
 upgrade path touches them.
 
+## Checking on a running instance
+
+Two surfaces, and they answer different questions.
+
+**`GET /health`** is liveness, for your container platform. It touches the
+database and answers `{"status":"ok"}` with `200`, or `503` if SQLite is
+unreadable. It takes no session, and its body and status codes are a contract —
+they will not change under you.
+
+**`GET /health?verbose=1`** adds a component breakdown, and needs a session or a
+bearer token. That is deliberate: the breakdown names your public base URL, your
+configured Apps, and which parts are misconfigured, which is not something an
+unguarded endpoint should hand to anyone who asks. An unauthenticated caller
+that adds `?verbose=1` still gets the plain liveness body rather than an error.
+
+**`/status`** in the operator UI renders the same report as a page, and is
+usually where you want to start when checks have stopped appearing:
+
+| Component | Says |
+|---|---|
+| Database | The schema version this database is at, and whether it matches the binary |
+| Webhook | Whether a public HTTPS base URL is set. Whether GitHub's POST actually *arrives* is only knowable from GitHub |
+| GitHub | How many Apps are configured and when one was last verified — the **stored** result of the last test, not a live call |
+| Repositories | How many bindings are enabled. Zero here is the usual reason a correct install reports nothing |
+| Worker | Jobs running in this process, and job rows marked in flight. See below |
+| Docker | Whether an engine is reachable, and whether this configuration needs one |
+
+Two of those need a word of explanation.
+
+**Docker unreachable is not automatically a problem.** An install with no
+`default_runtime`, fork PRs skipped, and no pipeline file asking for a `runtime:`
+never needs an engine. The page says so rather than reporting an error you would
+learn to ignore — while still noting that a pipeline file *could* ask for one,
+since that file lives in a commit the server has not seen yet.
+
+**Worker shows two numbers on purpose.** "Running" counts jobs actually
+executing in this process; "in flight" counts rows in the database. They differ
+when a job was killed mid-run — a `docker kill`, an OOM, a redeploy — leaving a
+row with no worker behind it. That gap is the single most useful signal that a
+queue has stopped moving. Stale rows are requeued **at startup**, not on a
+timer, so restarting the server is what clears them.
+
+The health check never calls GitHub. It is polled on a timer, and an outbound
+API call per poll would spend rate limit and turn a GitHub outage into a
+container your platform restarts.
+
 ## Schema migrations
 
 Migrations are an ordered, append-only list compiled into the binary. Each one
@@ -116,6 +162,31 @@ schema it left behind, so rolling back a release is unsupported and the way out
 of a bad upgrade is the backup you took before it. And a failed migration
 aborts the boot: the transaction rolls back and the process exits rather than
 serving against a half-applied schema.
+
+To confirm an upgrade actually moved your database, `/status` reports the
+schema version — the last migration applied and how many have run — next to the
+version of the binary reporting it.
+
+## What a release will ask of you
+
+Every release section in the
+[changelog](https://github.com/openpreflight/openpreflight/blob/main/CHANGELOG.md)
+carries an **Upgrade** line saying either *No action required* or exactly what
+to run and what to set. Read it for each version you are skipping, not just the
+one you are landing on.
+
+Versions follow semver, drawn where it matters for a server that owns your
+branch protection:
+
+| Bump | Means |
+|---|---|
+| **Major** | Something can break a working install: a removed endpoint or field, a setting whose default changes behaviour, a migration needing a decision from you |
+| **Minor** | Additive only: new endpoints and pages, new settings defaulting to today's behaviour, migrations that only add columns |
+| **Patch** | Fixes, UI, docs — no schema change, no contract change |
+
+A minor upgrade may still run a migration. "Additive" means it does not change
+what your existing configuration does, not that the schema stands still —
+which is why the backup step above is not optional on a minor either.
 
 ## What gets deleted on its own
 

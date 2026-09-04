@@ -8,6 +8,12 @@ sidebar:
 Symptom → cause → fix, with a link to the page that owns the detail. Nothing
 here invents a failure mode; every entry is already documented elsewhere.
 
+Before working through it, open **`/status`** in the operator UI. It reports the
+database, the webhook URL, the GitHub Apps, the enabled repositories, the worker
+and Docker, and says what to do about anything that is not ok — which is faster
+than guessing which symptom below matches. See
+[Operations](/understanding/operations/#checking-on-a-running-instance).
+
 ## Process exits immediately on start
 
 **Cause:** `CI_SECRET_KEY` is unset or shorter than 32 bytes. The process
@@ -28,6 +34,32 @@ See [Configuration](/start/configuration/).
 anything else.
 
 See [Deployment](/understanding/deployment/).
+
+## Live logs only appear when the job finishes
+
+**Cause:** A reverse proxy is buffering the Server-Sent Events stream and
+releasing it in one piece at the end. The stream itself is fine.
+
+**Fix:** Turn buffering off for that path. OpenPreflight already sends
+`X-Accel-Buffering: no` and flushes every write, so nginx often needs nothing;
+Caddy needs `flush_interval -1`. To confirm which side is at fault, curl the
+stream against the app's port directly — if it streams there and not through the
+proxy, the proxy is buffering.
+
+See [Logs](/using/logs/#live-logs-through-a-reverse-proxy).
+
+## Jobs sit in progress and the queue stops moving
+
+**Cause:** A job was killed mid-run — a redeploy, an OOM, `docker kill` — leaving
+a row marked `in_progress` with no worker behind it. It still counts against
+`max_concurrent_jobs`, so with the default of 1 nothing else starts.
+
+**Fix:** Restart the server. Stale rows are requeued at startup, and
+deliberately not on a timer: the requeue is unconditional, so running it against
+live jobs would clobber them. `/status` shows the gap directly — "running" counts
+workers, "in flight" counts rows, and a difference is exactly this.
+
+See [Operations](/understanding/operations/#checking-on-a-running-instance).
 
 ## Push produces no check at all
 
