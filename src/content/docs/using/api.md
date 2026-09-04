@@ -140,6 +140,16 @@ happened. Jobs from before this was recorded have an empty list.
 | `POST` | `/webhook/{slug}` | GitHub (HMAC verified) |
 | `GET` | `/runs/{id}` | Log page (session, or shareable opt-in) |
 | `GET` | `/health` | Liveness; `503` if SQLite is unreadable |
+| `GET` | `/health?verbose=1` | Component breakdown — **session or bearer only** |
+
+`GET /health` is a fixed contract for container healthchecks: `{"status":"ok"}`
+with `200`, or `{"status":"error", ...}` with `503`. Adding `?verbose=1` returns
+the same report `/status` renders — components, states, and what to do about
+each — but only to an authenticated caller, because it names your public base
+URL and your configured Apps. An anonymous caller that asks for it gets the
+plain liveness body rather than an error, so a healthcheck that sends the
+parameter by accident still works. See
+[Operations](/understanding/operations/#checking-on-a-running-instance).
 
 Session cookies are HttpOnly, `Secure` behind HTTPS, and browser writes require
 a CSRF token. Bearer callers carry no ambient cookie and so skip CSRF. See

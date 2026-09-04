@@ -64,4 +64,10 @@ rather than more private.
 
 The run page tails in-flight logs over Server-Sent Events. A proxy that buffers
 responses will hold the whole stream until the job ends, which looks like
-"live logs do not work". See [Logs](/using/logs/) for the per-proxy settings.
+"live logs do not work" — the log arrives complete, all at once, when the job
+finishes.
+
+The application already sends `X-Accel-Buffering: no` and flushes every write,
+so a default nginx often needs nothing. Where a change is needed, the
+copy-paste blocks for nginx, Caddy and Traefik are in
+[Logs](/using/logs/#live-logs-through-a-reverse-proxy).
