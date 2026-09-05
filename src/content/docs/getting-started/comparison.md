@@ -62,7 +62,7 @@ the marketplace, or want GitHub to own the scheduling.
 Pick openpreflight if you do not want Actions minutes involved at all, do
 not want a runner registered against your org, and would rather the whole CI
 surface be a thing you can read in an afternoon. The scope note in
-[what is out of scope](/getting-started/faq/#what-is-out-of-scope) is the honest boundary.
+[what is out of scope](/getting-started/faq/#what-is-out-of-scope) is the boundary.
 
 ## Jenkins
 
@@ -79,7 +79,7 @@ upgrades, and the configuration surface are cost you would rather not carry.
 
 ## Where openpreflight is genuinely weaker
 
-Stated plainly, because these are the things that will bite:
+These are the things that will bite:
 
 - It runs on one machine. There is no agent protocol, so jobs run in the
   process or in a sibling container on the same Docker engine. Every one of the

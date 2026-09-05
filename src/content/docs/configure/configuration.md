@@ -121,7 +121,7 @@ Resolution order, highest first:
 
 1. the repo's pipeline file
 2. the binding's command overrides
-3. defaults inferred from the project's own files — `package.json`, `go.mod`,
+3. defaults inferred from the project's own files: `package.json`, `go.mod`,
    `Cargo.toml`, `pyproject.toml` / `requirements.txt`, first match wins
 4. nothing to run → the check is reported as skipped rather than failed
 

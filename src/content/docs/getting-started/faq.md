@@ -41,8 +41,8 @@ See [Coolify](/deploy/coolify/).
 ## Why gate on the check suite instead of push?
 
 Runs trigger on the check suite, build the immutable SHA, and hold to one
-live run per commit. That is deliberate: gate on the commit, not on the push,
-without importing a second scheduler. Adding a `push` case would reverse that
+live run per commit. The point is to gate on the commit rather than on the
+push, without importing a second scheduler. Adding a `push` case would reverse that
 decision, not extend it.
 
 See [ADR 005](/reference/decisions/005-check-suite-gating/).
@@ -91,8 +91,8 @@ Filter: src/**
 Result: RUN
 ```
 
-One caveat worth knowing: the file list is the **head commit's**, not a pull
-request's full diff. See [Path filters](/configure/path-filters/) for the pattern
+One caveat: the file list is the **head commit's**, not a pull request's full
+diff. See [Path filters](/configure/path-filters/) for the pattern
 syntax, why exclusions are not supported, and a monorepo example.
 
 It is still one job and three steps, not a matrix of jobs per directory.
@@ -100,7 +100,7 @@ Woodpecker still wins for fan-out; see [Comparison](/getting-started/comparison/
 
 ## Does the project use itself for CI?
 
-Yes. All three product repositories — the binary, the website, and these docs —
+Yes. All three product repositories (the binary, the website, and these docs)
 commit a `.ci.yml` and get their repository checks from a self-hosted instance
 at [ci.openpreflight.xyz](https://ci.openpreflight.xyz). A push to
 `openpreflight/openpreflight` runs `go vet ./...` and `go test ./...` there, and
@@ -110,8 +110,8 @@ operator would.
 GitHub Actions is kept for exactly one workflow: `release.yml`, on a `v*` tag.
 That builds multi-architecture images and attaches binaries to the release.
 Publishing artifacts is not something this tool does, and it is not on the
-roadmap — it reports a check. Splitting the two that way is the honest division
-of labour, not a gap.
+roadmap. It reports a check. Splitting the two that way is a division of labour
+rather than a gap.
 
 Nothing stops it from checking a public repo, incidentally. The repository's
 visibility is read from the webhook payload but never gates anything; "private

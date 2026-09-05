@@ -20,7 +20,7 @@ therefore cannot contain a space.
 | Pattern | Matches | Does not match |
 |---|---|---|
 | `src/**` | `src`, `src/main.go`, `src/a/b/c.go` | `lib/main.go` |
-| `src/*.go` | `src/main.go` | `src/a/main.go` — `*` does not cross `/` |
+| `src/*.go` | `src/main.go` | `src/a/main.go`; `*` does not cross `/` |
 | `*.md` | `README.md` | `docs/README.md` |
 | `go.mod` | `go.mod` exactly | `sub/go.mod` |
 
@@ -37,18 +37,18 @@ A leading `/` is stripped, so `/src/**` and `src/**` are the same.
 
 There is no `!docs/**`. A binding is an allow-list: a commit runs if **any**
 changed file matches **any** pattern. If you want "everything except docs", list
-what you do care about rather than what you do not — it is longer, and it does
+what you do care about rather than what you do not. It is longer, and it does
 not silently start ignoring a new top-level directory somebody adds later.
 
 ## What counts as a changed file
 
 The file list comes from GitHub's commit API for the **head commit** of the
-check suite, so it is the files that commit touched — **not** the full diff of a
+check suite, so it is the files that commit touched, **not** the full diff of a
 pull request.
 
-This is worth knowing, because it surprises people: if a pull request changes
-`src/` in its first commit and then adds a commit touching only `README.md`, the
-filter sees only `README.md` for that second commit and the check is skipped.
+This surprises people. If a pull request changes `src/` in its first commit and
+then adds a commit touching only `README.md`, the filter sees only `README.md`
+for that second commit and the check is skipped.
 The check for the earlier commit still stands on that commit.
 
 Renames count twice: both the old and new path are considered, so moving a file
@@ -60,8 +60,8 @@ When the file list is complete and nothing matches, the job **skips before
 cloning** and the Check Run completes with a `skipped` conclusion.
 
 Completing it matters. A required check needs an answer, and an absent check is
-not one — branch protection would wait forever. This is why a filter miss is not
-simply dropped.
+not one, so branch protection would wait forever. That is why a filter miss
+completes the check instead of dropping it.
 
 ## The diagnostic
 
@@ -76,8 +76,8 @@ Result: RUN
 
 On a skip the same block appears in the Check Run summary, since somebody
 reading the pull request cannot see the worker's log file. "Why did this run?"
-is as common a question as "why did it not?", which is why the diagnostic is not
-only written on a skip.
+is as common a question as "why did it not?", so the diagnostic is written on
+every run rather than only on skips.
 
 ## Fail-open
 
@@ -95,7 +95,7 @@ so the pipeline executes and the Check Run summary says so:
 ## Monorepo example
 
 A repository with a Go API and a React frontend, checked by two bindings on the
-same repo is **not** how this works — one repo plus one App is one binding. Use
+same repo is **not** how this works: one repo plus one App is one binding. Use
 one binding whose filter covers the code you want gated:
 
 ```
@@ -118,8 +118,8 @@ per-directory job matrix.
 
 ## Empty pipelines are a different thing
 
-A path filter skip is intentional. A pipeline that resolves to no steps at all —
-no pipeline file, no binding commands, no recognisable project — is usually a
+A path filter skip is intentional. A pipeline that resolves to no steps at all
+(no pipeline file, no binding commands, no recognisable project) is usually a
 configuration mistake, and it used to look identical.
 
 The two are now distinguishable, and a binding can make the mistake loud:

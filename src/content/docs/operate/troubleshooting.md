@@ -10,8 +10,8 @@ here invents a failure mode; every entry is already documented elsewhere.
 
 Before working through it, open **`/status`** in the operator UI. It reports the
 database, the webhook URL, the GitHub Apps, the enabled repositories, the worker
-and Docker, and says what to do about anything that is not ok — which is faster
-than guessing which symptom below matches. See
+and Docker, and says what to do about anything that is not ok, which is faster than
+guessing which symptom below matches. See
 [Operations](/operate/operations/#checking-on-a-running-instance).
 
 ## Process exits immediately on start
@@ -43,20 +43,20 @@ releasing it in one piece at the end. The stream itself is fine.
 **Fix:** Turn buffering off for that path. OpenPreflight already sends
 `X-Accel-Buffering: no` and flushes every write, so nginx often needs nothing;
 Caddy needs `flush_interval -1`. To confirm which side is at fault, curl the
-stream against the app's port directly — if it streams there and not through the
+stream against the app's port directly. If it streams there and not through the
 proxy, the proxy is buffering.
 
 See [Logs](/use/logs/#live-logs-through-a-reverse-proxy).
 
 ## Jobs sit in progress and the queue stops moving
 
-**Cause:** A job was killed mid-run — a redeploy, an OOM, `docker kill` — leaving
-a row marked `in_progress` with no worker behind it. It still counts against
+**Cause:** A job was killed mid-run by a redeploy, an OOM or `docker kill`,
+leaving a row marked `in_progress` with no worker behind it. It still counts against
 `max_concurrent_jobs`, so with the default of 1 nothing else starts.
 
 **Fix:** Restart the server. Stale rows are requeued at startup, and
 deliberately not on a timer: the requeue is unconditional, so running it against
-live jobs would clobber them. `/status` shows the gap directly — "running" counts
+live jobs would clobber them. `/status` shows the gap directly: "running" counts
 workers, "in flight" counts rows, and a difference is exactly this.
 
 See [Operations](/operate/operations/#checking-on-a-running-instance).
