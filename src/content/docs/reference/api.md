@@ -75,7 +75,7 @@ that commit out, resolves the plan exactly as the worker would, evaluates the
 path filter against the same changed-file list a webhook would deliver, and
 deletes the checkout.
 
-**It writes nothing** — no Check Run on the commit, no job row, nothing queued —
+**It writes nothing**: no Check Run on the commit, no job row, nothing queued,
 so it is safe against a production instance. A `200` means the dry run
 completed, not that the configuration is valid: read `decision` and `errors`.
 
@@ -94,8 +94,8 @@ completed, not that the configuration is valid: read `decision` and `errors`.
 
 `decision` is `run`, `skip` (with a `skip_reason`) or `fail`. `origins` names
 the layer that supplied each resolved value. `errors` are things that would fail
-or skip a real run, and **all of them are reported at once** — a real run stops
-at the first. `warnings` are legal but probably unintended.
+or skip a real run, and **all of them are reported at once**, while a real run
+stops at the first. `warnings` are legal but probably unintended.
 
 A `400` means the dry run could not be attempted at all: no such binding, App
 credentials GitHub rejected, no installation that can see the repository, no
@@ -130,7 +130,7 @@ skips that many rows.
 
 `GET /api/v1/jobs/{id}` returns `{ "job": {...}, "plan_origins": [...] }`.
 `plan_origins` is the per-value provenance recorded when that commit's plan was
-resolved — the same list the dry run returns, but for the run that actually
+resolved: the same list the dry run returns, but for the run that actually
 happened. Jobs from before this was recorded have an empty list.
 
 ## Public
@@ -140,12 +140,12 @@ happened. Jobs from before this was recorded have an empty list.
 | `POST` | `/webhook/{slug}` | GitHub (HMAC verified) |
 | `GET` | `/runs/{id}` | Log page (session, or shareable opt-in) |
 | `GET` | `/health` | Liveness; `503` if SQLite is unreadable |
-| `GET` | `/health?verbose=1` | Component breakdown — **session or bearer only** |
+| `GET` | `/health?verbose=1` | Component breakdown, **session or bearer only** |
 
 `GET /health` is a fixed contract for container healthchecks: `{"status":"ok"}`
 with `200`, or `{"status":"error", ...}` with `503`. Adding `?verbose=1` returns
-the same report `/status` renders — components, states, and what to do about
-each — but only to an authenticated caller, because it names your public base
+the same report `/status` renders (components, states, and what to do about
+each), but only to an authenticated caller, because it names your public base
 URL and your configured Apps. An anonymous caller that asks for it gets the
 plain liveness body rather than an error, so a healthcheck that sends the
 parameter by accident still works. See

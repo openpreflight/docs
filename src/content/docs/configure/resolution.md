@@ -6,7 +6,7 @@ sidebar:
 ---
 Four layers can decide what a commit runs. This page is the order they are
 checked in, and the endpoint that tells you which one actually won for a given
-commit — so the answer to *"why did it run **that**?"* does not require pushing
+commit, so the answer to *"why did it run **that**?"* does not require pushing
 a commit and reading the result afterwards.
 
 ## The four layers
@@ -21,12 +21,11 @@ resolved on its own:
 | 3 | **Settings** | Settings → Configuration and Runner | `default_pipeline_file`, `default_timeout_seconds`, `default_check_name`, `default_runtime` |
 | 4 | **Built-in default** | the binary | `.ci.yml`, 15m, `openpreflight`, the worker process |
 
-Two things about this table are worth stating plainly, because they are the
-parts people get wrong.
+Two things about this table are the parts people get wrong.
 
 **The commands resolve as a block; everything else resolves per value.** If the
 pipeline file sets *any* of `install`, `test` or `build`, the file supplies all
-three and the binding's command overrides are ignored entirely — there is no
+three and the binding's command overrides are ignored entirely. There is no
 merging, so you cannot set `test` in the file and inherit `install` from the
 binding. But `runtime` and `timeout` are independent: a file that sets only
 `runtime: node:22` applies that image to commands that came from the binding or
@@ -48,11 +47,11 @@ match wins:
 | `package.json` | Node | by lockfile: `pnpm install --frozen-lockfile`, `yarn install --immutable`, `npm ci`, else `npm install --no-audit --no-fund` | `<runner> test`, only if a `test` script exists | `<runner> run build`, only if a `build` script exists |
 | `go.mod` | Go | `go mod download` | `go test ./...` | `go build ./...` |
 | `Cargo.toml` | Rust | `cargo fetch --locked` (plain `cargo fetch` with no `Cargo.lock`) | `cargo test` | `cargo build --release` |
-| `pyproject.toml`, `requirements.txt`, `setup.py` | Python | by lockfile: `uv sync --frozen`, `poetry install --no-interaction`, `pip install -r requirements.txt`, else `pip install .` | `pytest`, only on evidence — see below | — |
+| `pyproject.toml`, `requirements.txt`, `setup.py` | Python | by lockfile: `uv sync --frozen`, `poetry install --no-interaction`, `pip install -r requirements.txt`, else `pip install .` | `pytest`, only on evidence (see below) | none |
 
 Node is checked first, so no repository that worked before these detectors
-existed changes its plan. A repository that matches two of them — a Go service
-with a JavaScript front end, say — gets the first match **and a warning**,
+existed changes its plan. A repository that matches two of them (a Go service
+with a JavaScript front end, say) gets the first match **and a warning**,
 because silently picking one of two plausible plans is worse than either.
 
 Two asymmetries in that table are deliberate:
@@ -69,7 +68,7 @@ Two asymmetries in that table are deliberate:
 
 If nothing matches, there is nothing to run and the check concludes `skipped`
 rather than failing. Set `on_empty_pipeline: fail` on the binding if you would
-rather that be loud — see [Enable repos](/configure/bindings/).
+rather that be loud. See [Enable repos](/configure/bindings/).
 
 ## The dry run
 
@@ -87,7 +86,7 @@ changed-file list a webhook would deliver. Then it throws the checkout away.
 
 **A dry run writes nothing.** No Check Run on the commit, no job row, nothing on
 the queue. It is safe to run against a production instance and against a
-repository whose binding is disabled — a disabled binding resolves normally and
+repository whose binding is disabled: a disabled binding resolves normally and
 says that webhooks for it are being ignored.
 
 ### Reading the result
@@ -132,7 +131,7 @@ inferred from `go.mod`. Three layers, one commit. A single "plan from" string
 cannot say that.
 
 `errors` are things that would fail or skip a real run. `warnings` are legal but
-probably not what you meant — an ambiguous project layout, a `runtime:` with no
+probably not what you meant: an ambiguous project layout, a `runtime:` with no
 reachable engine, a filter that matched nothing on this commit.
 
 **Every problem is reported at once.** A real run stops at the first one,
@@ -166,8 +165,8 @@ single command.
 
 **A fork pull request.** Fork code always runs in a container, never as a
 process on the host. If the pipeline file sets no `runtime`, the image comes
-from `settings.default_runtime` and the origin says so explicitly — that value
-is the trust boundary, so it should never be ambiguous. See
+from `settings.default_runtime` and the origin says so explicitly, because that
+value is the trust boundary, so it should never be ambiguous. See
 [Security model](/reference/security-model/).
 
 **A monorepo whose commit touched only docs.** The binding's `paths` is
@@ -178,8 +177,8 @@ Nothing was wrong; the filter did its job. See
 
 ## Related
 
-- [Pipelines](/use/pipelines/) — the `.ci.yml` contract itself
-- [Enable repos](/configure/bindings/) — the binding fields, layer 2
-- [Configuration](/configure/configuration/) — the settings, layer 3
-- [Runs](/use/runs/) — reading a run after the fact
-- [API](/reference/api/) — the resolve endpoint's request and response
+- [Pipelines](/use/pipelines/): the `.ci.yml` contract itself
+- [Enable repos](/configure/bindings/): the binding fields, layer 2
+- [Configuration](/configure/configuration/): the settings, layer 3
+- [Runs](/use/runs/): reading a run after the fact
+- [API](/reference/api/): the resolve endpoint's request and response

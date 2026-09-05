@@ -26,7 +26,7 @@ The PEM and the webhook secret are encrypted at rest and never shown again.
 
 This path is github.com only. GitHub Enterprise: paste credentials (below).
 
-## Advanced — paste credentials
+## Advanced: paste credentials
 
 GitHub → Settings → Developer settings → **GitHub Apps** → New GitHub App,
 then paste name, slug, App ID, webhook secret, and PEM.

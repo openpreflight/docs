@@ -4,8 +4,8 @@ description: "Why GitHub must reach the webhook over public HTTPS, what that mea
 sidebar:
   order: 3
 ---
-There is one hard network requirement, and it is worth being explicit about it
-before you deploy: **GitHub must be able to reach this worker.** Everything else
+There is one hard network requirement, and it decides whether you can deploy at
+all: **GitHub must be able to reach this worker.** Everything else
 about the deployment is yours to arrange. For mounts, ports, and proxy headers,
 see [Deployment](/deploy/deployment/); this page is about the requirement
 itself and the trust boundary it creates.
@@ -33,7 +33,7 @@ Nothing here needs a datacentre, but something has to terminate a public name:
 
 | Situation | What people use |
 |---|---|
-| VPS or cloud box | A reverse proxy on the host — Caddy or nginx with automatic certificates |
+| VPS or cloud box | A reverse proxy on the host: Caddy or nginx with automatic certificates |
 | Home server, no inbound ports | An outbound tunnel that terminates publicly, such as a Cloudflare Tunnel or Tailscale Funnel |
 | Behind a corporate proxy | Whatever already publishes your internal services; the requirement is only that GitHub's POST arrives |
 
@@ -51,7 +51,7 @@ Say this accurately, because overclaiming here is easy:
   dependencies it downloads, the secrets, the logs, and the database they are
   recorded in never leave infrastructure you control.
 
-What travels to GitHub is the result — a conclusion, a step table, and a
+What travels to GitHub is the result: a conclusion, a step table, and a
 truncated log tail on the Check Run. The full log stays on your host and is
 served from `/runs/{id}`, behind a session unless the binding opted into
 shareable logs.
@@ -64,7 +64,7 @@ rather than more private.
 
 The run page tails in-flight logs over Server-Sent Events. A proxy that buffers
 responses will hold the whole stream until the job ends, which looks like
-"live logs do not work" — the log arrives complete, all at once, when the job
+"live logs do not work". The log arrives complete, all at once, when the job
 finishes.
 
 The application already sends `X-Accel-Buffering: no` and flushes every write,

@@ -19,8 +19,8 @@ delivery for a repository with no enabled binding is dropped.
 
 GitHub has to be able to reach that URL, which is the one part of this system
 that is necessarily public. See [Networking](/deploy/networking/) for
-what that means in practice. Everything the run itself touches — the checkout,
-the build, the secrets, the logs — stays on infrastructure you control.
+what that means in practice. Everything the run itself touches (the checkout,
+the build, the secrets, the logs) stays on infrastructure you control.
 
 ## Executors and the trust boundary
 
@@ -75,22 +75,22 @@ webhook secrets, no Coolify tokens, no installation token.
 
 ## Fork pull requests
 
-Fork pull requests are **skipped by default**, and the reason is worth stating
-plainly: a fork PR is an invitation to run a stranger's code on your server. On
-a hosted CI provider that risk is someone else's to absorb. Here it is yours,
-so the default is no.
+Fork pull requests are **skipped by default**. A fork PR is an invitation to run
+a stranger's code on your server. On a hosted CI provider that risk is someone
+else's to absorb. Here it is yours, so the default is no.
 
 The skip is reported, not silent. A refused fork pull request still gets a Check
 Run, completed with a `skipped` conclusion, whose summary says which setting
 refused it and what to change. That matters when the check name is a *required*
-check: branch protection needs an answer, and an absent check is not one.
+check, because branch protection will sit and wait on a check that never
+arrives.
 
 An operator who wants fork checks has two settings to change, and both are
 required:
 
-- `skip_fork_prs` — turn it off to let fork jobs queue at all.
-- `default_runtime` — the image fork jobs run in. Without it there is nothing to
-  run them in, and the job fails rather than silently falling back.
+- Turn `skip_fork_prs` off, so fork jobs queue at all.
+- Set `default_runtime` to the image fork jobs run in. Without it there is
+  nothing to run them in, and the job fails rather than silently falling back.
 
 A reachable Docker engine is also required. Fork jobs **always** run in Docker,
 never as a process on this host, and that is not configurable. See

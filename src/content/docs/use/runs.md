@@ -4,8 +4,8 @@ description: "The run page, the per-repository page, what the executor and plan 
 sidebar:
   order: 2
 ---
-Three pages answer three different questions, and it is worth knowing which is
-which before you go looking.
+Three pages answer three different questions. Knowing which is which saves a
+lot of clicking around.
 
 | Page | Question it answers |
 |---|---|
@@ -16,7 +16,7 @@ which before you go looking.
 ## The run page
 
 `GET /runs/{id}` is what the Check Run's **Details** link points at. GitHub
-never fetches it — the reader's browser does — so it needs a session unless the
+never fetches it (the reader's browser does), so it needs a session unless the
 binding opted into [shareable logs](/use/logs/).
 
 Alongside the commit, branch, trigger and duration, two fields say how the run
@@ -42,7 +42,7 @@ both show up here.
 
 **Plan from** says where the *commands* came from. It cannot say that the
 timeout came from settings while the image came from `.ci.yml`, and mixed
-provenance is normal — a file that sets only `runtime:` supplies the executor
+provenance is normal: a file that sets only `runtime:` supplies the executor
 while the commands come from somewhere else entirely.
 
 So the run page carries a per-value table too:
@@ -55,7 +55,7 @@ So the run page carries a per-value table too:
 | `test` | `go test ./...` | Go defaults from go.mod |
 
 It is recorded when the plan is resolved, so it says what applied to **this**
-commit rather than what would apply today — which is the distinction you want
+commit rather than what would apply today, which is the distinction you want
 when the configuration has changed since. `GET /api/v1/jobs/{id}` returns the
 same list as `plan_origins`.
 
@@ -75,20 +75,21 @@ before anything is pushed. It writes no Check Run and queues nothing. See
 
 ## Reading a skipped run
 
-A `skipped` conclusion is not a failure and not an error — it means the worker
-decided there was nothing to do. Which kind of skip it was is recorded, because
+A `skipped` conclusion means the worker decided there was nothing to do. It is
+neither a failure nor an error. Which kind of skip it was is recorded, because
 they used to be indistinguishable:
 
 | Reason | What happened |
 |---|---|
 | `path_filter` | No changed file matched the binding's paths. Intentional. See [Path filters](/configure/path-filters/) |
-| `no_pipeline` | Nothing resolved to run: no pipeline file, no binding commands, no recognisable project. Usually a misconfiguration — set `on_empty_pipeline: fail` to make it loud |
+| `no_pipeline` | Nothing resolved to run: no pipeline file, no binding commands, no recognisable project. Usually a misconfiguration; set `on_empty_pipeline: fail` to make it loud |
 | `fork_disabled` | A fork pull request, and `skip_fork_prs` is on |
 | `fork_no_docker` | Fork PRs are enabled but no Docker engine is reachable |
 | `fork_no_runtime` | Fork PRs are enabled but `default_runtime` is empty |
 
-Every one of these still **completes** the Check Run. That is deliberate: a
-required check needs an answer, and an absent check is not one.
+Every one of these still **completes** the Check Run. A required check that
+never arrives leaves branch protection waiting forever, so the worker always
+reports something.
 
 ## Cancel and re-run
 
@@ -96,5 +97,5 @@ required check needs an answer, and an absent check is not one.
 engine-side, not just detached from.
 
 **Re-run** queues a fresh job for the same commit. It is a new job with a new
-Check Run, never a mutation of the old one — the old run stays on the commit as
+Check Run, never a mutation of the old one. The old run stays on the commit as
 a record of what happened.

@@ -77,7 +77,7 @@ reverse_proxy 127.0.0.1:8080 {
 ```
 
 **Traefik** buffers nothing by default, so the usual cause there is an explicit
-`buffering` middleware on the router — remove it from this path. If the stream
+`buffering` middleware on the router. Remove it from this path. If the stream
 still stalls, set the flush interval on the service:
 
 ```yaml

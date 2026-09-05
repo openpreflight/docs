@@ -35,7 +35,7 @@ Highest first:
 
 1. the repo's pipeline file
 2. the binding's command overrides
-3. defaults inferred from the project's own files — `package.json` (Node),
+3. defaults inferred from the project's own files: `package.json` (Node),
    `go.mod` (Go), `Cargo.toml` (Rust), `pyproject.toml` / `requirements.txt`
    (Python), first match wins
 4. nothing to run → the check is reported as skipped rather than failed
@@ -47,8 +47,8 @@ independently.
 
 A step that fails stops the run; later steps are reported as skipped.
 
-To see which layer won for a real commit — including the inferred commands and
-the exact image — use the dry run:
+To see which layer won for a real commit, including the inferred commands and
+the exact image, use the dry run:
 [How configuration resolves](/configure/resolution/).
 
 Defaults for the pipeline file path, timeout, and check name live in
