@@ -2,7 +2,7 @@
 title: "Troubleshooting"
 description: "Common failure modes (process won't start, no Check Run, skipped checks, fork PRs, Docker socket errors) and the page that owns each fix."
 sidebar:
-  order: 5
+  order: 2
 ---
 
 Symptom → cause → fix, with a link to the page that owns the detail. Nothing
@@ -12,7 +12,7 @@ Before working through it, open **`/status`** in the operator UI. It reports the
 database, the webhook URL, the GitHub Apps, the enabled repositories, the worker
 and Docker, and says what to do about anything that is not ok — which is faster
 than guessing which symptom below matches. See
-[Operations](/understanding/operations/#checking-on-a-running-instance).
+[Operations](/operate/operations/#checking-on-a-running-instance).
 
 ## Process exits immediately on start
 
@@ -23,7 +23,7 @@ refuses to boot by design.
 secret, and restart. Keep it forever. Losing it makes stored PEMs and tokens
 unreadable.
 
-See [Configuration](/start/configuration/).
+See [Configuration](/configure/configuration/).
 
 ## `/health` returns 503
 
@@ -33,7 +33,7 @@ See [Configuration](/start/configuration/).
 (uid 10001 in the image). A missing or corrupted volume surfaces here before
 anything else.
 
-See [Deployment](/understanding/deployment/).
+See [Deployment](/deploy/deployment/).
 
 ## Live logs only appear when the job finishes
 
@@ -46,7 +46,7 @@ Caddy needs `flush_interval -1`. To confirm which side is at fault, curl the
 stream against the app's port directly — if it streams there and not through the
 proxy, the proxy is buffering.
 
-See [Logs](/using/logs/#live-logs-through-a-reverse-proxy).
+See [Logs](/use/logs/#live-logs-through-a-reverse-proxy).
 
 ## Jobs sit in progress and the queue stops moving
 
@@ -59,7 +59,7 @@ deliberately not on a timer: the requeue is unconditional, so running it against
 live jobs would clobber them. `/status` shows the gap directly — "running" counts
 workers, "in flight" counts rows, and a difference is exactly this.
 
-See [Operations](/understanding/operations/#checking-on-a-running-instance).
+See [Operations](/operate/operations/#checking-on-a-running-instance).
 
 ## Push produces no check at all
 
@@ -69,15 +69,15 @@ acknowledged (valid HMAC) and dropped.
 **Fix:** Open **Repos**, pick the CI App, check the repository. The bindings
 table is the allow-list.
 
-See [Enable repos](/setup/bindings/) and
-[Architecture](/understanding/architecture/).
+See [Enable repos](/configure/bindings/) and
+[Architecture](/reference/architecture/).
 
 ## Check reports skipped, not failed
 
 **Cause:** Nothing resolved to run: no pipeline file, no binding command
 overrides, and no `package.json` scripts that the Node defaults would pick up.
 
-**Fix:** Commit a [pipeline](/using/pipelines/) (or set binding overrides).
+**Fix:** Commit a [pipeline](/use/pipelines/) (or set binding overrides).
 Skipped means "nothing to do", not an error.
 
 ## Fork PR produces no check
@@ -89,8 +89,8 @@ untrusted code.
 engine and `default_runtime`; fork jobs always run in Docker, never as a
 process on this host.
 
-See [Security model](/understanding/security-model/) and
-[ADR 004](/adr/004-docker-executor/).
+See [Security model](/reference/security-model/) and
+[ADR 004](/reference/decisions/004-docker-executor/).
 
 ## Job fails instantly when `runtime:` is set
 
@@ -102,7 +102,7 @@ the process executor.
 reachable daemon. Confirm with a binding that omits `runtime:` if you only
 need process execution.
 
-See [Pipelines](/using/pipelines/).
+See [Pipelines](/use/pipelines/).
 
 ## `runtime:` job has an empty `/work`
 
@@ -115,8 +115,8 @@ not hold the checkout. `npm ci` then fails with a missing `package-lock.json`
 `/proc/self/mountinfo`. If that still misses, set `CI_WORKSPACE_HOST` to the
 host directory mounted at `WORKSPACE_DIR` and recreate the container.
 
-See [Deployment](/understanding/deployment/) and
-[Configuration](/start/configuration/).
+See [Deployment](/deploy/deployment/) and
+[Configuration](/configure/configuration/).
 
 ## Permission denied on the docker socket
 
@@ -134,7 +134,7 @@ On Docker Desktop the answer is `0`. Do not use the host's `stat` on macOS:
 `/var/run/docker.sock` is a symlink into `~/.docker`, so it reports a group
 that means nothing inside the container.
 
-See [Deployment](/understanding/deployment/).
+See [Deployment](/deploy/deployment/).
 
 ## Boot fails after a key rotation
 
@@ -145,5 +145,5 @@ See [Deployment](/understanding/deployment/).
 re-seal log line), then unset `CI_SECRET_KEY_OLD` and restart. Keep a backup
 of `/data` from before the rotate until you have logged in and tested an App.
 
-See [Configuration](/start/configuration/) and
-[Deployment](/understanding/deployment/).
+See [Configuration](/configure/configuration/) and
+[Deployment](/deploy/deployment/).

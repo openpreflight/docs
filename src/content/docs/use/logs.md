@@ -104,4 +104,4 @@ there and not through the proxy, the proxy is still buffering.
 :::
 
 Retention and size caps are settings; see
-[Configuration](/start/configuration/).
+[Configuration](/configure/configuration/).

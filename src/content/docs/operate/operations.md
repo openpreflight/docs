@@ -2,7 +2,7 @@
 title: "Operations"
 description: "Backup and restore of ci.db and logs, what a restart does to a running job, health and status checks, the upgrade procedure, and the versioning policy."
 sidebar:
-  order: 5
+  order: 1
 ---
 Everything worth keeping is `DATA_DIR` plus `CI_SECRET_KEY`. Neither is much
 use without the other. Nothing else on the box holds state.
@@ -193,7 +193,7 @@ which is why the backup step above is not optional on a minor either.
 An hourly pass prunes expired sessions, then deletes job rows and their log
 files older than `log_retention_days` (default 14). Queued and running jobs are
 never pruned. Nothing else is cleaned up automatically. See
-[Configuration](/start/configuration/) for the settings that govern it.
+[Configuration](/configure/configuration/) for the settings that govern it.
 
 There is no cap on checkout size. A per-job workspace is removed when the job
 ends, but a repository large enough to fill the disk will fill it while it

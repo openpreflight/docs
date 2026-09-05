@@ -27,7 +27,7 @@ unreachable, the job fails instead of falling back to the process executor.
 
 Image names are allow-listed (no shell metacharacters, no leading `-`). A file
 that only sets `runtime:` / `timeout:` still applies those while commands come
-from the binding or `package.json`. See [ADR 004](/adr/004-docker-executor/).
+from the binding or `package.json`. See [ADR 004](/reference/decisions/004-docker-executor/).
 
 ## Resolution order
 
@@ -49,7 +49,7 @@ A step that fails stops the run; later steps are reported as skipped.
 
 To see which layer won for a real commit — including the inferred commands and
 the exact image — use the dry run:
-[How configuration resolves](/setup/resolution/).
+[How configuration resolves](/configure/resolution/).
 
 Defaults for the pipeline file path, timeout, and check name live in
-[Configuration](/start/configuration/).
+[Configuration](/configure/configuration/).

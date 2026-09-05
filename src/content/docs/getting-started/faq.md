@@ -2,12 +2,12 @@
 title: "FAQ"
 description: "Short answers on the current release, GitHub Apps, Coolify, check-suite gating, GitHub Enterprise, monorepos, whether the project checks itself, and what is out of scope."
 sidebar:
-  order: 4
+  order: 2
 ---
 
 Positioning questions the homepage raises, and the ones people ask before
 installing. Each answer links the page or ADR that argues it in full. For how
-this sits against other CI, see [Comparison](/start/comparison/).
+this sits against other CI, see [Comparison](/getting-started/comparison/).
 
 ## What is the current release?
 
@@ -26,8 +26,8 @@ An App also has exactly one webhook URL, which is why Coolify's own GitHub
 connector cannot do this job: its webhook belongs to Coolify's deploy
 pipeline and its manifest has no `checks` permission.
 
-See [Register a GitHub App](/setup/github-app/) and
-[ADR 003](/adr/003-github-app/).
+See [Register a GitHub App](/configure/github-app/) and
+[ADR 003](/reference/decisions/003-github-app/).
 
 ## Why is Coolify optional?
 
@@ -36,7 +36,7 @@ not the product, and not required for checks. Skip it and everything else
 works the same: checks still come from a GitHub App you register, and jobs
 still run here or on any Docker engine you point `CI_DOCKER_HOST` at.
 
-See [Coolify](/setup/coolify/).
+See [Coolify](/deploy/coolify/).
 
 ## Why gate on the check suite instead of push?
 
@@ -45,7 +45,7 @@ live run per commit. That is deliberate: gate on the commit, not on the push,
 without importing a second scheduler. Adding a `push` case would reverse that
 decision, not extend it.
 
-See [ADR 005](/adr/005-check-suite-gating/).
+See [ADR 005](/reference/decisions/005-check-suite-gating/).
 
 ## What is out of scope?
 
@@ -54,7 +54,7 @@ artifacts. Jobs on another machine use a Docker engine via `CI_DOCKER_HOST`,
 not Coolify's API as a job runner. A GitHub App can be created with GitHub's
 review screen, or pasted.
 
-See [Architecture](/understanding/architecture/) and the homepage's "What it
+See [Architecture](/reference/architecture/) and the homepage's "What it
 isn't" list.
 
 ## Does it work with GitHub Enterprise Server?
@@ -92,11 +92,11 @@ Result: RUN
 ```
 
 One caveat worth knowing: the file list is the **head commit's**, not a pull
-request's full diff. See [Path filters](/setup/path-filters/) for the pattern
+request's full diff. See [Path filters](/configure/path-filters/) for the pattern
 syntax, why exclusions are not supported, and a monorepo example.
 
 It is still one job and three steps, not a matrix of jobs per directory.
-Woodpecker still wins for fan-out; see [Comparison](/start/comparison/).
+Woodpecker still wins for fan-out; see [Comparison](/getting-started/comparison/).
 
 ## Does the project use itself for CI?
 

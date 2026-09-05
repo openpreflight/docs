@@ -2,12 +2,12 @@
 title: "Configuration"
 description: "Environment variables the process needs to start, and the Settings row that lives in SQLite afterwards."
 sidebar:
-  order: 2
+  order: 1
 ---
 Two layers. The process reads a handful of env vars so it can start. Everything
 else is a row in SQLite, edited in the UI or over the JSON API. For a
-procedural first run, see [Quickstart](/start/quickstart/). Pipeline file
-semantics are also covered under [Pipelines](/using/pipelines/).
+procedural first run, see [Quickstart](/getting-started/quickstart/). Pipeline file
+semantics are also covered under [Pipelines](/use/pipelines/).
 
 ## One job at a time, by default
 
@@ -47,7 +47,7 @@ There is no `GITHUB_APP_ID` and no `CI_ALLOWED_REPOS`. Those live in
 Compose variable: it puts uid 10001 in the docker socket's group so `runtime:`
 jobs and fork PRs can reach the engine. The default of `998` suits a typical
 Linux docker group and does not work on Docker Desktop, where the socket is
-gid 0 inside the container. See [Deployment](/understanding/deployment/).
+gid 0 inside the container. See [Deployment](/deploy/deployment/).
 
 Generate a key with:
 
@@ -89,7 +89,7 @@ webhook for a repo with no enabled binding is dropped.
 
 Empty paths means every path. A complete file list with no match skips (Check
 Run `skipped`) before clone; a truncated or failed list fails open and runs. See
-[Path filters](/setup/path-filters/) for the pattern syntax and the diagnostics.
+[Path filters](/configure/path-filters/) for the pattern syntax and the diagnostics.
 
 `on_empty_pipeline` is `skip` (the default) or `fail`, set on the binding form or
 over the API, and decides what happens
@@ -129,7 +129,7 @@ To find out which layer won for an actual commit, without pushing one, use the
 dry run at Repos → **Dry run** or
 `POST /api/v1/bindings/{id}/resolve`. It reports every resolved value with the
 layer that supplied it. See
-[How configuration resolves](/setup/resolution/).
+[How configuration resolves](/configure/resolution/).
 
 Backups, upgrades, and what a restart does to a running job are in
-[Operations](/understanding/operations/).
+[Operations](/operate/operations/).

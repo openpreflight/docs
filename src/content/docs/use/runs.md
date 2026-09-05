@@ -17,7 +17,7 @@ which before you go looking.
 
 `GET /runs/{id}` is what the Check Run's **Details** link points at. GitHub
 never fetches it — the reader's browser does — so it needs a session unless the
-binding opted into [shareable logs](/using/logs/).
+binding opted into [shareable logs](/use/logs/).
 
 Alongside the commit, branch, trigger and duration, two fields say how the run
 was decided:
@@ -60,7 +60,7 @@ when the configuration has changed since. `GET /api/v1/jobs/{id}` returns the
 same list as `plan_origins`.
 
 To ask the same question about a commit that has not run, use the dry run:
-[How configuration resolves](/setup/resolution/).
+[How configuration resolves](/configure/resolution/).
 
 ## The repository page
 
@@ -71,7 +71,7 @@ the repo cards on the overview, or from **Repos**.
 `/repos/{id}/edit` is the form for changing any of it, and **Dry run**
 (`/repos/{id}/resolve`) answers what a given branch, tag or commit would do
 before anything is pushed. It writes no Check Run and queues nothing. See
-[How configuration resolves](/setup/resolution/).
+[How configuration resolves](/configure/resolution/).
 
 ## Reading a skipped run
 
@@ -81,7 +81,7 @@ they used to be indistinguishable:
 
 | Reason | What happened |
 |---|---|
-| `path_filter` | No changed file matched the binding's paths. Intentional. See [Path filters](/setup/path-filters/) |
+| `path_filter` | No changed file matched the binding's paths. Intentional. See [Path filters](/configure/path-filters/) |
 | `no_pipeline` | Nothing resolved to run: no pipeline file, no binding commands, no recognisable project. Usually a misconfiguration — set `on_empty_pipeline: fail` to make it loud |
 | `fork_disabled` | A fork pull request, and `skip_fork_prs` is on |
 | `fork_no_docker` | Fork PRs are enabled but no Docker engine is reachable |

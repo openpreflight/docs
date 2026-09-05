@@ -2,7 +2,7 @@
 title: "How configuration resolves"
 description: "The four layers that decide what a commit runs, in the order they are checked, and the dry run that tells you which one won."
 sidebar:
-  order: 5
+  order: 4
 ---
 Four layers can decide what a commit runs. This page is the order they are
 checked in, and the endpoint that tells you which one actually won for a given
@@ -69,7 +69,7 @@ Two asymmetries in that table are deliberate:
 
 If nothing matches, there is nothing to run and the check concludes `skipped`
 rather than failing. Set `on_empty_pipeline: fail` on the binding if you would
-rather that be loud — see [Enable repos](/setup/bindings/).
+rather that be loud — see [Enable repos](/configure/bindings/).
 
 ## The dry run
 
@@ -168,18 +168,18 @@ single command.
 process on the host. If the pipeline file sets no `runtime`, the image comes
 from `settings.default_runtime` and the origin says so explicitly — that value
 is the trust boundary, so it should never be ambiguous. See
-[Security model](/understanding/security-model/).
+[Security model](/reference/security-model/).
 
 **A monorepo whose commit touched only docs.** The binding's `paths` is
 `backend/**`. `decision` is `skip`, `skip_reason` is `path_filter`, and
 `path_filter` shows the changed count, the matched count and `Result: SKIP`.
 Nothing was wrong; the filter did its job. See
-[Path filters](/setup/path-filters/).
+[Path filters](/configure/path-filters/).
 
 ## Related
 
-- [Pipelines](/using/pipelines/) — the `.ci.yml` contract itself
-- [Enable repos](/setup/bindings/) — the binding fields, layer 2
-- [Configuration](/start/configuration/) — the settings, layer 3
-- [Runs](/using/runs/) — reading a run after the fact
-- [API](/using/api/) — the resolve endpoint's request and response
+- [Pipelines](/use/pipelines/) — the `.ci.yml` contract itself
+- [Enable repos](/configure/bindings/) — the binding fields, layer 2
+- [Configuration](/configure/configuration/) — the settings, layer 3
+- [Runs](/use/runs/) — reading a run after the fact
+- [API](/reference/api/) — the resolve endpoint's request and response

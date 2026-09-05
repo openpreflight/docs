@@ -18,7 +18,7 @@ touching the queue. The bindings table is a second gate: a correctly signed
 delivery for a repository with no enabled binding is dropped.
 
 GitHub has to be able to reach that URL, which is the one part of this system
-that is necessarily public. See [Networking](/understanding/networking/) for
+that is necessarily public. See [Networking](/deploy/networking/) for
 what that means in practice. Everything the run itself touches — the checkout,
 the build, the secrets, the logs — stays on infrastructure you control.
 
@@ -59,7 +59,7 @@ own toolchain.
 Secret columns (App PEM, webhook secret, Coolify token) are AES-256-GCM
 encrypted. GET responses return a redacted marker, never the value. Key
 material is `CI_SECRET_KEY`; rotation is documented in
-[Configuration](/start/configuration/).
+[Configuration](/configure/configuration/).
 
 ## Clone credentials
 
@@ -94,16 +94,16 @@ required:
 
 A reachable Docker engine is also required. Fork jobs **always** run in Docker,
 never as a process on this host, and that is not configurable. See
-[ADR 004](/adr/004-docker-executor/).
+[ADR 004](/reference/decisions/004-docker-executor/).
 
 ## Sessions
 
 Session cookies are HttpOnly, `Secure` behind HTTPS, and browser writes require
 a CSRF token. Bearer callers carry no ambient cookie and so skip CSRF. See
-[ADR 002](/adr/002-authentication/).
+[ADR 002](/reference/decisions/002-authentication/).
 
 ## Shareable logs
 
 A binding can opt into shareable logs for `GET /runs/{id}` and
 `GET /api/v1/jobs/{id}/logs`. Job ids are random UUIDs, but treat such a link as
-a secret. See [Logs](/using/logs/).
+a secret. See [Logs](/use/logs/).

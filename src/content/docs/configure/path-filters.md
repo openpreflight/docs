@@ -2,7 +2,7 @@
 title: "Path filters"
 description: "Pattern syntax, what `**` does, why exclusions are not supported, the fail-open rule, the diagnostics in the log, and a monorepo example."
 sidebar:
-  order: 4
+  order: 5
 ---
 A binding's **paths** field limits which commits get checked. Empty means every
 path, which is the default and the behaviour every install had before filters
@@ -10,7 +10,7 @@ existed.
 
 This is one job with an optional filter, not a matrix of jobs per directory. If
 you need different pipelines per directory, that is fan-out, and
-[Comparison](/start/comparison/) points at tools that do it.
+[Comparison](/getting-started/comparison/) points at tools that do it.
 
 ## Pattern syntax
 

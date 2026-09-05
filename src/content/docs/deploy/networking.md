@@ -2,12 +2,12 @@
 title: "Networking"
 description: "Why GitHub must reach the webhook over public HTTPS, what that means when you have no public IP, and where the privacy boundary actually falls."
 sidebar:
-  order: 4
+  order: 3
 ---
 There is one hard network requirement, and it is worth being explicit about it
 before you deploy: **GitHub must be able to reach this worker.** Everything else
 about the deployment is yours to arrange. For mounts, ports, and proxy headers,
-see [Deployment](/understanding/deployment/); this page is about the requirement
+see [Deployment](/deploy/deployment/); this page is about the requirement
 itself and the trust boundary it creates.
 
 ## Why it has to be reachable
@@ -70,4 +70,4 @@ finishes.
 The application already sends `X-Accel-Buffering: no` and flushes every write,
 so a default nginx often needs nothing. Where a change is needed, the
 copy-paste blocks for nginx, Caddy and Traefik are in
-[Logs](/using/logs/#live-logs-through-a-reverse-proxy).
+[Logs](/use/logs/#live-logs-through-a-reverse-proxy).

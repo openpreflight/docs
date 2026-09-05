@@ -2,7 +2,7 @@
 title: "Deployment"
 description: "Compose mounts, DOCKER_GID, reverse-proxy notes, Coolify install-worker, and rotating CI_SECRET_KEY."
 sidebar:
-  order: 3
+  order: 1
 ---
 The image is a static Go binary plus `git`, Node, and `docker-cli`. It runs as
 uid 10001. `tini` is the entrypoint so pipeline shells get reaped.
@@ -51,7 +51,7 @@ to the host directory mounted at `WORKSPACE_DIR` and recreate.
 
 Nothing else needs this. The service boots and reports checks with an
 unreachable socket; only `runtime:` jobs and fork PRs fail. Job containers
-never receive that socket; see [ADR 004](/adr/004-docker-executor/).
+never receive that socket; see [ADR 004](/reference/decisions/004-docker-executor/).
 
 To run jobs on another Docker engine (including a Coolify server's), set
 `CI_DOCKER_HOST` (else `DOCKER_HOST`) to that daemon. That is Docker's remote
@@ -60,7 +60,7 @@ API, not Coolify's. Coolify tokens cannot start `docker run`.
 ## Coolify (or any reverse proxy)
 
 - Give the service a public HTTPS URL. GitHub must reach `POST /webhook/{slug}`;
-  see [Networking](/understanding/networking/) for why, and what to do when you
+  see [Networking](/deploy/networking/) for why, and what to do when you
   have no public IP.
 - Point the domain at this container's port 8080.
 - Set `CI_SECRET_KEY` as a secret / env var on the application, not in git.
@@ -82,17 +82,17 @@ still works with read-only.
 
 Never point Coolify's own GitHub connector webhook at this service. An App has
 one webhook URL, and repointing it steals Coolify's deploys. See
-[ADR 003](/adr/003-github-app/).
+[ADR 003](/reference/decisions/003-github-app/).
 
 ## After first boot
 
 1. Complete setup (admin password + public base URL) if you did not bootstrap.
-   See [Quickstart](/start/quickstart/).
-2. [Register a GitHub App](/setup/github-app/) and paste it under **GitHub Apps**.
-3. [Enable bindings](/setup/bindings/). Only enable private repos you trust: a
+   See [Quickstart](/getting-started/quickstart/).
+2. [Register a GitHub App](/configure/github-app/) and paste it under **GitHub Apps**.
+3. [Enable bindings](/configure/bindings/). Only enable private repos you trust: a
    pipeline runs the repo's own commands in this process, or in a sibling
    container when `runtime:` is set.
-4. Optionally [add a Coolify instance](/setup/coolify/) (team token) as a
+4. Optionally [add a Coolify instance](/deploy/coolify/) (team token) as a
    repo-picker source, or to install this worker.
 
 ## Rotating `CI_SECRET_KEY`
@@ -115,4 +115,4 @@ database without the key is not enough to recover PEMs and tokens. The key
 without the database is not enough to recover configuration.
 
 Procedure, restore, upgrades, and what a redeploy does to a running job are in
-[Operations](/understanding/operations/).
+[Operations](/operate/operations/).
