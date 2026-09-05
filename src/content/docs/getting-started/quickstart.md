@@ -6,12 +6,12 @@ sidebar:
 ---
 This is the shortest path from an empty box to a process waiting for a GitHub
 App. Full environment and settings detail lives in
-[Configuration](/start/configuration/).
+[Configuration](/configure/configuration/).
 
 ## Requirements
 
 - A GitHub App you own (permissions and events in
-  [Register a GitHub App](/setup/github-app/))
+  [Register a GitHub App](/configure/github-app/))
 - A public HTTPS URL GitHub can reach
 - `git` in the worker image (clone happens here). Node is needed in this image
   only when a job has no `runtime:` and runs as a process
@@ -34,11 +34,11 @@ docker compose -f compose.prod.yaml up -d
 `CI_SECRET_KEY` is the only variable you must set; the process refuses to start
 without it. Keep it forever. Losing it makes stored PEMs and tokens unreadable.
 Everything else either has a default or is asked for in the wizard. See
-[Configuration](/start/configuration/) for the full env table and key rotation.
+[Configuration](/configure/configuration/) for the full env table and key rotation.
 
-**v2.0.0** is the current tagged release. Linux binaries are on the
-[GitHub Release](https://github.com/openpreflight/openpreflight/releases/tag/v2.0.0).
-Pin the image with `OPENPREFLIGHT_VERSION=2.0.0` rather than editing the file.
+**v2.1.0** is the current tagged release. Linux binaries are on the
+[GitHub Release](https://github.com/openpreflight/openpreflight/releases/tag/v2.1.0).
+Pin the image with `OPENPREFLIGHT_VERSION=2.1.0` rather than editing the file.
 v1.0.0 was 29 August 2026.
 
 To build from source instead (the contributor path, where `compose.yaml` is
@@ -52,7 +52,7 @@ docker compose up --build
 ```
 
 If you use `runtime:` or fork PRs, you also need `DOCKER_GID`. See
-[Deployment](/understanding/deployment/), which covers compose, volumes, the
+[Deployment](/deploy/deployment/), which covers compose, volumes, the
 docker socket, and reverse-proxy notes.
 
 ## First boot
@@ -66,13 +66,13 @@ wizard. It is ignored once a user exists.
 
 ## Setup order
 
-1. [Register a GitHub App](/setup/github-app/) and paste it under **GitHub Apps**.
-2. [Enable repo bindings](/setup/bindings/). The bindings table is the
+1. [Register a GitHub App](/configure/github-app/) and paste it under **GitHub Apps**.
+2. [Enable repo bindings](/configure/bindings/). The bindings table is the
    allow-list.
-3. Optionally [add a Coolify instance](/setup/coolify/) as a repo-picker source
+3. Optionally [add a Coolify instance](/deploy/coolify/) as a repo-picker source
    or to install this worker.
 
-Then commit a [pipeline](/using/pipelines/) (or rely on Node defaults) and push.
+Then commit a [pipeline](/use/pipelines/) (or rely on Node defaults) and push.
 
 ## What you should see
 
@@ -93,9 +93,9 @@ View full logs →
 
 **View full logs** is the Check Run's `details_url`: it opens
 `GET /runs/{job-id}` on your instance. That page requires a session by
-default; a binding can opt into shareable logs. See [Logs](/using/logs/).
+default; a binding can opt into shareable logs. See [Logs](/use/logs/).
 
 If nothing resolves to run, the check reports skipped rather than failed.
-That is intentional. See [Pipelines](/using/pipelines/) and
-[Troubleshooting](/using/troubleshooting/).
+That is intentional. See [Pipelines](/use/pipelines/) and
+[Troubleshooting](/operate/troubleshooting/).
 

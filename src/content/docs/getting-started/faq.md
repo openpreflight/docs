@@ -1,19 +1,19 @@
 ---
 title: "FAQ"
-description: "Short answers on the current release, GitHub Apps, Coolify, check-suite gating, GitHub Enterprise, monorepos, dogfooding, and what is out of scope."
+description: "Short answers on the current release, GitHub Apps, Coolify, check-suite gating, GitHub Enterprise, monorepos, whether the project checks itself, and what is out of scope."
 sidebar:
-  order: 4
+  order: 2
 ---
 
 Positioning questions the homepage raises, and the ones people ask before
 installing. Each answer links the page or ADR that argues it in full. For how
-this sits against other CI, see [Comparison](/start/comparison/).
+this sits against other CI, see [Comparison](/getting-started/comparison/).
 
 ## What is the current release?
 
-**v2.0.0** is out (2 September 2026). Linux binaries are on the
-[GitHub Release](https://github.com/openpreflight/openpreflight/releases/tag/v2.0.0).
-The [changelog](https://github.com/openpreflight/openpreflight/blob/v2.0.0/CHANGELOG.md)
+**v2.1.0** is out (5 September 2026). Linux binaries are on the
+[GitHub Release](https://github.com/openpreflight/openpreflight/releases/tag/v2.1.0).
+The [changelog](https://github.com/openpreflight/openpreflight/blob/v2.1.0/CHANGELOG.md)
 is the feature list. [v1.0.0](https://github.com/openpreflight/openpreflight/releases/tag/v1.0.0)
 was the first tagged release (29 August 2026). [What is out of scope](#what-is-out-of-scope)
 is still the product boundary. Those things are out of scope rather than
@@ -26,8 +26,8 @@ An App also has exactly one webhook URL, which is why Coolify's own GitHub
 connector cannot do this job: its webhook belongs to Coolify's deploy
 pipeline and its manifest has no `checks` permission.
 
-See [Register a GitHub App](/setup/github-app/) and
-[ADR 003](/adr/003-github-app/).
+See [Register a GitHub App](/configure/github-app/) and
+[ADR 003](/reference/decisions/003-github-app/).
 
 ## Why is Coolify optional?
 
@@ -36,7 +36,7 @@ not the product, and not required for checks. Skip it and everything else
 works the same: checks still come from a GitHub App you register, and jobs
 still run here or on any Docker engine you point `CI_DOCKER_HOST` at.
 
-See [Coolify](/setup/coolify/).
+See [Coolify](/deploy/coolify/).
 
 ## Why gate on the check suite instead of push?
 
@@ -45,7 +45,7 @@ live run per commit. That is deliberate: gate on the commit, not on the push,
 without importing a second scheduler. Adding a `push` case would reverse that
 decision, not extend it.
 
-See [ADR 005](/adr/005-check-suite-gating/).
+See [ADR 005](/reference/decisions/005-check-suite-gating/).
 
 ## What is out of scope?
 
@@ -54,7 +54,7 @@ artifacts. Jobs on another machine use a Docker engine via `CI_DOCKER_HOST`,
 not Coolify's API as a job runner. A GitHub App can be created with GitHub's
 review screen, or pasted.
 
-See [Architecture](/understanding/architecture/) and the homepage's "What it
+See [Architecture](/reference/architecture/) and the homepage's "What it
 isn't" list.
 
 ## Does it work with GitHub Enterprise Server?
@@ -79,21 +79,39 @@ A binding can list path patterns (`frontend/**`, comma or newline). Empty
 paths is every path, as before. When the file list for the SHA is complete
 and nothing matches, the job is **skipped** (Check Run conclusion `skipped`)
 before clone, so required checks do not hang. If GitHub truncates the list
-(300 files) or the commits API errors, the job still runs.
+(300 files) or the commits API errors, the job still runs and says so.
+
+The log and the Check Run carry the decision, so a filter that is too narrow is
+visible rather than a mystery:
+
+```
+Changed files: 18
+Matched files: 4
+Filter: src/**
+Result: RUN
+```
+
+One caveat worth knowing: the file list is the **head commit's**, not a pull
+request's full diff. See [Path filters](/configure/path-filters/) for the pattern
+syntax, why exclusions are not supported, and a monorepo example.
 
 It is still one job and three steps, not a matrix of jobs per directory.
-Woodpecker still wins for fan-out; see [Comparison](/start/comparison/).
+Woodpecker still wins for fan-out; see [Comparison](/getting-started/comparison/).
 
 ## Does the project use itself for CI?
 
-No. `openpreflight/openpreflight` runs GitHub Actions: `ci.yml` for vet, test,
-and a Docker build, and `release.yml` on a `v*` tag.
+Yes. All three product repositories — the binary, the website, and these docs —
+commit a `.ci.yml` and get their repository checks from a self-hosted instance
+at [ci.openpreflight.xyz](https://ci.openpreflight.xyz). A push to
+`openpreflight/openpreflight` runs `go vet ./...` and `go test ./...` there, and
+the Check Run on the commit comes from a GitHub App we registered like any other
+operator would.
 
-A self-hosted instance at [ci.openpreflight.xyz](https://ci.openpreflight.xyz)
-can check public repos the same way it checks private ones. That is proof the
-binary works, not CI for this repository. Releases have to
-build multi-arch images and attach binaries, which this tool does not do. It
-reports a check; publishing artifacts is somebody else's job.
+GitHub Actions is kept for exactly one workflow: `release.yml`, on a `v*` tag.
+That builds multi-architecture images and attaches binaries to the release.
+Publishing artifacts is not something this tool does, and it is not on the
+roadmap — it reports a check. Splitting the two that way is the honest division
+of labour, not a gap.
 
 Nothing stops it from checking a public repo, incidentally. The repository's
 visibility is read from the webhook payload but never gates anything; "private

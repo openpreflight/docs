@@ -6,7 +6,7 @@ hero:
   tagline: "A small CI provider for private repos. One Go binary, one SQLite file: register a GitHub App, enable your repos, and get one Check Run per commit."
   actions:
     - text: Quickstart
-      link: /start/quickstart/
+      link: /getting-started/quickstart/
       icon: right-arrow
     - text: View on GitHub
       link: https://github.com/openpreflight/openpreflight
@@ -16,31 +16,31 @@ hero:
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
-**v2.0.0** is out (2 September 2026). Linux binaries are on the
-[GitHub Release](https://github.com/openpreflight/openpreflight/releases/tag/v2.0.0).
+**v2.1.0** is out (5 September 2026). Linux binaries are on the
+[GitHub Release](https://github.com/openpreflight/openpreflight/releases/tag/v2.1.0).
 What shipped is in the
-[changelog](https://github.com/openpreflight/openpreflight/blob/v2.0.0/CHANGELOG.md);
-what this still does not include is in the [FAQ](/start/faq/).
+[changelog](https://github.com/openpreflight/openpreflight/blob/v2.1.0/CHANGELOG.md);
+what this still does not include is in the [FAQ](/getting-started/faq/).
 v1.0.0 was 29 August 2026.
 
 <CardGrid>
-  <Card title="Start here" icon="rocket">
-    [Quickstart](/start/quickstart/) gets the binary running and through the
-    first-boot wizard. [Configuration](/start/configuration/) is the full
+  <Card title="Getting started" icon="rocket">
+    [Quickstart](/getting-started/quickstart/) gets the binary running and through the
+    first-boot wizard. [Configuration](/configure/configuration/) is the full
     environment reference.
   </Card>
-  <Card title="Set it up" icon="setting">
-    [Register a GitHub App](/setup/github-app/). Only an App can create Check
-    Runs. Then [enable repos](/setup/bindings/); the bindings table is the
+  <Card title="Configure" icon="setting">
+    [Register a GitHub App](/configure/github-app/). Only an App can create Check
+    Runs. Then [enable repos](/configure/bindings/); the bindings table is the
     allow-list.
   </Card>
-  <Card title="Use it" icon="document">
-    [Pipelines](/using/pipelines/) is the `.ci.yml` contract and its resolution
-    order. [Logs](/using/logs/) and the [API](/using/api/) cover the rest.
+  <Card title="Use" icon="document">
+    [Pipelines](/use/pipelines/) is the `.ci.yml` contract and its resolution
+    order. [Logs](/use/logs/) and the [API](/reference/api/) cover the rest.
   </Card>
-  <Card title="Understand it" icon="open-book">
-    [Architecture](/understanding/architecture/) explains the one-process shape.
-    The [decisions](/adr/005-check-suite-gating/) record why it gates on the
+  <Card title="Reference" icon="open-book">
+    [Architecture](/reference/architecture/) explains the one-process shape.
+    The [decisions](/reference/decisions/005-check-suite-gating/) record why it gates on the
     check suite rather than on push.
   </Card>
 </CardGrid>

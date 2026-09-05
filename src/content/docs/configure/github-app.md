@@ -2,14 +2,14 @@
 title: "Register a GitHub App"
 description: "Create a GitHub App with GitHub's review screen, or paste credentials. Permissions, events, and webhook URL."
 sidebar:
-  order: 1
+  order: 2
 ---
 Only a GitHub App can create Check Runs. User and OAuth tokens are refused. A
 GitHub App also has exactly one webhook URL, which is why Coolify's own GitHub
 connector cannot do this job: its webhook belongs to Coolify's deploy
 pipeline and its manifest has no `checks` permission. Coolify is used here for
 server inventory and as a repository picker; the checks come from an App you
-register. See [ADR 003](/adr/003-github-app/).
+register. See [ADR 003](/reference/decisions/003-github-app/).
 
 Set the **public base URL** in Settings first so GitHub can reach the callback
 and the webhook.
@@ -45,5 +45,5 @@ JWT and lists installations.
 ## After the App is registered
 
 Enable the repositories you want checks for under
-[Bindings](/setup/bindings/). A webhook for a repo with no enabled binding is
+[Bindings](/configure/bindings/). A webhook for a repo with no enabled binding is
 acknowledged and dropped, however valid its signature.

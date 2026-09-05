@@ -64,7 +64,7 @@ Branch protection then reads whichever finished last.
 - Per-step Check Runs are rejected while the executor runs steps sequentially in
   one shell and one workspace. GitHub renders a Re-run button per check run, and
   a step that cannot be re-run alone must not advertise one. If the Docker
-  executor ([ADR 004](/adr/004-docker-executor/)) later makes steps independently
+  executor ([ADR 004](/reference/decisions/004-docker-executor/)) later makes steps independently
   schedulable, this is the decision to revisit. The recorded `check_suite_id`
   is what makes that cheap.
 - A local `check_suites` table is rejected. Suites cannot be created through the

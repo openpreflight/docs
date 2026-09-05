@@ -2,12 +2,12 @@
 title: "Configuration"
 description: "Environment variables the process needs to start, and the Settings row that lives in SQLite afterwards."
 sidebar:
-  order: 2
+  order: 1
 ---
 Two layers. The process reads a handful of env vars so it can start. Everything
 else is a row in SQLite, edited in the UI or over the JSON API. For a
-procedural first run, see [Quickstart](/start/quickstart/). Pipeline file
-semantics are also covered under [Pipelines](/using/pipelines/).
+procedural first run, see [Quickstart](/getting-started/quickstart/). Pipeline file
+semantics are also covered under [Pipelines](/use/pipelines/).
 
 ## One job at a time, by default
 
@@ -47,7 +47,7 @@ There is no `GITHUB_APP_ID` and no `CI_ALLOWED_REPOS`. Those live in
 Compose variable: it puts uid 10001 in the docker socket's group so `runtime:`
 jobs and fork PRs can reach the engine. The default of `998` suits a typical
 Linux docker group and does not work on Docker Desktop, where the socket is
-gid 0 inside the container. See [Deployment](/understanding/deployment/).
+gid 0 inside the container. See [Deployment](/deploy/deployment/).
 
 Generate a key with:
 
@@ -73,19 +73,31 @@ Runner, Logs, Admin as their own pages) or `PATCH /api/v1/settings`.
 | `default_timeout_seconds` | `900` | Per-job timeout |
 | `max_concurrent_jobs` | `1` | Jobs this process runs at once. See above |
 | `max_log_bytes` | 10 MiB | The log stops growing at this size; the run continues |
+| `max_workspace_bytes` | 1 GiB | Checkout plus whatever the build writes. Measured after clone and between steps; over the limit fails the job rather than filling the disk. `0` disables the check |
 | `log_retention_days` | `14` | Prune old logs and job rows |
 | `default_runtime` | empty | Docker image used when a fork job's pipeline has no `runtime:` |
-| `skip_fork_prs` | `true` | Fork PRs are ignored. Saving `false` requires Docker plus `default_runtime`. |
+| `skip_fork_prs` | `true` | Fork PRs are not run. The Check Run still completes as `skipped` so a required check resolves. Saving `false` requires Docker plus `default_runtime` |
 
 ## Binding overrides
 
 Per repo, highest first at run time: **binding → App → settings**.
 
 A binding can override branches, paths, check name, pipeline file, timeout,
-install/test/build commands, and whether logs are shareable. Empty paths means
-every path. A complete file list with no match skips (Check Run `skipped`)
-before clone. The bindings table is itself the allow-list: a signed webhook for
-a repo with no enabled binding is dropped.
+install/test/build commands, whether logs are shareable, and
+`on_empty_pipeline`. The bindings table is itself the allow-list: a signed
+webhook for a repo with no enabled binding is dropped.
+
+Empty paths means every path. A complete file list with no match skips (Check
+Run `skipped`) before clone; a truncated or failed list fails open and runs. See
+[Path filters](/configure/path-filters/) for the pattern syntax and the diagnostics.
+
+`on_empty_pipeline` is `skip` (the default) or `fail`, set on the binding form or
+over the API, and decides what happens
+when a pipeline resolves to no steps at all. That is usually a configuration
+mistake rather than an intention, and it used to be indistinguishable from a
+path-filter skip. Every skip now records a `skip_reason` on the job:
+`path_filter`, `no_pipeline`, or one of `fork_disabled` / `fork_no_docker` /
+`fork_no_runtime`.
 
 ## Pipeline file
 
@@ -109,9 +121,15 @@ Resolution order, highest first:
 
 1. the repo's pipeline file
 2. the binding's command overrides
-3. Node defaults inferred from `package.json`: `npm ci` / `pnpm` / `yarn` by
-   lockfile, then `test` and `build`, but only if those scripts exist
+3. defaults inferred from the project's own files — `package.json`, `go.mod`,
+   `Cargo.toml`, `pyproject.toml` / `requirements.txt`, first match wins
 4. nothing to run → the check is reported as skipped rather than failed
 
+To find out which layer won for an actual commit, without pushing one, use the
+dry run at Repos → **Dry run** or
+`POST /api/v1/bindings/{id}/resolve`. It reports every resolved value with the
+layer that supplied it. See
+[How configuration resolves](/configure/resolution/).
+
 Backups, upgrades, and what a restart does to a running job are in
-[Operations](/understanding/operations/).
+[Operations](/operate/operations/).

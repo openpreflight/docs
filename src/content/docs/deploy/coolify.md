@@ -2,13 +2,13 @@
 title: "Optional: Coolify"
 description: "Add Coolify as an optional deployment target and repository picker. Not required for checks to work."
 sidebar:
-  order: 3
+  order: 2
 ---
 Coolify is a supported deployment target and an optional repo source. It is
 not the product, and checks do not need it. Add a team-scoped API token and you
 get server inventory, a repository picker, and a one-click Install this worker. Skip it
 entirely and everything else works the same: the checks come from a
-[GitHub App you register](/setup/github-app/), and jobs run here or on any
+[GitHub App you register](/configure/github-app/), and jobs run here or on any
 Docker engine you point `CI_DOCKER_HOST` at.
 
 ## Add an instance
@@ -32,6 +32,6 @@ webhook URL, and repointing it would steal Coolify's deploys.
 ## Deploying the worker on Coolify
 
 Compose, volumes, reverse-proxy, and install-worker details are in
-[Deployment](/understanding/deployment/). Jobs on another machine use
+[Deployment](/deploy/deployment/). Jobs on another machine use
 `CI_DOCKER_HOST` / `DOCKER_HOST` (a Docker engine), not Coolify's API as a job
 runner.

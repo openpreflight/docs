@@ -61,4 +61,4 @@ committed `*_templ.go` files.
 
 Do not introduce `pkg/` or flatten `internal/` into generic `auth` /
 `database` / `service` packages. Name packages after the work they do. See
-[architecture.md](/understanding/architecture/) and [CONTRIBUTING.md](https://github.com/openpreflight/openpreflight/blob/main/CONTRIBUTING.md).
+[architecture.md](/reference/architecture/) and [CONTRIBUTING.md](https://github.com/openpreflight/openpreflight/blob/main/CONTRIBUTING.md).
