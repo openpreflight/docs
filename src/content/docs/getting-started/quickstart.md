@@ -77,23 +77,22 @@ Then commit a [pipeline](/use/pipelines/) (or rely on Node defaults) and push.
 ## What you should see
 
 On the next push to an enabled binding, GitHub opens one Check Run on the
-commit. The panel in the pull request looks like this:
+commit. The summary is markdown this worker writes. This repository's
+[`.ci.yml`](https://github.com/openpreflight/openpreflight/blob/main/.ci.yml)
+has `install` and `test` only — no `build` — so a passing run looks like:
 
-```text
-openpreflight
-────────────────────
-✓ install    8s
-✓ test      21s
-✓ build     13s
-
-Passed in 42s
-
-View full logs →
+```
+✓ install  47s
+✓ test     12s
 ```
 
-**View full logs** is the Check Run's `details_url`: it opens
-`GET /runs/{job-id}` on your instance. That page requires a session by
-default; a binding can opt into shareable logs. See [Logs](/use/logs/).
+**Passed in 59s**
+
+[View full logs](/use/logs/)
+
+Durations change per run. **View full logs** is the Check Run's `details_url`:
+it opens `GET /runs/{job-id}` on your instance. That page requires a session
+by default; a binding can opt into shareable logs. See [Logs](/use/logs/).
 
 If nothing resolves to run, the check reports skipped rather than failed.
 That is intentional. See [Pipelines](/use/pipelines/) and

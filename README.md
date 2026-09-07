@@ -1,18 +1,16 @@
 <div align="center">
-  <picture>
-    <source
-      media="(prefers-color-scheme: dark)"
-      srcset="https://openpreflight.xyz/banner-dark.png"
-    />
-    <img
-      src="https://openpreflight.xyz/banner-light.png"
-      alt="openpreflight: a small CI provider for private repos. One Go binary, one SQLite file: register a GitHub App, enable your repos, and get one Check Run per commit."
-      width="880"
-    />
-  </picture>
-</div>
+
+<img src="https://openpreflight.xyz/apple-touch-icon.png" alt="openpreflight" width="72" height="72" />
 
 # openpreflight docs
+
+**A small CI provider for private repos.**
+
+One Go binary · one SQLite file · one Check Run per commit
+
+[Website](https://openpreflight.xyz) · [Docs](https://docs.openpreflight.xyz) · [Source](https://github.com/openpreflight/openpreflight)
+
+</div>
 
 The documentation site, published at **https://docs.openpreflight.xyz**.
 Astro + Starlight + Tailwind v4. It describes **v2.1.2**
