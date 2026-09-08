@@ -1,0 +1,224 @@
+---
+import { compactLinks, footerGroups, legalLinks, tagline } from '../lib/site';
+
+interface Props {
+  variant: 'full' | 'compact';
+}
+
+const { variant } = Astro.props;
+---
+
+{
+  variant === 'full' ? (
+    <footer class="site-footer site-footer--full">
+      <div class="site-footer__inner">
+        <div class="site-footer__grid">
+          <div>
+            <a class="site-footer__brand" href="/">
+              <span class="site-footer__mark">
+                <img alt="" height="36" src="/favicon.svg" width="36" />
+              </span>
+              openpreflight
+            </a>
+            <p class="site-footer__tagline">{tagline}</p>
+          </div>
+          <nav aria-label="Footer" class="site-footer__groups">
+            {
+              footerGroups.map((group) => (
+                <div>
+                  <h2 class="site-footer__heading">{group.title}</h2>
+                  <ul>
+                    {group.links.map((link) => (
+                      <li>
+                        <a href={link.href}>{link.label}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))
+            }
+          </nav>
+        </div>
+        <div class="site-footer__legal">
+          <p>openpreflight is Apache-2.0. This site is MIT.</p>
+          <div class="site-footer__legal-links">
+            {legalLinks.map((link) => (
+              <a href={link.href}>{link.label}</a>
+            ))}
+          </div>
+        </div>
+      </div>
+    </footer>
+  ) : (
+    <footer class="site-footer site-footer--compact">
+      <nav aria-label="Footer">
+        {
+          compactLinks.map((link) => (
+            <a href={link.href}>{link.label}</a>
+          ))
+        }
+      </nav>
+      <p>
+        {
+          legalLinks.map((link, i) => (
+            <>
+              {i > 0 ? ' · ' : ''}
+              <a href={link.href}>{link.label}</a>
+            </>
+          ))
+        }
+      </p>
+    </footer>
+  )
+}
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--sl-color-hairline);
+    color: var(--sl-color-gray-3);
+    font-size: var(--sl-text-sm);
+  }
+
+  .site-footer a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .site-footer a:hover {
+    color: var(--sl-color-accent-high);
+  }
+
+  .site-footer--full {
+    padding: 3rem var(--sl-content-pad-x);
+    background: var(--sl-color-bg-nav);
+  }
+
+  .site-footer__inner {
+    max-width: 72rem;
+    margin-inline: auto;
+  }
+
+  .site-footer__grid {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  @media (min-width: 72rem) {
+    .site-footer__grid {
+      grid-template-columns: 0.85fr 2fr;
+    }
+  }
+
+  .site-footer__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-weight: 600;
+    color: var(--sl-color-white);
+  }
+
+  .site-footer__mark {
+    display: grid;
+    width: 2.25rem;
+    height: 2.25rem;
+    place-items: center;
+    overflow: hidden;
+    border-radius: 0.7rem;
+    background: var(--sl-color-accent);
+  }
+
+  .site-footer__mark img {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .site-footer__tagline {
+    max-width: 22rem;
+    margin-top: 1.1rem;
+    line-height: 1.55;
+  }
+
+  .site-footer__groups {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.75rem 2rem;
+  }
+
+  @media (min-width: 50rem) {
+    .site-footer__groups {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .site-footer__heading {
+    margin: 0;
+    font-size: var(--sl-text-xs);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .site-footer__groups ul {
+    margin: 0.85rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .site-footer__groups li + li {
+    margin-top: 0.65rem;
+  }
+
+  .site-footer__groups a {
+    color: var(--sl-color-white);
+    font-weight: 500;
+  }
+
+  .site-footer__legal {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 2.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--sl-color-hairline);
+    font-size: var(--sl-text-xs);
+  }
+
+  .site-footer__legal p {
+    margin: 0;
+  }
+
+  @media (min-width: 50rem) {
+    .site-footer__legal {
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .site-footer__legal-links {
+      margin-inline-start: auto;
+    }
+  }
+
+  .site-footer__legal-links {
+    display: flex;
+    gap: 1.25rem;
+  }
+
+  .site-footer--compact {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1.25rem var(--sl-content-pad-x);
+    padding-inline-start: calc(var(--sl-content-inline-start, 0px) + var(--sl-content-pad-x));
+    font-size: var(--sl-text-xs);
+  }
+
+  .site-footer--compact nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1.25rem;
+  }
+
+  .site-footer--compact p {
+    margin: 0;
+  }
+</style>
