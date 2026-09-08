@@ -1,0 +1,57 @@
+# openpreflight docs
+
+> A small CI provider for private repos. One Go binary, one SQLite file: register a GitHub App, enable your repos, and get one Check Run per commit.
+
+This is the how-to site. Positioning lives on the marketing site.
+
+Docs: https://docs.openpreflight.xyz
+Marketing: https://openpreflight.xyz
+Source: https://github.com/openpreflight/openpreflight
+Release: https://github.com/openpreflight/openpreflight/releases/tag/v2.1.2 (v2.1.2, 7 September 2026)
+License: Apache-2.0
+
+## Getting started
+
+- [Quickstart](https://docs.openpreflight.xyz/getting-started/quickstart/): Binary, first-boot wizard, ready for a GitHub App
+- [FAQ](https://docs.openpreflight.xyz/getting-started/faq/): Current release, GitHub Apps, Coolify, gating, GHE, monorepos, out of scope
+- [Comparison](https://docs.openpreflight.xyz/getting-started/comparison/): Woodpecker, Drone, actions/runner, Jenkins
+
+## Deploy
+
+- [Deployment](https://docs.openpreflight.xyz/deploy/deployment/): Compose, volumes, reverse proxy, rotating CI_SECRET_KEY
+- [Networking](https://docs.openpreflight.xyz/deploy/networking/): Why GitHub must reach the webhook over public HTTPS
+- [Coolify](https://docs.openpreflight.xyz/deploy/coolify/): Optional inventory / install-worker
+
+## Configure
+
+- [Configuration](https://docs.openpreflight.xyz/configure/configuration/): Environment variables and the Settings row
+- [Register a GitHub App](https://docs.openpreflight.xyz/configure/github-app/): Permissions, events, webhook URL
+- [Enable repos](https://docs.openpreflight.xyz/configure/bindings/): Bindings table is the allow-list
+- [How configuration resolves](https://docs.openpreflight.xyz/configure/resolution/): File, binding, package.json
+- [Path filters](https://docs.openpreflight.xyz/configure/path-filters/): Pattern syntax, fail-open, monorepos
+
+## Use
+
+- [Pipelines](https://docs.openpreflight.xyz/use/pipelines/): `.ci.yml` contract and runtime
+- [Runs](https://docs.openpreflight.xyz/use/runs/): Run page, skipped runs
+- [Logs](https://docs.openpreflight.xyz/use/logs/): Full logs vs Check Run tail, shareable logs
+
+## Operate
+
+- [Operations](https://docs.openpreflight.xyz/operate/operations/): Backup, restart, upgrade
+- [Troubleshooting](https://docs.openpreflight.xyz/operate/troubleshooting/): Common failure modes
+
+## Reference
+
+- [Architecture](https://docs.openpreflight.xyz/reference/architecture/): One process, what is absent
+- [Security model](https://docs.openpreflight.xyz/reference/security-model/): HMAC, encryption, trust boundaries
+- [API](https://docs.openpreflight.xyz/reference/api/): JSON API surface
+- [ADR 001](https://docs.openpreflight.xyz/reference/decisions/001-database/): SQLite in-process
+- [ADR 002](https://docs.openpreflight.xyz/reference/decisions/002-authentication/): Local admin, opaque sessions
+- [ADR 003](https://docs.openpreflight.xyz/reference/decisions/003-github-app/): Our GitHub App, not Coolify's
+- [ADR 004](https://docs.openpreflight.xyz/reference/decisions/004-docker-executor/): Optional docker run
+- [ADR 005](https://docs.openpreflight.xyz/reference/decisions/005-check-suite-gating/): Gate on the check suite
+
+## Contributing
+
+- [Development](https://docs.openpreflight.xyz/contributing/development/): Local Go build and test loop

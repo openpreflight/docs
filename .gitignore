@@ -5,3 +5,4 @@ graphify-out/
 .env
 .env.production
 .DS_Store
+.plans/*

@@ -1,0 +1,8 @@
+---
+import Default from '@astrojs/starlight/components/Footer.astro';
+
+const id = Astro.locals.starlightRoute.id;
+const isHome = id === 'index' || id === '';
+---
+
+{!isHome && <Default />}

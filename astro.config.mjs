@@ -1,10 +1,25 @@
 // @ts-check
+import { existsSync, statSync } from 'node:fs';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'astro/config';
+import sitemap from '@astrojs/sitemap';
 import starlight from '@astrojs/starlight';
 import tailwindcss from '@tailwindcss/vite';
 
 const CODE_REPO = 'https://github.com/openpreflight/openpreflight';
 const SITE = 'https://docs.openpreflight.xyz';
+const contentDir = fileURLToPath(new URL('./src/content/docs', import.meta.url));
+
+/** @param {string} pathname */
+function pageSource(pathname) {
+  const trimmed = pathname.replace(/\/$/, '');
+  const rel = trimmed === '' ? 'index' : trimmed.replace(/^\//, '');
+  return ['md', 'mdx'].flatMap((ext) => [
+    join(contentDir, `${rel}.${ext}`),
+    join(contentDir, rel, `index.${ext}`),
+  ]).find((candidate) => existsSync(candidate));
+}
 
 // This repository is the source of truth for the documentation. Pages live
 // under src/content/docs/, one directory per sidebar group. Every group is
@@ -41,10 +56,18 @@ export default defineConfig({
     '/adr/005-check-suite-gating/': '/reference/decisions/005-check-suite-gating/',
   },
   integrations: [
+    sitemap({
+      serialize(item) {
+        const file = pageSource(new URL(item.url).pathname);
+        if (file) item.lastmod = statSync(file).mtime.toISOString();
+        return item;
+      },
+    }),
     starlight({
       title: 'openpreflight',
       description:
         'A small CI provider for private repos. One Go binary, one SQLite file: register a GitHub App, enable your repos, and get one Check Run per commit.',
+      routeMiddleware: './src/routeData.ts',
       logo: {
         light: './src/assets/logo-light.svg',
         dark: './src/assets/logo-dark.svg',
@@ -57,6 +80,10 @@ export default defineConfig({
         baseUrl: 'https://github.com/openpreflight/docs/edit/main/',
       },
       customCss: ['./src/styles/global.css'],
+      components: {
+        Footer: './src/components/Footer.astro',
+        PageFrame: './src/components/PageFrame.astro',
+      },
       head: [
         {
           tag: 'link',
@@ -71,16 +98,20 @@ export default defineConfig({
           attrs: { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
         },
         {
+          tag: 'link',
+          attrs: { rel: 'manifest', href: '/site.webmanifest' },
+        },
+        {
+          tag: 'link',
+          attrs: { rel: 'describedby', href: `${SITE}/llms.txt` },
+        },
+        {
           tag: 'meta',
-          attrs: { property: 'og:image', content: `${SITE}/og.png` },
+          attrs: { name: 'apple-mobile-web-app-title', content: 'openpreflight' },
         },
         {
           tag: 'meta',
           attrs: { name: 'twitter:card', content: 'summary_large_image' },
-        },
-        {
-          tag: 'meta',
-          attrs: { name: 'twitter:image', content: `${SITE}/og.png` },
         },
         {
           tag: 'meta',
