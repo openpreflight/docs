@@ -2,7 +2,14 @@
  * Inner-page Open Graph cards. Splash keeps `public/og.png`.
  * SVG → PNG through sharp; no extra dependency, no Chrome.
  */
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import sharp from "sharp";
+
+const mark = readFileSync(
+  join(process.cwd(), "public/favicon.svg"),
+  "utf8",
+).replace("<svg ", '<svg x="80" y="72" width="72" height="72" ');
 
 export type OgPage = {
   slug: string;
@@ -58,11 +65,7 @@ export async function renderOgPng(page: OgPage): Promise<Buffer> {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
   <rect width="1200" height="630" fill="#f7f8f5"/>
   <rect width="12" height="630" fill="#2f6f4f"/>
-  <g transform="translate(80,72) scale(2.25)">
-    <rect width="32" height="32" rx="7" fill="#2f6f4f"/>
-    <path d="M8 16.5 L13.5 22 L21.5 12.5 H25.5" fill="none" stroke="#ffffff" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M20.25 9.25 L21.5 11.75 L22.75 9.25" fill="none" stroke="#ffffff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/>
-  </g>
+  ${mark}
   <text x="80" y="210" fill="#2f6f4f" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="20" font-weight="600" letter-spacing="0.14em">${esc(page.kicker.toUpperCase())}</text>
   <text x="80" y="292" fill="#1a1d19" font-family="ui-sans-serif, system-ui, sans-serif" font-size="${headlineSize}" font-weight="600">${headlineTspans}</text>
   <text x="80" y="${descY}" fill="#5f665c" font-family="ui-sans-serif, system-ui, sans-serif" font-size="26">${descTspans}</text>
