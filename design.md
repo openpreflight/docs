@@ -49,8 +49,9 @@ spacing:
 components:
   mark:
     description: >
-      Rounded square (#2f6f4f) with a white runway-check: diagonal check that levels into a
-      short horizontal runway, plus a caret above the apex. No wordmark inside the favicon.
+      Rounded square (#2f6f4f) with four white Check Run status glyphs on a strict grid:
+      solid dot (running) and ring (pending) on top; check (passed) and dash (skipped) below.
+      No wordmark inside the favicon.
   check-run-panel:
     description: >
       The product's only hero artifact: monospace Check Run output (pass greens, muted sep).
@@ -89,9 +90,9 @@ startup pitch deck.
 
 ## Mark / favicon
 
-The mark is a **runway-check** on forest green: a checkstroke that finishes as a short runway,
-with a caret at the apex (preflight / takeoff). Favicon and apple-touch use the mark only.
-Starlight/docs may show mark + title text separately.
+The mark is a **status quad** on forest green: solid dot (running) and ring (pending) on
+top; check (passed) and dash (skipped) below. Its simple geometry remains distinct at favicon size.
+Favicon and apple-touch use the mark only. Starlight/docs may show mark + title text separately.
 
 ## Website (marketing)
 
