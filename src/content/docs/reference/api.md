@@ -152,5 +152,11 @@ parameter by accident still works. See
 [Operations](/operate/operations/#checking-on-a-running-instance).
 
 Session cookies are HttpOnly, `Secure` behind HTTPS, and browser writes require
-a CSRF token. Bearer callers carry no ambient cookie and so skip CSRF. See
+a CSRF token. Bearer callers carry no ambient cookie and so skip CSRF.
+
+A session — cookie or bearer token — expires 24 hours after the request that
+last used it, and 7 days after it was issued whatever the traffic. The
+`expires_at` in the login response is the idle deadline, so a long-running
+client should expect to sign in again rather than treat that timestamp as
+final. `POST /api/v1/password` invalidates every session for the user. See
 [Security model](/reference/security-model/).

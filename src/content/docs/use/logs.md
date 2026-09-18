@@ -8,6 +8,12 @@ Full logs are written to `/data/logs/<job-id>.log`, capped by `max_log_bytes`
 (10 MiB by default) and pruned after `log_retention_days` (14 by default). The
 Check Run carries a truncated tail; the full log is on the details page.
 
+ANSI escape sequences are stripped as the log is written, so what lands on disk
+is plain text. Build tools colour their output whether or not a terminal is
+attached, and none of the four readers — the run page, the live stream, the
+Check Run tail on GitHub, and the JSON API — interpret escape codes; left in,
+a coloured line arrives as `[42m[30m generating static routes [39m[49m`.
+
 ## Details URL
 
 `GET /runs/{job-id}` is the `details_url` GitHub links to. GitHub never fetches
