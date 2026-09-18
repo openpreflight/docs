@@ -54,6 +54,7 @@ export default defineConfig({
     '/adr/003-github-app/': '/reference/decisions/003-github-app/',
     '/adr/004-docker-executor/': '/reference/decisions/004-docker-executor/',
     '/adr/005-check-suite-gating/': '/reference/decisions/005-check-suite-gating/',
+    '/adr/006-job-ids/': '/reference/decisions/006-job-ids/',
   },
   integrations: [
     sitemap({

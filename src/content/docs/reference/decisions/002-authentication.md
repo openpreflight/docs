@@ -20,7 +20,12 @@ v1 has a single local user. Password is bcrypt (cost default, minimum 12
 characters). First boot is either the setup wizard or
 `CI_BOOTSTRAP_ADMIN_PASSWORD`.
 
-Login issues an opaque 32-byte session token stored in SQLite (14-day TTL):
+Login issues an opaque 32-byte session token stored in SQLite. A session is
+idle-expiring, not fixed-length: it dies 24 hours after the last request that
+used it, and 7 days after it was issued whatever the activity. The store is the
+authority — the idle deadline slides forward on use, so the cookie carries the
+7-day ceiling and a cookie that outlives its row simply fails the lookup.
+Changing the password deletes every session for that user.
 
 - Browser: `ci_session` HttpOnly cookie, `Secure` behind HTTPS,
   `SameSite=Lax`. Cookie writes require a CSRF token (`ci_csrf` cookie +
@@ -38,6 +43,12 @@ shareable logs.
 
 - Operators are not coupled to GitHub identity. A stolen GitHub session
   cannot open the configurator.
+- A copied cookie or bearer token is only useful while someone keeps using it,
+  and never past a week. An operator who signs in daily is re-authenticated
+  weekly; one who stops is signed out the next day.
+- Rotating the password is a working revocation: it invalidates the credentials
+  already issued instead of only the next login. The browser that changed it is
+  handed a fresh cookie; a CLI holding a bearer token signs in again.
 - There is one admin. Sharing the password is the access model.
 - Logout must delete both the cookie and any Bearer token the caller
   presented; JSON login does not set a cookie.

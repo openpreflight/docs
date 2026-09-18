@@ -99,8 +99,19 @@ never as a process on this host, and that is not configurable. See
 ## Sessions
 
 Session cookies are HttpOnly, `Secure` behind HTTPS, and browser writes require
-a CSRF token. Bearer callers carry no ambient cookie and so skip CSRF. See
-[ADR 002](/reference/decisions/002-authentication/).
+a CSRF token. Bearer callers carry no ambient cookie and so skip CSRF.
+
+Sessions are idle-expiring. One dies **24 hours after the last request that used
+it**, and **7 days after it was issued** however much it is used. The idle
+deadline slides forward on each request; the 7-day ceiling does not move. The
+session row in SQLite is the authority on both, so the cookie's own expiry is
+just a hint and a cookie that outlives its row fails the lookup.
+
+Changing the password **deletes every session for that user**, including any
+bearer token issued to a CLI. The browser that made the change is handed a new
+cookie; everything else signs in again. Rotate the password to revoke access.
+
+See [ADR 002](/reference/decisions/002-authentication/).
 
 ## Shareable logs
 
