@@ -111,6 +111,17 @@ Changing the password **deletes every session for that user**, including any
 bearer token issued to a CLI. The browser that made the change is handed a new
 cookie; everything else signs in again. Rotate the password to revoke access.
 
+The sessions table stores a **SHA-256 of each token**, never the token, so a
+copied `ci.db` signs nobody in even without `CI_SECRET_KEY`.
+
+Sign-in allows **five attempts per minute per client address**. Attempts are
+counted before the bcrypt compare, so a blocked guess costs no CPU. The address
+is the TCP peer, so behind a reverse proxy the limit is shared by every client.
+
+Before an admin exists, `/setup` needs the **setup token** the process prints
+to its log at startup. Reaching the URL first is not enough to claim the
+instance.
+
 See [ADR 002](/reference/decisions/002-authentication/).
 
 ## Shareable logs
