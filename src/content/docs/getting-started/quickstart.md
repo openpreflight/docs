@@ -36,9 +36,9 @@ without it. Keep it forever. Losing it makes stored PEMs and tokens unreadable.
 Everything else either has a default or is asked for in the wizard. See
 [Configuration](/configure/configuration/) for the full env table and key rotation.
 
-**v2.2.0** is the current tagged release. Linux binaries are on the
-[GitHub Release](https://github.com/openpreflight/openpreflight/releases/tag/v2.2.0).
-Pin the image with `OPENPREFLIGHT_VERSION=2.2.0` rather than editing the file.
+**v2.3.0** is the current tagged release. Linux binaries are on the
+[GitHub Release](https://github.com/openpreflight/openpreflight/releases/tag/v2.3.0).
+Pin the image with `OPENPREFLIGHT_VERSION=2.3.0` rather than editing the file.
 v1.0.0 was 29 August 2026.
 
 To build from source instead (the contributor path, where `compose.yaml` is
@@ -57,8 +57,11 @@ docker socket, and reverse-proxy notes.
 
 ## First boot
 
-The first request with no admin user lands on the setup wizard: admin password
-plus the public base URL. Both are needed before GitHub can reach you.
+The first request with no admin user lands on the setup wizard: a setup token,
+the admin password, and the public base URL. The token is in the server log
+from startup, on the line that begins `no admin yet` (`setup_token=…`), so
+only someone who can read the logs can claim a fresh instance. A restart
+before setup prints a new one.
 
 For a headless deploy, set `CI_BOOTSTRAP_ADMIN_PASSWORD` so the `admin` user is
 created on first boot and you can drive setup over the API instead of the

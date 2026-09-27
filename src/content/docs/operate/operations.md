@@ -166,6 +166,8 @@ serving against a half-applied schema.
 To confirm an upgrade actually moved your database, `/status` reports the
 schema version (the last migration applied and how many have run) next to the
 version of the binary reporting it.
+The binary's version is also at the foot of the sidebar and on the sign-in
+page, so a glance after a restart tells you which release came up.
 
 ## What a release will ask of you
 

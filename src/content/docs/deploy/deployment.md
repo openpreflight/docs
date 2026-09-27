@@ -86,7 +86,8 @@ one webhook URL, and repointing it steals Coolify's deploys. See
 
 ## After first boot
 
-1. Complete setup (admin password + public base URL) if you did not bootstrap.
+1. Complete setup (setup token from the container log, admin password, public
+   base URL) if you did not bootstrap.
    See [Quickstart](/getting-started/quickstart/).
 2. [Register a GitHub App](/configure/github-app/) and paste it under **GitHub Apps**.
 3. [Enable bindings](/configure/bindings/). Only enable private repos you trust: a

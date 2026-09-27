@@ -16,8 +16,8 @@ aliases that mirror `PATCH` / `DELETE` for the HTML UI are omitted.
 
 | Method | Path | Purpose |
 |---|---|---|
-| `POST` | `/api/v1/setup` | First-run wizard |
-| `POST` | `/api/v1/login` | Returns `{ token }` |
+| `POST` | `/api/v1/setup` | First-run wizard; needs `setup_token` from the startup log |
+| `POST` | `/api/v1/login` | Returns `{ token }`; `429` + `Retry-After` past 5 attempts a minute |
 | `POST` | `/api/v1/logout` | End session |
 
 ## Settings
@@ -158,5 +158,8 @@ A session — cookie or bearer token — expires 24 hours after the request that
 last used it, and 7 days after it was issued whatever the traffic. The
 `expires_at` in the login response is the idle deadline, so a long-running
 client should expect to sign in again rather than treat that timestamp as
-final. `POST /api/v1/password` invalidates every session for the user. See
+final. `POST /api/v1/password` invalidates every session for the user.
+
+Login allows five attempts per minute per client address and a success resets
+the count. Behind a reverse proxy all clients share that budget. See
 [Security model](/reference/security-model/).

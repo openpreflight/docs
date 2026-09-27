@@ -17,14 +17,16 @@ webhooks with HMAC; that is a different trust boundary.
 ## Decision
 
 v1 has a single local user. Password is bcrypt (cost default, minimum 12
-characters). First boot is either the setup wizard or
-`CI_BOOTSTRAP_ADMIN_PASSWORD`.
+characters). First boot is either the setup wizard, which needs the setup
+token printed to the server log at startup, or `CI_BOOTSTRAP_ADMIN_PASSWORD`.
+Login is limited to five attempts per minute per client address.
 
-Login issues an opaque 32-byte session token stored in SQLite. A session is
-idle-expiring, not fixed-length: it dies 24 hours after the last request that
-used it, and 7 days after it was issued whatever the activity. The store is the
-authority — the idle deadline slides forward on use, so the cookie carries the
-7-day ceiling and a cookie that outlives its row simply fails the lookup.
+Login issues an opaque 32-byte session token; SQLite stores only its SHA-256.
+A session is idle-expiring, not fixed-length: it dies 24 hours after the last
+request that used it, and 7 days after it was issued whatever the activity.
+The store is the authority — the idle deadline slides forward on use, so the
+cookie carries the 7-day ceiling and a cookie that outlives its row simply
+fails the lookup.
 Changing the password deletes every session for that user.
 
 - Browser: `ci_session` HttpOnly cookie, `Secure` behind HTTPS,
