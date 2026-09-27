@@ -43,7 +43,8 @@ bundle (`GET /components/{bundle}`) plus a small theme script (system / light /
 dark). Form posts stay native.
 
 The authenticated layout is the shadcn Sidebar (Workspace / Setup / Settings)
-with Inset breadcrumbs. Login and setup are a centered card (`max-w-[440px]`).
+with Inset breadcrumbs and a refresh button in the header. Login and setup are a
+centered card (`max-w-[440px]`).
 Do not add HTMX, Alpine, React, Vue, or DaisyUI. After editing `*.templ` or
 `internal/web/assets/css/globals.css`:
 

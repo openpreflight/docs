@@ -11,9 +11,9 @@ this sits against other CI, see [Comparison](/getting-started/comparison/).
 
 ## What is the current release?
 
-**v2.3.0** is out (27 September 2026). Linux binaries are on the
-[GitHub Release](https://github.com/openpreflight/openpreflight/releases/tag/v2.3.0).
-The [changelog](https://github.com/openpreflight/openpreflight/blob/v2.3.0/CHANGELOG.md)
+**v2.3.1** is out (27 September 2026). Linux binaries are on the
+[GitHub Release](https://github.com/openpreflight/openpreflight/releases/tag/v2.3.1).
+The [changelog](https://github.com/openpreflight/openpreflight/blob/v2.3.1/CHANGELOG.md)
 is the feature list. [v1.0.0](https://github.com/openpreflight/openpreflight/releases/tag/v1.0.0)
 was the first tagged release (29 August 2026). [What is out of scope](#what-is-out-of-scope)
 is still the product boundary. Those things are out of scope rather than
