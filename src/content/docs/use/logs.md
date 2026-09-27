@@ -75,7 +75,7 @@ location /api/v1/jobs/ {
 
 **Caddy**
 
-```caddy
+```text title="Caddyfile"
 reverse_proxy 127.0.0.1:8080 {
     # -1 flushes every write immediately, which is what SSE needs.
     flush_interval -1
