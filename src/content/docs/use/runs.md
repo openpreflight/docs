@@ -1,51 +1,43 @@
 ---
 title: "Runs"
-description: "The run page, the per-repository page, what the executor and plan source tell you, and how to read a skipped run."
+description: "The run page, the repository page, the cause of a skipped job, and how to cancel or re-run a job."
 sidebar:
   order: 1
 ---
-Three pages answer three different questions. Knowing which is which saves a
-lot of clicking around.
+This page tells you about the pages that show jobs, the causes of a skip, and
+how to cancel or re-run a job.
 
-| Page | Question it answers |
+| Page | What it shows |
 |---|---|
-| `/jobs` | What has this instance been doing? |
-| `/repos/{id}` | What has *this repository* been doing? |
-| `/runs/{id}` | What happened to *this commit*? |
+| `/jobs` | All the jobs of this server |
+| `/repos/{id}` | The jobs of one repository |
+| `/runs/{id}` | The job for one commit |
 
 ## The run page
 
-`GET /runs/{id}` is what the Check Run's **Details** link points at. GitHub
-never fetches it (the reader's browser does), so it needs a session unless the
-binding opted into [shareable logs](/use/logs/).
+`GET /runs/{id}` is the target of the **Details** link on the Check Run.
+GitHub does not open this page. The browser of the reader opens it, thus it
+must have a session, but not for [shareable logs](/use/logs/#shareable-logs).
 
-Alongside the commit, branch, trigger and duration, two fields say how the run
-was decided:
+The run page shows the commit, the branch, the trigger and the run time. Two
+more fields show how the server made the plan.
 
-**Executor** is `worker process` or `docker: <image>`. A job runs in the worker
-process unless its pipeline file sets `runtime:`, or it is a fork pull request,
-which always runs in a container.
+**Executor** is `worker process` or `docker: <image>`. A job runs with the
+process executor, unless its pipeline file sets `runtime:` or it is a
+[fork pull request](/configure/fork-pull-requests/).
 
-**Plan from** is where the commands came from, and it resolves in this order:
+**Plan from** gives the source of the commands: the pipeline file,
+`binding commands`, or an inferred default such as
+`Node defaults from package.json`. The order of these sources is in
+[How configuration resolves](/reference/resolution/). If a job did an unwanted
+operation, read this field first.
 
-| Value | Meaning |
-|---|---|
-| `.ci.yml` (or your `pipeline_file`) | The repository's own pipeline file |
-| `binding commands` | The install/test/build fields on the binding |
-| `Node defaults from package.json`, `Go defaults from go.mod`, … | Inferred, because neither of the above was set |
+## Where each value came from
 
-If a run did something you did not expect, this is the field to read first. A
-pipeline file that is present but unparsed, or a binding override you forgot,
-both show up here.
-
-## Where every value came from
-
-**Plan from** says where the *commands* came from. It cannot say that the
-timeout came from settings while the image came from `.ci.yml`, and mixed
-provenance is normal: a file that sets only `runtime:` supplies the executor
-while the commands come from somewhere else entirely.
-
-So the run page carries a per-value table too:
+**Plan from** gives the source of the commands only. Other values can come from
+other layers. Example: a file that sets only `runtime:` supplies the executor,
+and the commands come from a different layer. Thus the run page also shows a
+table with one row for each value:
 
 | Value | Resolved to | From |
 |---|---|---|
@@ -54,48 +46,61 @@ So the run page carries a per-value table too:
 | `runtime` | `node:22` | `.ci.yml` |
 | `test` | `go test ./...` | Go defaults from go.mod |
 
-It is recorded when the plan is resolved, so it says what applied to **this**
-commit rather than what would apply today, which is the distinction you want
-when the configuration has changed since. `GET /api/v1/jobs/{id}` returns the
-same list as `plan_origins`.
-
-To ask the same question about a commit that has not run, use the dry run:
-[How configuration resolves](/reference/resolution/).
+The server records this table when it resolves the plan. Thus it shows the
+values that applied to **this** commit, also if the configuration changed
+after the job. `GET /api/v1/jobs/{id}` returns the same list as `plan_origins`.
+For a commit that did not run, use the [dry run](/configure/dry-run/).
 
 ## The repository page
 
-`GET /repos/{id}` is one repository's own page: its configuration, its last run
-with duration and the reason it did not pass, and its recent runs. Reach it from
-the repo cards on the overview, or from **Repos**.
+`GET /repos/{id}` shows one repository: its configuration, its last job with
+the run time and the cause of a failure, and its recent jobs. Open it from the
+repository cards on the overview, or from **Repos**.
 
-`/repos/{id}/edit` is the form for changing any of it, and **Dry run**
-(`/repos/{id}/resolve`) answers what a given branch, tag or commit would do
-before anything is pushed. It writes no Check Run and queues nothing. See
-[How configuration resolves](/reference/resolution/).
+**Edit** opens the binding fields (`/repos/{id}/edit`). **Dry run**
+(`/repos/{id}/resolve`) shows the plan for a branch, a tag or a commit. Refer
+to [Dry run](/configure/dry-run/).
 
-## Reading a skipped run
+## Skip reasons
 
-A `skipped` conclusion means the worker decided there was nothing to do. It is
-neither a failure nor an error. Which kind of skip it was is recorded, because
-they used to be indistinguishable:
+A `skipped` Check Run means that the server found nothing to do. It is not a
+failure and not an error. The job records the type of skip in `skip_reason`,
+and the Check Run summary gives one sentence about it.
 
-| Reason | What happened |
+| `skip_reason` | Cause |
 |---|---|
-| `path_filter` | No changed file matched the binding's paths. Intentional. See [Path filters](/configure/path-filters/) |
-| `no_pipeline` | Nothing resolved to run: no pipeline file, no binding commands, no recognisable project. Usually a misconfiguration; set `on_empty_pipeline: fail` to make it loud |
-| `fork_disabled` | A fork pull request, and `skip_fork_prs` is on |
-| `fork_no_docker` | Fork PRs are enabled but no Docker engine is reachable |
-| `fork_no_runtime` | Fork PRs are enabled but `default_runtime` is empty |
+| `path_filter` | No changed file matched the paths of the binding. This is intentional. Refer to [Path filters](/configure/path-filters/). |
+| `no_pipeline` | Nothing resolved to run: no pipeline file, no binding commands and no project that the server recognizes. This is usually a configuration error. |
+| `fork_disabled` | A fork pull request, and `skip_fork_prs` is on. |
+| `fork_no_docker` | Fork pull requests are on, but the server cannot connect to a Docker engine. |
+| `fork_no_runtime` | Fork pull requests are on, but `default_runtime` is empty. |
 
-Every one of these still **completes** the Check Run. A required check that
-never arrives leaves branch protection waiting forever, so the worker always
-reports something.
+For each cause, the server completes the Check Run. If a mandatory check does
+not come, branch protection waits for it with no time limit. Thus the server always
+reports a result. The correction for each fork cause is in
+[Fork pull requests](/configure/fork-pull-requests/#if-a-fork-pull-request-is-skipped).
+
+### Empty pipelines
+
+A path filter skip is intentional. A pipeline with no steps is usually a
+configuration error. To make it fail, set `on_empty_pipeline: fail` on the
+binding. On the **Edit** page of the binding, this is **Nothing to run** → **Fail the job**.
+
+| `on_empty_pipeline` | Result for a pipeline with no steps |
+|---|---|
+| `skip` (default) | The Check Run is `skipped`, with `skip_reason` `no_pipeline`. |
+| `fail` | The Check Run is a failure. |
 
 ## Cancel and re-run
 
-**Cancel** stops a running job. For a container job the container is removed
-engine-side, not just detached from.
+**Cancel** stops a job that is queued or that runs. The server reports the
+Check Run as cancelled. For a Docker job, the server removes the container on
+the engine, and does not only stop the `docker run` client. The route is
+`POST /api/v1/jobs/{id}/cancel`. If the job is not queued and does not run,
+the server returns `409`.
 
-**Re-run** queues a fresh job for the same commit. It is a new job with a new
-Check Run, never a mutation of the old one. The old run stays on the commit as
-a record of what happened.
+**Re-run** queues a new job for the same commit, with a new Check Run. It does
+not change the previous job. The previous Check Run stays on the commit as a record. The
+new job reads the binding again, thus changed binding values apply. If the
+repository has no active binding, the server refuses the re-run with `409`.
+The route is `POST /api/v1/jobs/{id}/rerun`.
