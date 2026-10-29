@@ -50,12 +50,14 @@ The page also tells you that a pipeline file can set `runtime:`. The server cann
 ## The Worker component
 
 The **Worker** component shows two numbers. `running` counts the jobs that execute in this server. `in flight` counts the job rows in the database that are in progress.
+
 The two numbers are different when a `docker kill`, an OOM or a redeploy stopped a job before its end. The job row stays, but no job runs for it.
 A stale row counts against `max_concurrent_jobs`. With the default of 1, no other job starts.
 A difference between the two numbers is the best sign that the queue does not move.
 
-The server puts stale rows back in the queue at start only, not on a timer. To clear them, restart the server.
-The requeue changes all rows that are in progress. On a timer, it can also change the rows of live jobs.
+The requeue changes all rows that are in progress, also the rows of live jobs.
+Thus the server does it at start only, when no job is live, and not on a timer.
+To clear stale rows, restart the server.
 
 ## Related
 

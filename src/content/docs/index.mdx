@@ -1,9 +1,9 @@
 ---
 title: Documentation
-description: "A small CI provider for private repos. One Go binary, one SQLite file: register a GitHub App, enable your repos, and get one Check Run per commit."
+description: "A small CI provider for private repositories. One Go binary and one SQLite file: register a GitHub App, add your repositories, and get one Check Run for each commit."
 template: splash
 hero:
-  tagline: "A small CI provider for private repos. One Go binary, one SQLite file: register a GitHub App, enable your repos, and get one Check Run per commit."
+  tagline: "A small CI provider for private repositories. One Go binary and one SQLite file: register a GitHub App, add your repositories, and get one Check Run for each commit."
   actions:
     - text: Quickstart
       link: /getting-started/quickstart/
@@ -16,12 +16,11 @@ hero:
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
-**v2.3.1** is out (27 September 2026). Linux binaries are on the
-[GitHub Release](https://github.com/openpreflight/openpreflight/releases/tag/v2.3.1).
-What shipped is in the
-[changelog](https://github.com/openpreflight/openpreflight/blob/v2.3.1/CHANGELOG.md);
-what this still does not include is in the [overview](/getting-started/overview/).
-v1.0.0 was 29 August 2026.
+The current release is **v2.3.1** (27 September 2026). The Linux binaries are on
+the [GitHub Release](https://github.com/openpreflight/openpreflight/releases/tag/v2.3.1).
+The [changelog](https://github.com/openpreflight/openpreflight/blob/v2.3.1/CHANGELOG.md)
+lists the changes. The [overview](/getting-started/overview/#limits) lists the limits.
+Release v1.0.0 was on 29 August 2026.
 
 <CardGrid>
   <Card title="Getting started" icon="rocket">
@@ -31,10 +30,10 @@ v1.0.0 was 29 August 2026.
   </Card>
   <Card title="Deploy" icon="laptop">
     [Deployment](/deploy/deployment/) gives the Compose file and the Docker engine
-    access. [Networking](/deploy/networking/) tells you how GitHub reaches the webhook.
+    access. [Networking](/deploy/networking/) tells you how GitHub sends events to the webhook.
   </Card>
   <Card title="Configure" icon="setting">
-    [Register a GitHub App](/configure/github-app/), [enable
+    [Register a GitHub App](/configure/github-app/), [add
     repositories](/configure/bindings/), and write a [pipeline](/configure/pipelines/).
   </Card>
   <Card title="Use" icon="document">

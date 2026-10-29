@@ -12,7 +12,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const dist = join(root, 'dist');
 
 const SITE_DEFAULT_DESCRIPTION =
-  'A small CI provider for private repos. One Go binary, one SQLite file: register a GitHub App, enable your repos, and get one Check Run per commit.';
+  'A small CI provider for private repositories. One Go binary and one SQLite file: register a GitHub App, add your repositories, and get one Check Run for each commit.';
 
 const required = [
   'index.html',

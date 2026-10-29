@@ -73,7 +73,7 @@ export default defineConfig({
     starlight({
       title: 'openpreflight',
       description:
-        'A small CI provider for private repos. One Go binary, one SQLite file: register a GitHub App, enable your repos, and get one Check Run per commit.',
+        'A small CI provider for private repositories. One Go binary and one SQLite file: register a GitHub App, add your repositories, and get one Check Run for each commit.',
       routeMiddleware: './src/routeData.ts',
       logo: {
         light: './src/assets/logo-light.svg',

@@ -23,11 +23,13 @@ server prints to the server log at startup. Each client address can make a
 maximum of five login attempts in a minute.
 
 Login issues an opaque 32-byte session token. SQLite stores only its SHA-256.
+
 A session has an idle expiry, not a fixed length. It expires 24 hours after the
 last request that used it. It also expires 7 days after the server issued it,
 with or without activity. The store is the authority. Because the idle
 deadline moves forward on use, the cookie carries the 7-day ceiling. A cookie
 that outlives its row fails the lookup.
+
 A password change deletes all sessions for that user.
 
 - Browser: `ci_session` HttpOnly cookie, `Secure` behind HTTPS,
