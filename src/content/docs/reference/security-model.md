@@ -112,7 +112,9 @@ of `ci.db` cannot sign in a person, also without `CI_SECRET_KEY`.
 Sign-in accepts **five tries each minute from one client address**. A
 correct sign-in sets the count to zero. The server counts a try before the
 bcrypt compare. Thus, a blocked try uses no CPU. The address is the TCP
-peer. Behind a reverse proxy, all clients share one limit.
+peer. Behind a reverse proxy, all clients share one limit, unless
+`CI_CLIENT_IP_HEADER` names the header that the proxy sets. Refer to
+[Client IP behind a proxy](/deploy/networking/#client-ip-behind-a-proxy).
 
 If there is no admin, `/setup` must have the **setup token** that the server
 writes to its log at startup. Access to the URL alone does not let a person

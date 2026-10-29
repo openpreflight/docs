@@ -25,7 +25,39 @@ The key without the database does not restore the configuration.
 Keep `CI_SECRET_KEY` with your other secrets, not with the backup. If you lose the key, the server cannot decrypt the stored secrets. Refer to [Rotate the secret key](/operate/rotate-secret-key/).
 :::
 
-## Make a backup
+## Make a backup while the server runs
+
+From 2.4.0, `openpreflight backup` writes a complete copy of `ci.db` while the server runs. It uses SQLite `VACUUM INTO`. Jobs continue.
+
+1. Write the copy in the container:
+
+   ```bash
+   docker compose -f compose.prod.yaml exec openpreflight openpreflight backup /data/backup.db
+   ```
+
+   The command does not write over a file. If `/data/backup.db` exists, it stops with `output file already exists`.
+
+2. Copy the database and the logs out of the container:
+
+   ```bash
+   mkdir -p openpreflight-backup
+   docker compose -f compose.prod.yaml cp openpreflight:/data/backup.db ./openpreflight-backup/ci.db
+   docker compose -f compose.prod.yaml cp openpreflight:/data/logs ./openpreflight-backup/logs
+   ```
+
+3. Remove the copy from the volume:
+
+   ```bash
+   docker compose -f compose.prod.yaml exec openpreflight rm /data/backup.db
+   ```
+
+4. Keep a copy of the current `CI_SECRET_KEY` in a different location from the backup.
+
+The result is the same as the procedure below: `./openpreflight-backup` contains `ci.db` and `logs/`.
+
+## Make a backup with a stop
+
+Use this procedure before 2.4.0.
 
 SQLite uses WAL mode. A copy of a live `ci.db` is not complete, because the most recent writes are in `ci.db-wal`.
 When the container stops, SQLite writes the WAL into `ci.db`. A copy of the stopped container is then one complete file.

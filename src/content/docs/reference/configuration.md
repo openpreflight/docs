@@ -18,6 +18,7 @@ rows in the SQLite database. You change them in the UI or with the
 | `CI_SECRET_KEY_OLD` | empty | The previous key, for a rotation only. When the server starts, it encrypts the secret columns again with `CI_SECRET_KEY`. Refer to [Rotate CI_SECRET_KEY](/operate/rotate-secret-key/). |
 | `CI_PUBLIC_BASE_URL` | empty | The public base URL for the first start only. After the first start, the `public_base_url` setting controls the URL. |
 | `CI_BOOTSTRAP_ADMIN_PASSWORD` | empty | Makes the `admin` user on the first start. Use it to configure a headless deployment through the API. The server ignores it if the database contains a user. |
+| `CI_CLIENT_IP_HEADER` | empty | The header that your reverse proxy sets to the client IP, for example `CF-Connecting-IP` or `X-Forwarded-For`. The sign-in limit then counts each client. If it is empty, the limit uses the TCP peer. Refer to [Networking](/deploy/networking/#client-ip-behind-a-proxy). From 2.4.0. |
 | `CI_DOCKER_HOST` | `DOCKER_HOST`, then the engine default | The Docker engine for `runtime:` jobs and fork pull requests. The engine default is usually the mounted socket. |
 | `CI_WORKSPACE_HOST` | empty | The host path of `WORKSPACE_DIR`, for the source of `docker run -v`. Set it only if the server translates the mount table incorrectly. Refer to [Docker engine access](/deploy/deployment/#docker-engine-access). |
 | `LISTEN_ADDR` | `:8080` | The address of the HTTP server. |
