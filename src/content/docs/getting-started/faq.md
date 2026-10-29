@@ -51,8 +51,7 @@ See [ADR 005](/reference/decisions/005-check-suite-gating/).
 
 No GitHub Actions YAML, no `actions/runner`, no matrices, caches, or
 artifacts. Jobs on another machine use a Docker engine via `CI_DOCKER_HOST`,
-not Coolify's API as a job runner. A GitHub App can be created with GitHub's
-review screen, or pasted.
+not Coolify's API as a job runner.
 
 See [Architecture](/reference/architecture/) and the homepage's "What it
 isn't" list.

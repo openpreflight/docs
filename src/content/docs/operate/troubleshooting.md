@@ -75,7 +75,8 @@ See [Enable repos](/configure/bindings/) and
 ## Check reports skipped, not failed
 
 **Cause:** Nothing resolved to run: no pipeline file, no binding command
-overrides, and no `package.json` scripts that the Node defaults would pick up.
+overrides, and no project file that the defaults detect (`package.json`,
+`go.mod`, `Cargo.toml`, `pyproject.toml`, `requirements.txt` or `setup.py`).
 
 **Fix:** Commit a [pipeline](/use/pipelines/) (or set binding overrides).
 Skipped means "nothing to do", not an error.
@@ -111,9 +112,9 @@ See [Pipelines](/use/pipelines/).
 not hold the checkout. `npm ci` then fails with a missing `package-lock.json`
 (or the job looks like it cloned nothing).
 
-**Fix:** Upgrade to a build that rewrites the volume source from
-`/proc/self/mountinfo`. If that still misses, set `CI_WORKSPACE_HOST` to the
-host directory mounted at `WORKSPACE_DIR` and recreate the container.
+**Fix:** Set `CI_WORKSPACE_HOST` to the host directory mounted at
+`WORKSPACE_DIR`, then recreate the container. The worker reads the volume
+source from `/proc/self/mountinfo`, but some mount layouts hide it.
 
 See [Deployment](/deploy/deployment/) and
 [Configuration](/configure/configuration/).

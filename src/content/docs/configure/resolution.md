@@ -1,15 +1,15 @@
 ---
 title: "How configuration resolves"
-description: "The four layers that decide what a commit runs, in the order they are checked, and the dry run that tells you which one won."
+description: "The five layers that decide what a commit runs, in the order they are checked, and the dry run that tells you which one won."
 sidebar:
   order: 4
 ---
-Four layers can decide what a commit runs. This page is the order they are
+Five layers can decide what a commit runs. This page is the order they are
 checked in, and the endpoint that tells you which one actually won for a given
 commit, so the answer to *"why did it run **that**?"* does not require pushing
 a commit and reading the result afterwards.
 
-## The four layers
+## The five layers
 
 Highest first. The first layer that supplies a value wins, and each value is
 resolved on its own:
@@ -18,8 +18,9 @@ resolved on its own:
 |---|---|---|---|
 | 1 | **Pipeline file** | `.ci.yml` in the commit being checked | `install`, `test`, `build`, `runtime`, `timeout` |
 | 2 | **Binding** | Repos → Edit (`/repos/{id}/edit`) | command overrides, `pipeline_file`, `timeout_seconds`, `check_name`, `paths`, `branches`, `on_empty_pipeline` |
-| 3 | **Settings** | Settings → Configuration and Runner | `default_pipeline_file`, `default_timeout_seconds`, `default_check_name`, `default_runtime` |
-| 4 | **Built-in default** | the binary | `.ci.yml`, 15m, `openpreflight`, the worker process |
+| 3 | **GitHub App** | GitHub Apps → Edit (`/github-apps/{id}/edit`) | `check_name` only |
+| 4 | **Settings** | Settings → Configuration and Runner | `default_pipeline_file`, `default_timeout_seconds`, `default_check_name`, `default_runtime` |
+| 5 | **Built-in default** | the binary | `.ci.yml`, 15m, `openpreflight`, the worker process |
 
 Two things about this table are the parts people get wrong.
 
@@ -179,6 +180,6 @@ Nothing was wrong; the filter did its job. See
 
 - [Pipelines](/use/pipelines/): the `.ci.yml` contract itself
 - [Enable repos](/configure/bindings/): the binding fields, layer 2
-- [Configuration](/configure/configuration/): the settings, layer 3
+- [Configuration](/configure/configuration/): the settings, layer 4
 - [Runs](/use/runs/): reading a run after the fact
 - [API](/reference/api/): the resolve endpoint's request and response

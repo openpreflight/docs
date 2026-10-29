@@ -197,7 +197,7 @@ files older than `log_retention_days` (default 14). Queued and running jobs are
 never pruned. Nothing else is cleaned up automatically. See
 [Configuration](/configure/configuration/) for the settings that govern it.
 
-There is no cap on checkout size. A per-job workspace is removed when the job
-ends, but a repository large enough to fill the disk will fill it while it
-runs. Size `WORKSPACE_DIR` for your largest checkout times
-`max_concurrent_jobs`.
+`max_workspace_bytes` (default 1 GiB) limits each job workspace. The worker
+measures the workspace after the clone and between steps, and fails the job
+when it is larger. Make `WORKSPACE_DIR` at least `max_workspace_bytes` times
+`max_concurrent_jobs`. A per-job workspace is removed when the job ends.

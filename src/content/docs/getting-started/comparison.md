@@ -94,7 +94,8 @@ These are the things that will bite:
   combination.
 - GitHub only, because it is built on Check Runs and no other forge has them.
 - One admin user. No teams, no roles, no SSO.
-- You register the GitHub App yourself. It is not created for you.
+- You register a GitHub App on your account. The setup can create it for you
+  through GitHub, but the App is yours to own and keep.
 
 ## Where it is genuinely better
 

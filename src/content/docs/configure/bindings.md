@@ -26,6 +26,7 @@ Per binding you can override:
 - the timeout
 - the install / test / build commands
 - whether logs are shareable
+- what an empty pipeline reports (`on_empty_pipeline`)
 
 At run time, precedence is **binding → App → settings**. See
 [How configuration resolves](/configure/resolution/) for the full order, what the
