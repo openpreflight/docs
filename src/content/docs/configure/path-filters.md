@@ -54,13 +54,25 @@ new top-level directory, the filter does not ignore it without a sign.
 
 ## The changed files
 
-The file list comes from the GitHub commit API for the **head commit** of the
-check suite. The filter examines only the files in that commit. It does not
-examine the full pull request.
+From 2.4.0, the filter examines all the files that the pull request or the
+push changes. The file list comes from the GitHub compare API, from a start
+commit to the head commit:
+
+- For a pull request, the start is the base of the pull request.
+- For a push to a branch, the start is the branch tip before the push.
+- For a new branch, there is no start. The filter examines the head commit only.
 
 Example: commit 1 changes `src/main.go`, and commit 2 changes only `README.md`.
-For commit 2, the filter examines `README.md` only, and the Check Run is
-`skipped`. The Check Run for commit 1 stays on commit 1.
+The filter is `src/**`. For commit 2, the filter examines `src/main.go` and
+`README.md`, and the job runs.
+
+Before 2.4.0, the filter examined the head commit only. In the example, the
+Check Run for commit 2 was `skipped`, and a mandatory check let the pull request
+merge. A re-run of a job from before 2.4.0 examines the head commit only.
+
+The log shows the range: `path filter: files changed in 1a2b3c4...5d6e7f8`.
+
+The [dry run](/configure/dry-run/) examines the one commit that you give it.
 
 The filter examines a renamed file two times: with the previous path and with
 the new path. Thus, if you move a file into a filtered directory, the file matches.
@@ -93,8 +105,10 @@ because "Why did this run?" is a frequent question too.
 
 If the changed-file list is not reliable, the job **runs**:
 
-- GitHub truncates the `files` array on very large commits (more than 300 files).
-- The call to the commit API failed.
+- GitHub truncates the `files` array on a very large commit or range (300 files
+  or more).
+- The call to the GitHub API failed. For example, a force push removed the start
+  commit.
 
 An unwanted run is better than a skip because of a file that the server cannot
 see. The pipeline runs, and the Check Run summary says this:
