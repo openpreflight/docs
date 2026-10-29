@@ -1,56 +1,64 @@
 # openpreflight docs
 
-> A small CI provider for private repos. One Go binary, one SQLite file: register a GitHub App, enable your repos, and get one Check Run per commit.
+> A small CI provider for private repositories. One Go binary and one SQLite file: register a GitHub App, add your repositories, and get one Check Run for each commit.
 
-This is the how-to site. Positioning lives on the marketing site.
+This is the how-to site. The marketing site has the product positioning.
+The pages use ASD-STE100 Simplified Technical English; the glossary gives one term for each concept.
 
 Docs: https://docs.openpreflight.xyz
 Marketing: https://openpreflight.xyz
 Source: https://github.com/openpreflight/openpreflight
-Release: https://github.com/openpreflight/openpreflight/releases/tag/v2.1.2 (v2.1.2, 7 September 2026)
+Release: https://github.com/openpreflight/openpreflight/releases/tag/v2.3.1 (v2.3.1, 27 September 2026)
 License: Apache-2.0
 
 ## Getting started
 
-- [Quickstart](https://docs.openpreflight.xyz/getting-started/quickstart/): Binary, first-boot wizard, ready for a GitHub App
-- [FAQ](https://docs.openpreflight.xyz/getting-started/faq/): Current release, GitHub Apps, Coolify, gating, GHE, monorepos, out of scope
+- [Overview](https://docs.openpreflight.xyz/getting-started/overview/): What openpreflight does, and its limits
+- [Quickstart](https://docs.openpreflight.xyz/getting-started/quickstart/): From an empty host to the first Check Run
 - [Comparison](https://docs.openpreflight.xyz/getting-started/comparison/): Woodpecker, Drone, actions/runner, Jenkins
 
 ## Deploy
 
-- [Deployment](https://docs.openpreflight.xyz/deploy/deployment/): Compose, volumes, reverse proxy, rotating CI_SECRET_KEY
-- [Networking](https://docs.openpreflight.xyz/deploy/networking/): Why GitHub must reach the webhook over public HTTPS
-- [Coolify](https://docs.openpreflight.xyz/deploy/coolify/): Optional inventory / install-worker
+- [Deployment](https://docs.openpreflight.xyz/deploy/deployment/): Compose, volumes, Docker engine access
+- [Networking](https://docs.openpreflight.xyz/deploy/networking/): Public HTTPS for the webhook, live logs through a proxy
+- [Coolify](https://docs.openpreflight.xyz/deploy/coolify/): Optional repository picker and deployment target
 
 ## Configure
 
-- [Configuration](https://docs.openpreflight.xyz/configure/configuration/): Environment variables and the Settings row
-- [Register a GitHub App](https://docs.openpreflight.xyz/configure/github-app/): Permissions, events, webhook URL
-- [Enable repos](https://docs.openpreflight.xyz/configure/bindings/): Bindings table is the allow-list
-- [How configuration resolves](https://docs.openpreflight.xyz/configure/resolution/): File, binding, package.json
+- [Register a GitHub App](https://docs.openpreflight.xyz/configure/github-app/): Permissions, events, webhook URL, GitHub Enterprise Server
+- [Add repositories](https://docs.openpreflight.xyz/configure/bindings/): The bindings table is the allow-list
+- [Pipelines](https://docs.openpreflight.xyz/configure/pipelines/): The `.ci.yml` file and the runtime
 - [Path filters](https://docs.openpreflight.xyz/configure/path-filters/): Pattern syntax, fail-open, monorepos
+- [Dry run](https://docs.openpreflight.xyz/configure/dry-run/): What a commit will run, and which layer supplied it
+- [Fork pull requests](https://docs.openpreflight.xyz/configure/fork-pull-requests/): Opt-in checks for forks, in a container
 
 ## Use
 
-- [Pipelines](https://docs.openpreflight.xyz/use/pipelines/): `.ci.yml` contract and runtime
-- [Runs](https://docs.openpreflight.xyz/use/runs/): Run page, skipped runs
-- [Logs](https://docs.openpreflight.xyz/use/logs/): Full logs vs Check Run tail, shareable logs
+- [Runs](https://docs.openpreflight.xyz/use/runs/): The run page, skip reasons, cancel and re-run
+- [Logs](https://docs.openpreflight.xyz/use/logs/): Full logs, live tail, shareable logs
 
 ## Operate
 
-- [Operations](https://docs.openpreflight.xyz/operate/operations/): Backup, restart, upgrade
-- [Troubleshooting](https://docs.openpreflight.xyz/operate/troubleshooting/): Common failure modes
+- [Health](https://docs.openpreflight.xyz/operate/health/): The health endpoint and status
+- [Backup and restore](https://docs.openpreflight.xyz/operate/backup-restore/): ci.db and the logs
+- [Upgrade](https://docs.openpreflight.xyz/operate/upgrade/): Upgrade, restart, schema migrations, release policy
+- [Rotate the secret key](https://docs.openpreflight.xyz/operate/rotate-secret-key/): Replace CI_SECRET_KEY
+- [Troubleshooting](https://docs.openpreflight.xyz/operate/troubleshooting/): Symptom, cause and fix
 
 ## Reference
 
-- [Architecture](https://docs.openpreflight.xyz/reference/architecture/): One process, what is absent
-- [Security model](https://docs.openpreflight.xyz/reference/security-model/): HMAC, encryption, trust boundaries
-- [API](https://docs.openpreflight.xyz/reference/api/): JSON API surface
+- [Configuration](https://docs.openpreflight.xyz/reference/configuration/): Environment, settings, binding fields, pipeline keys
+- [How configuration resolves](https://docs.openpreflight.xyz/reference/resolution/): The five layers and the inferred defaults
+- [API](https://docs.openpreflight.xyz/reference/api/): JSON API routes
+- [Architecture](https://docs.openpreflight.xyz/reference/architecture/): One process, and what is absent
+- [Security model](https://docs.openpreflight.xyz/reference/security-model/): HMAC, encryption, trust boundaries, sessions
+- [Glossary](https://docs.openpreflight.xyz/reference/glossary/): One term for each concept
 - [ADR 001](https://docs.openpreflight.xyz/reference/decisions/001-database/): SQLite in-process
 - [ADR 002](https://docs.openpreflight.xyz/reference/decisions/002-authentication/): Local admin, opaque sessions
-- [ADR 003](https://docs.openpreflight.xyz/reference/decisions/003-github-app/): Our GitHub App, not Coolify's
-- [ADR 004](https://docs.openpreflight.xyz/reference/decisions/004-docker-executor/): Optional docker run
+- [ADR 003](https://docs.openpreflight.xyz/reference/decisions/003-github-app/): Our GitHub App, not Coolify's connector
+- [ADR 004](https://docs.openpreflight.xyz/reference/decisions/004-docker-executor/): Optional docker run executor
 - [ADR 005](https://docs.openpreflight.xyz/reference/decisions/005-check-suite-gating/): Gate on the check suite
+- [ADR 006](https://docs.openpreflight.xyz/reference/decisions/006-job-ids/): Job ids without a UUID dependency
 
 ## Contributing
 

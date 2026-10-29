@@ -1,119 +1,140 @@
 ---
 title: "Deployment"
-description: "Compose mounts, DOCKER_GID, reverse-proxy notes, Coolify install-worker, and rotating CI_SECRET_KEY."
+description: "Start the server with Docker Compose, keep its volumes, and give it access to a Docker engine with DOCKER_GID and CI_DOCKER_HOST."
 sidebar:
   order: 1
 ---
-The image is a static Go binary plus `git`, Node, and `docker-cli`. It runs as
-uid 10001. `tini` is the entrypoint so pipeline shells get reaped.
+This procedure starts the server with Docker Compose and gives it access to a
+Docker engine. For the shortest path to a first Check Run, refer to
+[Quickstart](/getting-started/quickstart/).
 
-Two compose files ship. `compose.prod.yaml` pulls the published image and needs
-no checkout; `compose.yaml` is `build: .` and is the contributor path.
+## The image
 
-```bash
-curl -O https://raw.githubusercontent.com/openpreflight/openpreflight/main/compose.prod.yaml
-export CI_SECRET_KEY="$(openssl rand -base64 48)"   # required, keep it forever
-export CI_PUBLIC_BASE_URL="https://ci.example.com"  # optional seed
-docker compose -f compose.prod.yaml up -d
-```
+The image contains a static Go binary, `git`, `nodejs`, `npm` and `docker-cli`.
+The server runs as uid 10001. The entrypoint is `tini`, which stops the shells
+of each pipeline step after the step ends.
 
-Set `OPENPREFLIGHT_VERSION` to pin a release; the default is `latest`.
+The repository has two compose files:
 
-Both files map `8080:8080` and take three mounts:
+| File | Use |
+|---|---|
+| `compose.prod.yaml` | Pulls the published image. You do not clone the repository. |
+| `compose.yaml` | Has `build: .`. You must clone the repository. This is the contributor path. |
+
+## Before you start
+
+- A host with Docker and Docker Compose.
+- A public HTTPS URL for the server. Refer to [Networking](/deploy/networking/).
+
+## Procedure
+
+1. Download `compose.prod.yaml`, set `CI_SECRET_KEY`, and start the server:
+
+   ```bash
+   curl -O https://raw.githubusercontent.com/openpreflight/openpreflight/main/compose.prod.yaml
+   export CI_SECRET_KEY="$(openssl rand -base64 48)"   # required, keep it forever
+   export CI_PUBLIC_BASE_URL="https://ci.example.com"  # optional seed
+   docker compose -f compose.prod.yaml up -d
+   ```
+
+2. Optional: to pin a release, set `OPENPREFLIGHT_VERSION`. The default is `latest`.
+3. If you use `runtime:` or fork pull requests, configure the
+   [Docker engine access](#docker-engine-access).
+4. Complete the setup. Refer to [Quickstart](/getting-started/quickstart/#complete-the-setup).
+
+:::caution
+Keep a copy of `CI_SECRET_KEY` in a safe location. If you lose the key, the
+server cannot decrypt the stored private keys and tokens.
+:::
+
+## Volumes
+
+The two compose files map `8080:8080` and use three mounts:
 
 | Volume | Mount | Must persist |
 |---|---|---|
 | `ci-data` | `/data` | yes: `ci.db`, encrypted secrets, job history, logs |
-| `ci-workspace` | `/workspace` | no, but a volume keeps checkouts off the container's writable layer |
-| host socket | `/var/run/docker.sock` | no; needed for `runtime:` and fork PRs |
+| `ci-workspace` | `/workspace` | no, but a volume keeps checkouts out of the writable layer of the container |
+| host socket | `/var/run/docker.sock` | no; necessary for `runtime:` and fork pull requests |
 
-`group_add: ${DOCKER_GID:-998}` puts uid 10001 in the socket's group. The value
-you need is the gid the container sees, which is not always what the host
-reports. Read it from inside:
+To make a backup of `/data`, refer to [Backup and restore](/operate/backup-restore/).
 
-```bash
-docker compose exec openpreflight stat -c %g /var/run/docker.sock
-```
+## Docker engine access
 
-On Linux with a native engine that matches the host's
-`stat -c %g /var/run/docker.sock`, and the default of `998` is often already
-right. On Docker Desktop it is `0`: the socket is `root:root` inside the
-VM, and the host path is a symlink into `~/.docker`, so the host's `stat`
-reports an unrelated group. Set `DOCKER_GID=0` there and recreate the
-container.
+The server uses a Docker engine for jobs that set `runtime:`, and for fork pull
+requests. Without an engine, the server starts and reports checks. Only the
+`runtime:` jobs and the fork pull requests fail. If `runtime:` is set and the
+engine is not available, the job fails. It does not change to the process
+executor.
 
-When this process is itself a container and `docker.sock` is the host engine,
-`docker run -v` must use the host path for `WORKSPACE_DIR` (the directory
-behind `/workspace` in `/proc/self/mountinfo`). The worker rewrites that
-itself. If a `runtime:` job logs `runtime … via docker` then fails because
-`package-lock.json` is missing, the rewrite missed: set `CI_WORKSPACE_HOST`
-to the host directory mounted at `WORKSPACE_DIR` and recreate.
+Job containers do not get the Docker socket. Refer to
+[ADR 004](/reference/decisions/004-docker-executor/).
 
-Nothing else needs this. The service boots and reports checks with an
-unreachable socket; only `runtime:` jobs and fork PRs fail. Job containers
-never receive that socket; see [ADR 004](/reference/decisions/004-docker-executor/).
+### `DOCKER_GID`
 
-To run jobs on another Docker engine (including a Coolify server's), set
-`CI_DOCKER_HOST` (else `DOCKER_HOST`) to that daemon. That is Docker's remote
-API, not Coolify's. Coolify tokens cannot start `docker run`.
+`DOCKER_GID` is a Compose variable. The server does not read it. Compose
+`group_add: ${DOCKER_GID:-998}` puts uid 10001 in the group of the socket.
+The default `998` is correct for a typical Linux docker group.
 
-## Coolify (or any reverse proxy)
+If the server gets "permission denied" on the Docker socket, set `DOCKER_GID`:
 
-- Give the service a public HTTPS URL. GitHub must reach `POST /webhook/{slug}`;
-  see [Networking](/deploy/networking/) for why, and what to do when you
-  have no public IP.
-- Point the domain at this container's port 8080.
-- Set `CI_SECRET_KEY` as a secret / env var on the application, not in git.
-- Optionally set `CI_PUBLIC_BASE_URL` to the public origin for first boot, and
-  `CI_BOOTSTRAP_ADMIN_PASSWORD` if you will configure over the API instead of
-  the wizard.
-- Honour `X-Forwarded-Proto`: session and CSRF cookies set `Secure` when that
-  header is `https` (Coolify's Traefik does this).
-- Health check: `GET /health` (the image already defines one). A 503 means the
-  process cannot read SQLite.
+1. Read the group ID of the socket from the container:
 
-Inspect → Install this worker calls
-`POST /api/v1/applications/dockercompose` with `instant_deploy: false`. Set
-`CI_SECRET_KEY` on the new application before the first start, attach this
-repository if the compose file `build: .`s, and make sure the service user can
-talk to that host's docker socket (same `DOCKER_GID` problem as Compose). The
-API token for that call needs permission to create applications; inventory
-still works with read-only.
+   ```bash
+   docker compose exec openpreflight stat -c %g /var/run/docker.sock
+   ```
 
-Never point Coolify's own GitHub connector webhook at this service. An App has
-one webhook URL, and repointing it steals Coolify's deploys. See
-[ADR 003](/reference/decisions/003-github-app/).
+2. Set `DOCKER_GID` to that value.
+3. Create the container again with `docker compose -f compose.prod.yaml up -d`.
 
-## After first boot
+The value that the container sees is not always the value that the host shows.
+On Linux with a native engine, the two values are the same. On Docker Desktop,
+the value is `0`, because the socket is `root:root` in the VM.
 
-1. Complete setup (setup token from the container log, admin password, public
-   base URL) if you did not bootstrap.
-   See [Quickstart](/getting-started/quickstart/).
-2. [Register a GitHub App](/configure/github-app/) and paste it under **GitHub Apps**.
-3. [Enable bindings](/configure/bindings/). Only enable private repos you trust: a
-   pipeline runs the repo's own commands in this process, or in a sibling
-   container when `runtime:` is set.
-4. Optionally [add a Coolify instance](/deploy/coolify/) (team token) as a
-   repo-picker source, or to install this worker.
+:::caution
+On macOS, do not use `stat` on the host. The host path
+`/var/run/docker.sock` is a symlink into `~/.docker`, and its group is not
+correct in the container.
+:::
 
-## Rotating `CI_SECRET_KEY`
+### `CI_WORKSPACE_HOST`
 
-1. Generate a new key (`openssl rand -base64 48`).
-2. Set `CI_SECRET_KEY` to the new value and `CI_SECRET_KEY_OLD` to the previous
-   one.
-3. Start once. The process re-seals `pem_enc`, `webhook_secret_enc`, and
-   `api_token_enc`, then logs that you should unset the old key.
-4. Unset `CI_SECRET_KEY_OLD` and restart so the previous key is not left in
-   the environment.
+If the server is a container and uses the host Docker socket, the engine reads
+the `docker run -v` source as a path on the host. The server changes the
+`WORKSPACE_DIR` path to the host directory behind it, from
+`/proc/self/mountinfo`. Some mount layouts hide that directory, for example
+unusual volume drivers or a remote engine.
 
-A row that opens with neither key fails startup. Keep a backup of `/data`
-from before the rotate until you have logged in and tested an App.
+The symptom: a `runtime:` job logs `runtime … via docker`, and then fails
+because `package-lock.json` is not there. The `/work` directory in the job
+container is empty.
 
-## Backups
+1. Find the host directory that is mounted at `WORKSPACE_DIR`.
+2. Set `CI_WORKSPACE_HOST` to that directory.
+3. Create the container again.
 
-Copy `/data` (or the `ci-data` volume) and keep `CI_SECRET_KEY` with it. The
-database without the key is not enough to recover PEMs and tokens. The key
-without the database is not enough to recover configuration.
+If `CI_WORKSPACE_HOST` is set, the server uses it and does not read the mount
+table.
 
-Procedure, restore, upgrades, and what a redeploy does to a running job are in
-[Operations](/operate/operations/).
+### `CI_DOCKER_HOST`
+
+To run jobs on a different Docker engine, set `CI_DOCKER_HOST` to that engine.
+The engine can be the engine of a Coolify server. If `CI_DOCKER_HOST` is
+empty, the server uses `DOCKER_HOST`, and then the engine default.
+`compose.prod.yaml` sets `CI_DOCKER_HOST` to `unix:///var/run/docker.sock`.
+
+`CI_DOCKER_HOST` uses the remote API of Docker, not the API of Coolify. A
+Coolify token cannot start `docker run`.
+
+## Result
+
+`GET /health` returns `200`, and the image health check is healthy. Refer to
+[Health](/operate/health/).
+
+## Related
+
+- [Networking](/deploy/networking/): the public URL, the reverse proxy and `X-Forwarded-Proto`
+- [Optional: Coolify](/deploy/coolify/): deploy the server on Coolify
+- [Rotate the secret key](/operate/rotate-secret-key/)
+- [Backup and restore](/operate/backup-restore/)
+- [Configuration](/reference/configuration/#environment): all environment variables

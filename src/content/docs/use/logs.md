@@ -1,113 +1,73 @@
 ---
 title: "Logs"
-description: "Where full job logs live, how the run page tails them, and when a binding makes a log page shareable."
+description: "Where the server keeps the full log of each job, how the run page shows a live log, and how a binding makes logs shareable."
 sidebar:
-  order: 3
+  order: 2
 ---
-Full logs are written to `/data/logs/<job-id>.log`, capped by `max_log_bytes`
-(10 MiB by default) and pruned after `log_retention_days` (14 by default). The
-Check Run carries a truncated tail; the full log is on the details page.
+This page tells you where the server keeps job logs, how the run page shows
+them, and who can read them.
 
-ANSI escape sequences are stripped as the log is written, so what lands on disk
-is plain text. Build tools colour their output whether or not a terminal is
-attached, and none of the four readers — the run page, the live stream, the
-Check Run tail on GitHub, and the JSON API — interpret escape codes; left in,
-a coloured line arrives as `[42m[30m generating static routes [39m[49m`.
+## Log files
 
-## Details URL
+The server writes the full log of each job to `/data/logs/<job-id>.log`.
 
-`GET /runs/{job-id}` is the `details_url` GitHub links to. GitHub never fetches
-it; the reader's browser does, so it requires a session by default.
-A binding can opt into shareable logs, which makes that one job's page readable
-by anyone holding the link. The same rule applies to
-`GET /api/v1/jobs/{id}/logs`. Job ids are random UUIDs, but treat such a link as
-a secret.
+| Setting | Default | Effect |
+|---|---|---|
+| `max_log_bytes` | 10 MiB | At this size, the log stops. The job continues. |
+| `log_retention_days` | `14` | After this number of days, the server deletes the logs and the job rows. |
 
-## Live tail
+The Check Run on GitHub shows the last part of the log. The full log is on the
+[run page](/use/runs/#the-run-page). The settings are in
+[Settings](/reference/configuration/#settings).
 
-While a job is in flight, the run page opens `EventSource` against
-`GET /api/v1/jobs/{id}/logs/stream`. The first payload is the bytes already
-on disk; later events append. The stream ends with `event: finished` when the
-job is terminal. Auth matches the snapshot `GET` (session, or shareable
-opt-in).
+The server removes ANSI escape sequences when it writes the log. Thus the file
+on disk is plain text. Build tools write color codes also when no terminal is
+connected. The four readers do not interpret these codes: the run page, the live
+log, the Check Run on GitHub and the JSON API. Without this step, a line with color
+shows as `[42m[30m generating static routes [39m[49m`.
 
-A meta-refresh on the page remains, so the log still updates without
-JavaScript.
+## Shareable logs
 
-The snapshot `GET /api/v1/jobs/{id}/logs` is unchanged and needs nothing
-special from a proxy.
+`GET /runs/{id}` is the `details_url` that GitHub links to. GitHub does not
+open it. The browser of the reader opens it, thus it must have a session by
+default.
 
-## Live logs through a reverse proxy
+If **Shareable logs** is set on a binding, each person with the link to a
+job can read its full log without a sign-in. This applies to these routes:
 
-**The symptom is unmistakable:** the log appears all at once, the moment the job
-finishes, instead of streaming while it runs. That is a proxy buffering the
-response, not a broken stream.
+- `GET /runs/{id}`
+- `GET /api/v1/jobs/{id}/logs`
+- `GET /api/v1/jobs/{id}/logs/stream`
 
-OpenPreflight already does its half. Every stream is sent with:
+**Shareable logs** is off by default. The server copies the value to each job
+when it queues the job. Thus a change on the binding applies to new jobs only.
 
-```
-Content-Type: text/event-stream
-Cache-Control: no-cache
-X-Accel-Buffering: no
-```
-
-and each write is flushed explicitly. `X-Accel-Buffering: no` is the header
-nginx honours, so on a default nginx the stream often works without any change
-at all. What a proxy still has to be told is not to buffer on its own account
-and not to close the connection while a long job is quiet.
-
-**nginx**
-
-```nginx
-location /api/v1/jobs/ {
-    proxy_pass http://127.0.0.1:8080;
-    proxy_http_version 1.1;
-    proxy_set_header Connection '';
-
-    proxy_buffering off;
-    proxy_cache off;
-
-    # A quiet build must not be cut off mid-stream. Make this longer than
-    # your longest job, or the tail is lost right before the interesting part.
-    proxy_read_timeout 1h;
-}
-```
-
-**Caddy**
-
-```text title="Caddyfile"
-reverse_proxy 127.0.0.1:8080 {
-    # -1 flushes every write immediately, which is what SSE needs.
-    flush_interval -1
-}
-```
-
-**Traefik** buffers nothing by default, so the usual cause there is an explicit
-`buffering` middleware on the router. Remove it from this path. If the stream
-still stalls, set the flush interval on the service:
-
-```yaml
-http:
-  services:
-    openpreflight:
-      loadBalancer:
-        responseForwarding:
-          flushInterval: 100ms
-        servers:
-          - url: http://127.0.0.1:8080
-```
-
-**Cloudflare and similar CDNs** buffer proxied responses. If the run page is
-behind one, either exclude `/api/v1/jobs/*/logs/stream` from proxying or accept
-that live tailing will not work through it; the page still updates on its
-meta-refresh, and the finished log is complete either way.
-
-:::note
-These directives are written from each proxy's documented behaviour. If live
-tailing still does not work after applying them, the fastest test is to curl the
-stream directly against the app's port, bypassing the proxy: if it streams
-there and not through the proxy, the proxy is still buffering.
+:::caution
+Keep the link to a shareable log secret. Job ids are random UUIDs, but each
+person who has the link can read the full build output.
 :::
 
-Retention and size caps are settings; see
-[Configuration](/configure/configuration/).
+To make the logs of a binding shareable:
+
+1. Open **Repos**.
+2. Open the repository.
+3. Click **Edit**.
+4. Select **Shareable logs**.
+5. Click **Save binding**.
+
+## Live log
+
+When a job runs, the run page opens an `EventSource` to
+`GET /api/v1/jobs/{id}/logs/stream`. The first event gives the bytes that are
+on disk. Each subsequent event adds new bytes. The stream ends with
+`event: finished` when the job is complete. The stream has the same access
+rule as the snapshot `GET`: a session, or a shareable log.
+
+The page also has a meta-refresh. Thus the log updates without JavaScript.
+
+The snapshot `GET /api/v1/jobs/{id}/logs` does not change, and a proxy does not
+have to do a special configuration for it.
+
+If the log shows only when the job ends, a reverse proxy holds the stream in a
+buffer. Refer to
+[Live logs through a proxy](/deploy/networking/#live-logs-through-a-proxy).

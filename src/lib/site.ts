@@ -9,25 +9,25 @@ export const footerGroups = [
   {
     title: "Getting started",
     links: [
+      { label: "Overview", href: "/getting-started/overview/" },
       { label: "Quickstart", href: "/getting-started/quickstart/" },
-      { label: "FAQ", href: "/getting-started/faq/" },
       { label: "Comparison", href: "/getting-started/comparison/" },
     ],
   },
   {
     title: "Configure",
     links: [
-      { label: "Configuration", href: "/configure/configuration/" },
       { label: "GitHub App", href: "/configure/github-app/" },
       { label: "Bindings", href: "/configure/bindings/" },
+      { label: "Pipelines", href: "/configure/pipelines/" },
     ],
   },
   {
     title: "Use",
     links: [
-      { label: "Pipelines", href: "/use/pipelines/" },
       { label: "Runs", href: "/use/runs/" },
       { label: "Logs", href: "/use/logs/" },
+      { label: "Troubleshooting", href: "/operate/troubleshooting/" },
     ],
   },
   {
@@ -35,6 +35,7 @@ export const footerGroups = [
     links: [
       { label: "Website", href: SITE },
       { label: "GitHub", href: REPO },
+      { label: "Configuration", href: "/reference/configuration/" },
       { label: "Architecture", href: "/reference/architecture/" },
       { label: "Security model", href: "/reference/security-model/" },
     ],

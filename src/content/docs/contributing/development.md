@@ -1,65 +1,91 @@
 ---
 title: "Development"
-description: "Local Go build, test, and run loop. No network or credentials required for tests."
+description: "Build, test and run the server on your computer. The tests do not use the network or credentials."
 sidebar:
   order: 1
 ---
-Go 1.26 (see `go.mod`). No CGO. Tests need `git`; they do not need network,
-GitHub, or Coolify.
+This procedure builds, tests and runs the server on your computer.
 
-## Run locally
+## Before you start
 
-```bash
-go build ./...
-go test ./...
-go vet ./...
+- Install Go 1.26. The `go.mod` file gives the version. The build does not use CGO.
+- Install `git`. The tests use it. The tests do not use the network, GitHub or Coolify.
+- If you change the UI, install `templ`, Node.js and npm.
 
-CI_SECRET_KEY="$(openssl rand -base64 48)" DATA_DIR=./data WORKSPACE_DIR=./workspace \
-  LISTEN_ADDR=127.0.0.1:8080 go run ./cmd/server
-```
+## Procedure
 
-Open http://127.0.0.1:8080 and complete the setup wizard, or set
-`CI_BOOTSTRAP_ADMIN_PASSWORD` and drive `POST /api/v1/login`.
+1. Build the code:
 
-`data/` and `workspace/` are gitignored. Do not point `DATA_DIR` at a
-directory you care about: jobs write checkouts there.
+   ```bash
+   go build ./...
+   ```
+
+2. Run the tests:
+
+   ```bash
+   go test ./...
+   ```
+
+3. Run the static checks:
+
+   ```bash
+   go vet ./...
+   ```
+
+4. Start the server:
+
+   ```bash
+   CI_SECRET_KEY="$(openssl rand -base64 48)" DATA_DIR=./data WORKSPACE_DIR=./workspace \
+     LISTEN_ADDR=127.0.0.1:8080 go run ./cmd/server
+   ```
+
+5. Open http://127.0.0.1:8080.
+6. Complete the setup wizard. As an alternative, set `CI_BOOTSTRAP_ADMIN_PASSWORD` and log in with `POST /api/v1/login`.
+
+`data/` and `workspace/` are in `.gitignore`.
+
+:::caution
+Do not set `DATA_DIR` or `WORKSPACE_DIR` to a directory with important files. The server writes the database and the logs to `DATA_DIR`, and the job checkouts to `WORKSPACE_DIR`.
+:::
 
 ## Tests
 
-`go test ./...` fakes the Coolify and GitHub HTTP APIs and runs clone/pipeline
-tests against a real `git-http-backend` over a fixture repository
-(`internal/testsupport`).
+`go test ./...` uses fake Coolify and GitHub HTTP APIs. The clone and pipeline tests use `git-http-backend` with a test repository (`internal/testsupport`).
 
-A change that touches store, auth, webhook HMAC, or the runner should come
-with a test that would have failed before the change.
+If a change touches the store, authentication, the webhook HMAC or the runner, add a test. The test must fail without the change.
 
-## UI / CSS
+## Change the UI
 
-Pages are **templ** plus copied [shadcn-templ](https://shadcn-templ.com/)
-components under `internal/web/components`. Styles are Tailwind v4 (nova / olive,
-forest green tokens), compiled into `internal/web/assets/css/output.css` and
-embedded at build time. There is no SPA. JavaScript is the official shadcn-templ
-bundle (`GET /components/{bundle}`) plus a small theme script (system / light /
-dark). Form posts stay native.
+The pages are **templ** with copied [shadcn-templ](https://shadcn-templ.com/) components in `internal/web/components`.
+The styles are Tailwind v4 (nova / olive, forest green tokens). The build compiles them into `internal/web/assets/css/output.css` and embeds them.
+There is no SPA. The JavaScript is the official shadcn-templ bundle (`GET /components/{bundle}`) and a small theme script (system / light / dark). Forms use native posts.
 
-The authenticated layout is the shadcn Sidebar (Workspace / Setup / Settings)
-with Inset breadcrumbs and a refresh button in the header. Login and setup are a
-centered card (`max-w-[440px]`).
-Do not add HTMX, Alpine, React, Vue, or DaisyUI. After editing `*.templ` or
-`internal/web/assets/css/globals.css`:
+The layout after login is the shadcn Sidebar (Workspace / Setup / Settings), with Inset breadcrumbs and a refresh button in the header.
+The login and setup pages are a centered card (`max-w-[440px]`).
+Do not add HTMX, Alpine, React, Vue or DaisyUI.
 
-```bash
-templ generate ./internal/web/...
-cd internal/web && npm ci && npm run css
-```
+If you edit a `*.templ` file or `internal/web/assets/css/globals.css`, do these steps:
 
-The Dockerfile always rebuilds CSS in a Node stage and runs `templ generate`
-in the Go stage so a forgotten local generate cannot ship stale markup.
-Local `go run` uses whatever is already in `assets/css/output.css` and the
-committed `*_templ.go` files.
+1. Generate the templ code:
 
-## Layout
+   ```bash
+   templ generate ./internal/web/...
+   ```
 
-Do not introduce `pkg/` or flatten `internal/` into generic `auth` /
-`database` / `service` packages. Name packages after the work they do. See
-[architecture.md](/reference/architecture/) and [CONTRIBUTING.md](https://github.com/openpreflight/openpreflight/blob/main/CONTRIBUTING.md).
+2. Build the CSS:
+
+   ```bash
+   cd internal/web && npm ci && npm run css
+   ```
+
+The Dockerfile always builds the CSS again in a Node stage, and runs `templ generate` in the Go stage. A missing local generate thus cannot put previous markup in the image.
+Local `go run` uses the current `assets/css/output.css` and the committed `*_templ.go` files.
+
+## Package layout
+
+Do not add `pkg/`. Do not change `internal/` into generic `auth`, `database` or `service` packages. Give each package the name of the work that it does.
+
+## Related
+
+- [Architecture](/reference/architecture/)
+- [CONTRIBUTING.md](https://github.com/openpreflight/openpreflight/blob/main/CONTRIBUTING.md)

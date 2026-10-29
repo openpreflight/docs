@@ -1,42 +1,57 @@
 ---
-title: "Enable repos"
-description: "Enable the private repos that should receive Check Runs; the bindings table is the allow-list."
+title: "Add repositories"
+description: "Add a binding for each private repository that gets Check Runs. The list of bindings is the allow-list."
 sidebar:
-  order: 3
+  order: 2
 ---
-**Repos** is the allow-list. **Pick repositories** (`/repos/pick`) chooses the
-CI App, optionally a Coolify instance as the source of the repo list, then
-checks the repositories to run. Unchecking a repo removes its binding.
-**Add a binding** (`/repos/new`) is the same form filled in by owner/name.
-**Edit** is the same form on its own page (`/repos/{id}/edit`).
+This procedure adds the repositories that get Check Runs. Each of these
+repositories has a binding, and the list of bindings is the allow-list.
 
-The bindings table is itself the allow-list. A webhook for a repo with no enabled
-binding is acknowledged and dropped, however valid its signature. Only enable
-private repos you trust: a pipeline runs the repo's own commands, either in
-this process or in a `docker run` container when `runtime:` is set.
+## Before you start
 
-## Per-binding overrides
+- [Register a GitHub App](/configure/github-app/) and install it on the account
+  that owns the repositories.
 
-Per binding you can override:
+:::caution
+Add only private repositories that you trust. A pipeline runs the commands
+of the repository, as a process on the server host or in a `docker run`
+container when `runtime:` is set.
+:::
 
-- the branch list
-- path patterns (`frontend/**`; empty means every path)
-- the check name
-- the pipeline file path
-- the timeout
-- the install / test / build commands
-- whether logs are shareable
+## Procedure
 
-At run time, precedence is **binding → App → settings**. See
-[How configuration resolves](/configure/resolution/) for the full order, what the
-inferred defaults are, and the dry run that tells you which layer won for a
-real commit before you push one.
+1. Open **Repos**.
+2. Click **Pick repositories** (`/repos/pick`).
+3. In **CI GitHub App**, select the App.
+4. Optional: in **Repo list from**, select a Coolify instance as the source of the list.
+5. Click **Load repositories**.
+6. Select the repositories that get checks.
+7. Click **Save selection**.
 
-## After bindings are enabled
+To remove a binding, clear its checkbox, and click **Save selection** again.
 
-Commit a [pipeline](/use/pipelines/), or rely on the defaults inferred from
-`package.json`, `go.mod`, `Cargo.toml` or `pyproject.toml`. Before pushing,
-**Test configuration** on the binding form runs a
-[dry run](/configure/resolution/) and shows exactly what that commit would do. Then
-push to an allowed branch; the worker reports one Check Run with full
-[logs](/use/logs/).
+To add one binding by owner and name, click **Add a binding** (`/repos/new`).
+It shows the same fields. **Edit** shows the same fields on a different page
+(`/repos/{id}/edit`).
+
+## Result
+
+Each selected repository has a binding, with **Enabled** set. The server
+accepts a webhook for a repository with no active binding, and then ignores it.
+This also applies when the signature is correct.
+
+## Binding fields
+
+A binding can change some values for its repository, for example the branches,
+the path filters and the commands. The full list is in
+[Binding fields](/reference/configuration/#binding-fields), and the order in
+which the values apply is in [How configuration resolves](/reference/resolution/).
+
+## Next
+
+1. Commit a [pipeline](/configure/pipelines/), or use the
+   [inferred defaults](/reference/resolution/#inferred-defaults).
+2. On the **Edit** page of the binding, click **Test configuration** to do a [dry run](/configure/dry-run/).
+3. Push to a branch that the binding accepts.
+
+The server reports one Check Run, with a link to the full [log](/use/logs/).

@@ -1,71 +1,82 @@
 ---
 title: "Path filters"
-description: "Pattern syntax, what `**` does, why exclusions are not supported, the fail-open rule, the diagnostics in the log, and a monorepo example."
+description: "Set the path patterns of a binding. The pattern syntax, the changed files, the fail-open rule, the diagnostic and monorepos."
 sidebar:
-  order: 5
+  order: 4
 ---
-A binding's **paths** field limits which commits get checked. Empty means every
-path, which is the default and the behaviour every install had before filters
-existed.
+A path filter limits the commits that get a job. This page gives the procedure,
+the pattern syntax and the rules that control if a commit runs.
 
-This is one job with an optional filter, not a matrix of jobs per directory. If
-you need different pipelines per directory, that is fan-out, and
-[Comparison](/getting-started/comparison/) points at tools that do it.
+The **Paths** field of a binding holds the path filters. If it is empty, each
+commit runs. This is the default.
+
+A path filter gives one job with a filter. It does not give a matrix of jobs
+for each directory. For different pipelines in different directories, refer to
+[Comparison](/getting-started/comparison/).
+
+## Procedure
+
+1. Open **Repos**.
+2. Open the repository.
+3. Click **Edit**.
+4. In **Paths**, type the patterns. Example: `api/**, go.mod, go.sum`.
+5. Click **Save binding**.
+6. Optional: click **Test configuration** to see the filter result for a commit.
 
 ## Pattern syntax
 
-Patterns are separated by commas, newlines, **spaces**, or tabs. A pattern
-therefore cannot contain a space.
+Put a comma, a newline, a space or a tab between two patterns. Thus a pattern
+cannot contain a space.
 
 | Pattern | Matches | Does not match |
 |---|---|---|
 | `src/**` | `src`, `src/main.go`, `src/a/b/c.go` | `lib/main.go` |
-| `src/*.go` | `src/main.go` | `src/a/main.go`; `*` does not cross `/` |
+| `src/*.go` | `src/main.go` | `src/a/main.go`; `*` stops at `/` |
 | `*.md` | `README.md` | `docs/README.md` |
-| `go.mod` | `go.mod` exactly | `sub/go.mod` |
+| `go.mod` | `go.mod` only | `sub/go.mod` |
 
-Two rules cover everything:
+Two rules apply:
 
-- A pattern ending in `/**` matches that directory and anything beneath it, at
-  any depth.
-- Anything else is matched with Go's [`path.Match`](https://pkg.go.dev/path#Match),
-  where `*` matches within a single path segment and stops at `/`.
+- A pattern that ends in `/**` matches that directory and all files below it,
+  at all depths.
+- For all other patterns, the server uses Go's
+  [`path.Match`](https://pkg.go.dev/path#Match). There, `*` matches in one path
+  segment and stops at `/`.
 
-A leading `/` is stripped, so `/src/**` and `src/**` are the same.
+The server removes a `/` at the start. Thus `/src/**` and `src/**` are the same.
 
 ### Exclusions are not supported
 
-There is no `!docs/**`. A binding is an allow-list: a commit runs if **any**
-changed file matches **any** pattern. If you want "everything except docs", list
-what you do care about rather than what you do not. It is longer, and it does
-not silently start ignoring a new top-level directory somebody adds later.
+There is no `!docs/**`. A binding is an allow-list: a commit runs if one
+changed file matches one pattern. To check all files but not the docs, list the
+directories that you want to check. This list is longer. But if somebody adds a
+new top-level directory, the filter does not ignore it without a sign.
 
-## What counts as a changed file
+## The changed files
 
-The file list comes from GitHub's commit API for the **head commit** of the
-check suite, so it is the files that commit touched, **not** the full diff of a
-pull request.
+The file list comes from the GitHub commit API for the **head commit** of the
+check suite. The filter examines only the files in that commit. It does not
+examine the full pull request.
 
-This surprises people. If a pull request changes `src/` in its first commit and
-then adds a commit touching only `README.md`, the filter sees only `README.md`
-for that second commit and the check is skipped.
-The check for the earlier commit still stands on that commit.
+Example: commit 1 changes `src/main.go`, and commit 2 changes only `README.md`.
+For commit 2, the filter examines `README.md` only, and the Check Run is
+`skipped`. The Check Run for commit 1 stays on commit 1.
 
-Renames count twice: both the old and new path are considered, so moving a file
-into a filtered directory matches.
+The filter examines a renamed file two times: with the previous path and with
+the new path. Thus, if you move a file into a filtered directory, the file matches.
 
-## No match means skipped, not silent
+## No match gives a skipped Check Run
 
-When the file list is complete and nothing matches, the job **skips before
-cloning** and the Check Run completes with a `skipped` conclusion.
+If the file list is complete and no file matches, the job stops before the
+clone. The Check Run completes as `skipped`.
 
-Completing it matters. A required check needs an answer, and an absent check is
-not one, so branch protection would wait forever. That is why a filter miss
-completes the check instead of dropping it.
+The server completes the Check Run because a mandatory check must have a
+result. If the Check Run does not come, branch protection waits for it with no time
+limit. Refer to [Skip reasons](/use/runs/#skip-reasons).
 
 ## The diagnostic
 
-Every run records the filter decision in the log, whether it ran or skipped:
+Each job writes the filter decision in the log, for a run and for a skip:
 
 ```
 Changed files: 18
@@ -74,36 +85,37 @@ Filter: src/**
 Result: RUN
 ```
 
-On a skip the same block appears in the Check Run summary, since somebody
-reading the pull request cannot see the worker's log file. "Why did this run?"
-is as common a question as "why did it not?", so the diagnostic is written on
-every run rather than only on skips.
+On a skip, the Check Run summary also shows this block. A reader of the pull
+request cannot see the log file on the server. The diagnostic is on each job,
+because "Why did this run?" is a frequent question too.
 
 ## Fail-open
 
-If the changed-file list cannot be trusted, the job **runs**:
+If the changed-file list is not reliable, the job **runs**:
 
-- GitHub truncates the `files` array on very large commits (over 300 files).
-- The commit API call failed.
+- GitHub truncates the `files` array on very large commits (more than 300 files).
+- The call to the commit API failed.
 
-Skipping a commit because a file could not be seen is worse than an extra run,
-so the pipeline executes and the Check Run summary says so:
+An unwanted run is better than a skip because of a file that the server cannot
+see. The pipeline runs, and the Check Run summary says this:
 
 > Path filter could not be evaluated (the file list was truncated by GitHub); the
 > pipeline was executed.
 
-## Monorepo example
+## Monorepos
 
-A repository with a Go API and a React frontend, checked by two bindings on the
-same repo is **not** how this works: one repo plus one App is one binding. Use
-one binding whose filter covers the code you want gated:
+One repository and one App give one binding. You cannot add two bindings for
+the same repository and the same App. Use one binding, with a filter that contains the code that
+you want to check.
+
+Example: a repository has a Go API and a React frontend. Set the filter to:
 
 ```
 paths: api/**, go.mod, go.sum
 ```
 
-Commits touching only `web/` are skipped; commits touching `api/` or the module
-files run. Put the pipeline for that subtree in `.ci.yml`:
+The server skips commits that change only `web/`. Commits that change `api/` or
+the module files run. Put the pipeline for that subtree in `.ci.yml`:
 
 ```yaml
 runtime: golang:1.26
@@ -112,21 +124,11 @@ test: cd api && go test ./...
 timeout: 10m
 ```
 
-If you want the frontend checked too, widen the filter and make the pipeline
-cover both, or run a second instance with its own App. There is deliberately no
-per-directory job matrix.
+To check the frontend too, make the filter wider, and make the pipeline check the two parts.
+Or run a second server with its own App. There is no job matrix for each
+directory.
 
-## Empty pipelines are a different thing
+## Empty pipelines
 
-A path filter skip is intentional. A pipeline that resolves to no steps at all
-(no pipeline file, no binding commands, no recognisable project) is usually a
-configuration mistake, and it used to look identical.
-
-The two are now distinguishable, and a binding can make the mistake loud:
-
-```yaml
-on_empty_pipeline: fail
-```
-
-`skip` is the default and keeps the old behaviour. The job's `skip_reason` says
-which case occurred: `path_filter` or `no_pipeline`.
+A pipeline with no steps is different from a path filter skip. Refer to
+[Skip reasons](/use/runs/#skip-reasons).

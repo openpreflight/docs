@@ -1,88 +1,107 @@
 ---
 title: "Quickstart"
-description: "Get the binary running, through the first-boot wizard, and ready for a GitHub App."
+description: "Start the server on an empty host, complete the setup wizard, connect a GitHub App and get the first Check Run."
 sidebar:
-  order: 1
+  order: 2
 ---
-This is the shortest path from an empty box to a process waiting for a GitHub
-App. Full environment and settings detail lives in
-[Configuration](/configure/configuration/).
+This procedure goes from an empty host to the first Check Run on a commit.
+For all of the environment variables and settings, refer to
+[Configuration](/reference/configuration/).
 
-## Requirements
+## Before you start
 
-- A GitHub App you own (permissions and events in
-  [Register a GitHub App](/configure/github-app/))
-- A public HTTPS URL GitHub can reach
-- `git` in the worker image (clone happens here). Node is needed in this image
-  only when a job has no `runtime:` and runs as a process
-- A reachable Docker engine (`CI_DOCKER_HOST` or a mounted `docker.sock`) if
-  you use `runtime:` or opt into fork PRs
-- Optionally, a Coolify API token for inventory, the repo picker, and
-  install-worker
+- A host with Docker and Docker Compose.
+- A public HTTPS URL that GitHub can reach. Refer to
+  [Networking](/deploy/networking/).
+- A GitHub account that can own a GitHub App. The permissions and events are
+  in [Register a GitHub App](/configure/github-app/).
+- If you use `runtime:` or fork pull requests, a Docker engine that the server
+  can reach. Refer to [Docker engine access](/deploy/deployment/#docker-engine-access).
+- Optional: a Coolify API token, for the server inventory, the repository
+  picker and the install on Coolify.
 
-## Run it
+The server image contains `git`, `nodejs` and `npm` only. If a job has no
+`runtime:`, the process executor runs it with these tools. A Go, Rust or Python
+job with no `runtime:` fails with `go: not found` (or `cargo`, `pytest`), and
+you get no warning. If the repository is not a Node.js project, set `runtime:`
+to an image that has the toolchain. Refer to [Pipelines](/configure/pipelines/).
 
-`compose.prod.yaml` is standalone: it pulls the published image, so there is
-nothing to clone.
+## Procedure
 
-```bash
-curl -O https://raw.githubusercontent.com/openpreflight/openpreflight/main/compose.prod.yaml
-export CI_SECRET_KEY="$(openssl rand -base64 48)"
-docker compose -f compose.prod.yaml up -d
-```
+### Start the server
 
-`CI_SECRET_KEY` is the only variable you must set; the process refuses to start
-without it. Keep it forever. Losing it makes stored PEMs and tokens unreadable.
-Everything else either has a default or is asked for in the wizard. See
-[Configuration](/configure/configuration/) for the full env table and key rotation.
+1. Download the compose file. It pulls the published image, and you do not
+   clone the repository.
 
-**v2.3.1** is the current tagged release. Linux binaries are on the
-[GitHub Release](https://github.com/openpreflight/openpreflight/releases/tag/v2.3.1).
-Pin the image with `OPENPREFLIGHT_VERSION=2.3.1` rather than editing the file.
-v1.0.0 was 29 August 2026.
+   ```bash
+   curl -O https://raw.githubusercontent.com/openpreflight/openpreflight/main/compose.prod.yaml
+   ```
 
-To build from source instead (the contributor path, where `compose.yaml` is
-`build: .` and needs the checkout):
+2. Make a secret key and set `CI_SECRET_KEY`. The server does not start without it.
 
-```bash
-git clone https://github.com/openpreflight/openpreflight
-cd openpreflight
-export CI_SECRET_KEY="$(openssl rand -base64 48)"
-docker compose up --build
-```
+   ```bash
+   export CI_SECRET_KEY="$(openssl rand -base64 48)"
+   ```
 
-If you use `runtime:` or fork PRs, you also need `DOCKER_GID`. See
-[Deployment](/deploy/deployment/), which covers compose, volumes, the
-docker socket, and reverse-proxy notes.
+   :::caution
+   Keep a copy of `CI_SECRET_KEY` in a safe location. If you lose the key, the
+   server cannot decrypt the stored private keys and tokens.
+   :::
 
-## First boot
+3. Optional: to pin a release, set `OPENPREFLIGHT_VERSION` to a version from the
+   [releases page](https://github.com/openpreflight/openpreflight/releases).
+   Do not edit the compose file.
+4. If you use `runtime:` or fork pull requests, set `DOCKER_GID`. Refer to
+   [Docker engine access](/deploy/deployment/#docker-engine-access).
+5. If you configure the server through the API, set `CI_BOOTSTRAP_ADMIN_PASSWORD`.
+   The server then creates the `admin` user on first boot.
+6. Start the server.
 
-The first request with no admin user lands on the setup wizard: a setup token,
-the admin password, and the public base URL. The token is in the server log
-from startup, on the line that begins `no admin yet` (`setup_token=…`), so
-only someone who can read the logs can claim a fresh instance. A restart
-before setup prints a new one.
+   ```bash
+   docker compose -f compose.prod.yaml up -d
+   ```
 
-For a headless deploy, set `CI_BOOTSTRAP_ADMIN_PASSWORD` so the `admin` user is
-created on first boot and you can drive setup over the API instead of the
-wizard. It is ignored once a user exists.
+All other variables have a default, or the setup wizard shows a field for them.
 
-## Setup order
+### Complete the setup
 
-1. [Register a GitHub App](/configure/github-app/) and paste it under **GitHub Apps**.
-2. [Enable repo bindings](/configure/bindings/). The bindings table is the
-   allow-list.
-3. Optionally [add a Coolify instance](/deploy/coolify/) as a repo-picker source
-   or to install this worker.
+If you set `CI_BOOTSTRAP_ADMIN_PASSWORD`, go to step 10.
 
-Then commit a [pipeline](/use/pipelines/) (or rely on Node defaults) and push.
+7. Open the public URL of the server. With no admin user, the server shows the
+   setup wizard.
+8. Find the setup token in the server log. It is on the line that starts with
+   `no admin yet` (`setup_token=…`).
+9. Enter the setup token, the admin password and the public base URL.
 
-## What you should see
+Only a person who can read the server log can claim a new server. If the server
+restarts before the setup is complete, it prints a new setup token.
 
-On the next push to an enabled binding, GitHub opens one Check Run on the
-commit. The summary is markdown this worker writes. This repository's
+### Connect GitHub
+
+10. Register a GitHub App, and add it in **GitHub Apps**. Refer to
+    [Register a GitHub App](/configure/github-app/).
+11. Add a binding for each repository that must get checks. Refer to
+    [Bindings](/configure/bindings/). The bindings are the allow-list.
+
+    :::caution
+    Add bindings only for private repositories that you trust. A pipeline runs the
+    commands of the repository on the server host, or in a sibling container
+    when `runtime:` is set.
+    :::
+
+12. Optional: add a Coolify instance as a source for the repository picker.
+    Refer to [Optional: Coolify](/deploy/coolify/).
+13. Commit a [pipeline](/configure/pipelines/) to the repository, or use the
+    [inferred defaults](/reference/resolution/#inferred-defaults).
+14. Push a commit to a repository that has a binding.
+
+## Result
+
+GitHub opens one Check Run on the commit. The server writes the summary in
+markdown. Example: the
 [`.ci.yml`](https://github.com/openpreflight/openpreflight/blob/main/.ci.yml)
-has `install` and `test` only — no `build` — so a passing run looks like:
+of openpreflight has `install` and `test` only, with no `build`. A job with no
+errors shows this summary:
 
 ```
 ✓ install  47s
@@ -93,11 +112,28 @@ has `install` and `test` only — no `build` — so a passing run looks like:
 
 [View full logs](/use/logs/)
 
-Durations change per run. **View full logs** is the Check Run's `details_url`:
-it opens `GET /runs/{job-id}` on your instance. That page requires a session
-by default; a binding can opt into shareable logs. See [Logs](/use/logs/).
+The times change for each job. **View full logs** is the `details_url` of
+the Check Run. It opens the run page, `GET /runs/{job-id}`, on your server. The
+run page is available only with a session, unless the binding makes the log shareable. Refer to
+[Shareable logs](/use/logs/#shareable-logs).
 
-If nothing resolves to run, the check reports skipped rather than failed.
-That is intentional. See [Pipelines](/use/pipelines/) and
-[Troubleshooting](/operate/troubleshooting/).
+If the server finds no commands to run, the Check Run is `skipped`, not
+`failure`. Refer to [Skip reasons](/use/runs/#skip-reasons).
 
+## Build from source
+
+The contributor path uses `compose.yaml`, which has `build: .`. You must clone the
+repository:
+
+```bash
+git clone https://github.com/openpreflight/openpreflight
+cd openpreflight
+export CI_SECRET_KEY="$(openssl rand -base64 48)"
+docker compose up --build
+```
+
+## Related
+
+- [Deployment](/deploy/deployment/): the volumes and the Docker engine access
+- [Networking](/deploy/networking/): the public URL and the reverse proxy
+- [Configuration](/reference/configuration/#environment): all environment variables

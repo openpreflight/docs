@@ -9,11 +9,11 @@ sidebar:
 
 ## Context
 
-Coolify already talks to GitHub for deploys. It is tempting to reuse that
-connector for commit checks so operators do not register another App.
+Coolify connects to GitHub for deploys. One option is to use that connector
+again for commit checks. Then operators do not register a second App.
 
-GitHub only lets a **GitHub App** create Check Runs. User and OAuth tokens
-are refused. A GitHub App has exactly one webhook URL. Coolify's connector
+GitHub lets only a **GitHub App** create Check Runs. GitHub refuses user and
+OAuth tokens. A GitHub App has one webhook URL only. Coolify's connector
 webhook belongs to Coolify's deploy pipeline, and its manifest has no
 `checks` permission.
 
@@ -21,18 +21,18 @@ webhook belongs to Coolify's deploy pipeline, and its manifest has no
 
 Operators register a GitHub App they own, with `Checks: Read and write`,
 `Contents: Read-only`, `Metadata: Read-only`, subscribed to **Check suite**
-and **Check run**. This process is that App's webhook (`/webhook/{slug}`).
+and **Check run**. This server is the webhook of that App (`/webhook/{slug}`).
 
-Coolify is optional inventory: a team-scoped API token so the UI can list
-servers and offer a repo picker. Coolify is not the Check Run author and
-must not have its GitHub webhook pointed here.
+Coolify is optional inventory. A team-scoped API token lets the UI list
+servers and show a repository picker. Coolify is not the Check Run author.
+The GitHub webhook of Coolify must not point to this server.
 
 ## Consequences
 
 - Setup is longer (create an App, paste PEM + webhook secret). That is the
-  cost of writing the same commit checks a PR already shows.
-- Repointing Coolify's GitHub connector at this service would steal deploys.
-  Docs warn against it.
-- Clone credentials are installation tokens from *our* App, passed to git
-  via `GIT_CONFIG_*` as Basic `x-access-token`, then the remote is stripped
-  before any pipeline step runs.
+  cost to write the same commit checks that a pull request shows.
+- If you point Coolify's GitHub connector to this server, this server steals
+  the deploys. The docs warn against it.
+- Clone credentials are installation tokens from *our* App. The server gives
+  them to git through `GIT_CONFIG_*` as Basic `x-access-token`. Then it removes
+  the remote before the first pipeline step runs.
