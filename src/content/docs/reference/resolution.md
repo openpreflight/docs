@@ -1,185 +1,117 @@
 ---
 title: "How configuration resolves"
-description: "The five layers that decide what a commit runs, in the order they are checked, and the dry run that tells you which one won."
+description: "The five layers that set the plan of a commit, the order of the layers, and the commands that the server infers from the repository."
 sidebar:
   order: 2
 ---
-Five layers can decide what a commit runs. This page is the order they are
-checked in, and the endpoint that tells you which one actually won for a given
-commit, so the answer to *"why did it run **that**?"* does not require pushing
-a commit and reading the result afterwards.
+Five layers can set the plan of a commit. This page gives the order of the
+layers, the commands that the server infers, and examples.
 
 ## The five layers
 
-Highest first. The first layer that supplies a value wins, and each value is
-resolved on its own:
+The table starts with the highest layer. The first layer that supplies a value
+sets that value. Each value resolves independently, but the commands resolve
+as one block.
 
-| # | Layer | Where it lives | Can supply |
+| # | Layer | Location | Values that it can supply |
 |---|---|---|---|
-| 1 | **Pipeline file** | `.ci.yml` in the commit being checked | `install`, `test`, `build`, `runtime`, `timeout` |
+| 1 | **Pipeline file** | `.ci.yml` in the commit that the job checks | `install`, `test`, `build`, `runtime`, `timeout` |
 | 2 | **Binding** | Repos → Edit (`/repos/{id}/edit`) | command overrides, `pipeline_file`, `timeout_seconds`, `check_name`, `paths`, `branches`, `on_empty_pipeline` |
 | 3 | **GitHub App** | GitHub Apps → Edit (`/github-apps/{id}/edit`) | `check_name` only |
 | 4 | **Settings** | Settings → Configuration and Runner | `default_pipeline_file`, `default_timeout_seconds`, `default_check_name`, `default_runtime` |
-| 5 | **Built-in default** | the binary | `.ci.yml`, 15m, `openpreflight`, the worker process |
+| 5 | **Built-in default** | the server | `.ci.yml`, 15m, `openpreflight`, the process executor |
 
-Two things about this table are the parts people get wrong.
+The commands resolve as one block. If the pipeline file sets one of `install`,
+`test` or `build`, the file supplies all three commands. The server then ignores
+the command overrides of the binding. You cannot set `test` in the file and get
+`install` from the binding.
 
-**The commands resolve as a block; everything else resolves per value.** If the
-pipeline file sets *any* of `install`, `test` or `build`, the file supplies all
-three and the binding's command overrides are ignored entirely. There is no
-merging, so you cannot set `test` in the file and inherit `install` from the
-binding. But `runtime` and `timeout` are independent: a file that sets only
-`runtime: node:22` applies that image to commands that came from the binding or
-from inference.
+`runtime` and `timeout` resolve independently. Example: a file that sets only
+`runtime: node:22` applies that image to the commands from the binding or from
+inference.
 
-**Layer 1 is read from the commit, not from your working copy.** The pipeline
-file that decides a run is the one in the commit GitHub sent, at that immutable
-SHA. Editing `.ci.yml` locally changes nothing until it is pushed, and a run on
-an older commit uses that commit's file.
+The server reads layer 1 from the commit, not from your working copy. The
+pipeline file of a job is the file in the commit that GitHub sent, at that SHA.
+A change to `.ci.yml` on your computer has no effect until you push it. A job
+on an older commit uses the file in that commit.
 
-### When nothing supplies commands
+For the names and defaults of each value, refer to
+[Configuration](/reference/configuration/).
 
-If no layer supplies commands, OpenPreflight infers them from what the
-repository looks like. The detectors are checked in this order, and the first
-match wins:
+## Inferred defaults
+
+If no layer supplies commands, the server infers them from the files in the
+repository. The server examines the markers in this order. The first match sets
+the commands.
 
 | Marker | Language | `install` | `test` | `build` |
 |---|---|---|---|---|
-| `package.json` | Node | by lockfile: `pnpm install --frozen-lockfile`, `yarn install --immutable`, `npm ci`, else `npm install --no-audit --no-fund` | `<runner> test`, only if a `test` script exists | `<runner> run build`, only if a `build` script exists |
+| `package.json` | Node | from the lockfile: `pnpm install --frozen-lockfile`, `yarn install --immutable`, `npm ci`, else `npm install --no-audit --no-fund` | `<runner> test`, only if `package.json` has a `test` script | `<runner> run build`, only if `package.json` has a `build` script |
 | `go.mod` | Go | `go mod download` | `go test ./...` | `go build ./...` |
-| `Cargo.toml` | Rust | `cargo fetch --locked` (plain `cargo fetch` with no `Cargo.lock`) | `cargo test` | `cargo build --release` |
-| `pyproject.toml`, `requirements.txt`, `setup.py` | Python | by lockfile: `uv sync --frozen`, `poetry install --no-interaction`, `pip install -r requirements.txt`, else `pip install .` | `pytest`, only on evidence (see below) | none |
+| `Cargo.toml` | Rust | `cargo fetch --locked` (`cargo fetch` if there is no `Cargo.lock`) | `cargo test` | `cargo build --release` |
+| `pyproject.toml`, `requirements.txt`, `setup.py` | Python | from the lockfile: `uv sync --frozen`, `poetry install --no-interaction`, `pip install -r requirements.txt`, else `pip install .` | `pytest`, only if the repository has tests (refer to the list below) | none |
 
-Node is checked first, so no repository that worked before these detectors
-existed changes its plan. A repository that matches two of them (a Go service
-with a JavaScript front end, say) gets the first match **and a warning**,
-because silently picking one of two plausible plans is worse than either.
+The server examines Node first. Thus, a repository that worked before the
+other markers has the same plan. If a repository matches two markers, the
+server uses the first match and gives a warning. Example: a Go service with a
+JavaScript front end.
 
-Two asymmetries in that table are deliberate:
+Python is different from the other languages:
 
-- **Python has no build step.** There is no single correct one, and running
-  `python -m build` against a repository that is not a package would fail a
-  check for no reason.
-- **Python's test step needs evidence.** `pytest` exits `5` when it collects no
-  tests, so an unconditional test step would fail the check for a repository
-  that simply has none. It is added when there is a `tests/` or `test/`
-  directory, a top-level `test_*.py` or `*_test.py`, or a `[tool.pytest` /
-  `[pytest]` table in the configuration. Go and Rust exit `0` with no tests, so
-  they need no such guard.
+- Python has no build step. There is no one correct build command. Also,
+  `python -m build` fails on a repository that is not a package.
+- The server adds the `pytest` step only if the repository has tests, because
+  `pytest` exits `5` when it finds no tests. The server finds tests from a
+  `tests/` or `test/` directory, a top-level `test_*.py` or `*_test.py`, or a `[tool.pytest` or
+  `[pytest]` table in the configuration. Go and Rust exit `0` with no tests.
 
-If nothing matches, there is nothing to run and the check concludes `skipped`
-rather than failing. Set `on_empty_pipeline: fail` on the binding if you would
-rather that be loud. See [Enable repos](/configure/bindings/).
+If no marker matches, there is no step to run, and the Check Run concludes
+`skipped`. To make this a failure, set `on_empty_pipeline` to `fail` on the
+binding. Refer to [Skip reasons](/use/runs/#skip-reasons).
 
-## The dry run
+:::caution
+Set `runtime:` to an image that has the toolchain if the repository is not a
+Node.js project. If `runtime` is empty, the inferred commands run on the server
+host. The server image contains only `git`, `nodejs` and `npm`. A Go, Rust or
+Python job then fails with `go: not found` (or `cargo`, `pytest`). The server
+gives no warning. `default_runtime` applies to fork commits only.
+:::
 
-Reading the table above tells you what *should* happen. The dry run tells you
-what *would* happen, for a real commit:
+## Find the layer that set a value
 
-- **In the UI:** Repos → a repository → **Dry run**, or **Test configuration**
-  in the binding editor. Enter a branch, tag or commit, or leave it blank for
-  the repository's default branch.
-- **Over the API:** `POST /api/v1/bindings/{id}/resolve?ref=main`
+A dry run shows the plan for a commit and the layer that set each value,
+without a job. Refer to [Dry run](/configure/dry-run/).
 
-It resolves the ref to an immutable SHA, checks that commit out, resolves the
-plan exactly as the worker would, and evaluates the path filter against the same
-changed-file list a webhook would deliver. Then it throws the checkout away.
-
-**A dry run writes nothing.** No Check Run on the commit, no job row, nothing on
-the queue. It is safe to run against a production instance and against a
-repository whose binding is disabled: a disabled binding resolves normally and
-says that webhooks for it are being ignored.
-
-### Reading the result
-
-```json
-{
-  "repo": "acme/api",
-  "ref": "main",
-  "sha": "b8bad2c0e1f4...",
-  "decision": "run",
-  "pipeline_file": ".ci.yml",
-  "check_name": "ci/preflight",
-  "executor": "docker: node:22",
-  "timeout": "3m0s",
-  "steps": [
-    {"name": "install", "command": "go mod download", "source": "Go defaults from go.mod"},
-    {"name": "test", "command": "go test ./...", "source": "Go defaults from go.mod"}
-  ],
-  "origins": [
-    {"field": "pipeline_file", "value": ".ci.yml", "source": "settings"},
-    {"field": "timeout", "value": "3m0s", "source": ".ci.yml"},
-    {"field": "runtime", "value": "node:22", "source": ".ci.yml"}
-  ],
-  "path_filter": "Changed files: 1\nMatched files: 1\nFilter: **\nResult: RUN",
-  "warnings": [],
-  "errors": []
-}
-```
-
-`decision` is one of:
-
-| Value | Meaning |
-|---|---|
-| `run` | The pipeline would execute |
-| `skip` | The check would conclude `skipped`; `skip_reason` says which kind |
-| `fail` | The configuration is broken, so the check would fail before running anything |
-
-`origins` is the useful part, and it is why this is not just an echo of your
-settings: that example says the timeout and the image came from the commit's
-`.ci.yml` while the pipeline filename came from settings and the commands were
-inferred from `go.mod`. Three layers, one commit. A single "plan from" string
-cannot say that.
-
-`errors` are things that would fail or skip a real run. `warnings` are legal but
-probably not what you meant: an ambiguous project layout, a `runtime:` with no
-reachable engine, a filter that matched nothing on this commit.
-
-**Every problem is reported at once.** A real run stops at the first one,
-because a job cannot execute on a broken file. The dry run keeps going, so a bad
-`timeout:` and a rejected image come back together rather than one fix at a
-time.
-
-## After a run, on the run page
-
-Provenance is recorded on the job when the plan is resolved, so a finished run
-explains itself without a second dry run. `GET /runs/{id}` shows the same
-per-value table under **Where every value came from**, and
-`GET /api/v1/jobs/{id}` returns it as `plan_origins`.
-
-The distinction matters when configuration has changed since: the run page shows
-what applied to *that* commit, and the dry run shows what would apply *now*.
+After a job, the run page shows the layer that set each value for that commit.
+Refer to [Runs](/use/runs/).
 
 ## Worked examples
 
-**A repository with only a binding override.** No `.ci.yml`. The binding sets
-`test_cmd: make check`. Result: one step, `make check`, source
-`binding commands`. `timeout` comes from settings, `runtime` is the worker
-process (built-in default).
+**A repository with only a binding override.** There is no `.ci.yml`. The
+binding sets `test_cmd: make check`. The result is one step, `make check`, with
+the source `binding commands`. `timeout` comes from the settings. `runtime` is
+the process executor (the built-in default).
 
-**A repository with a runtime-only pipeline file.** `.ci.yml` contains
-`runtime: node:22` and nothing else, and there is a `package.json` with a `test`
-script and a `pnpm-lock.yaml`. Result: `pnpm install --frozen-lockfile` and
-`pnpm test`, source `Node defaults from package.json`, running in `node:22`
-whose source is `.ci.yml`. The file supplied the executor without supplying a
-single command.
+**A repository with a pipeline file that sets only the runtime.** `.ci.yml`
+contains only `runtime: node:22`. The repository has a `package.json` with a
+`test` script, and a `pnpm-lock.yaml`. The result is
+`pnpm install --frozen-lockfile` and `pnpm test`, with the source
+`Node defaults from package.json`. The steps run in `node:22`, with the source
+`.ci.yml`. The file supplies the executor, but no command.
 
-**A fork pull request.** Fork code always runs in a container, never as a
-process on the host. If the pipeline file sets no `runtime`, the image comes
-from `settings.default_runtime` and the origin says so explicitly, because that
-value is the trust boundary, so it should never be ambiguous. See
-[Security model](/reference/security-model/).
+**A fork pull request.** A fork job always runs in a container. If the pipeline
+file sets no `runtime`, the image comes from `default_runtime`, and the origin
+shows this. Refer to [Fork pull requests](/configure/fork-pull-requests/).
 
-**A monorepo whose commit touched only docs.** The binding's `paths` is
-`backend/**`. `decision` is `skip`, `skip_reason` is `path_filter`, and
-`path_filter` shows the changed count, the matched count and `Result: SKIP`.
-Nothing was wrong; the filter did its job. See
-[Path filters](/configure/path-filters/).
+**A monorepo commit that changes only docs.** The `paths` of the binding is
+`backend/**`. `decision` is `skip`, and `skip_reason` is `path_filter`.
+`path_filter` shows the number of changed files, the number of matched files
+and `Result: SKIP`. Refer to [Path filters](/configure/path-filters/).
 
 ## Related
 
-- [Pipelines](/configure/pipelines/): the `.ci.yml` contract itself
-- [Enable repos](/configure/bindings/): the binding fields, layer 2
+- [Pipelines](/configure/pipelines/): the pipeline file
+- [Bindings](/configure/bindings/): the binding, layer 2
 - [Configuration](/reference/configuration/): the settings, layer 4
-- [Runs](/use/runs/): reading a run after the fact
-- [API](/reference/api/): the resolve endpoint's request and response
+- [Dry run](/configure/dry-run/): the plan for a commit, before you push
+- [API](/reference/api/): the routes

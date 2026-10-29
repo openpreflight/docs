@@ -1,12 +1,12 @@
 ---
 title: "Architecture"
-description: "One Go process is both configurator and worker: packages, the webhook-to-Check-Run path, and what is deliberately absent."
+description: "The packages of the one Go server, the path from a webhook to a Check Run, and the parts that the design does not include."
 sidebar:
   order: 4
 ---
-One Go process is both the **configurator** (HTML UI + JSON API) and the
-**worker** (webhook → queue → Check Run). There is no separate frontend, no
-message broker, and no `pkg/` library.
+One Go server is the **configurator** (the HTML UI and the JSON API). The same
+server also runs the jobs (webhook → queue → Check Run). There is no other
+frontend, no message broker and no `pkg/` library.
 
 ```text
 GitHub ──POST /webhook/{slug}──► api ──enqueue──► queue.Runner
@@ -22,64 +22,73 @@ Browser / CLI ──session/Bearer──► api │                ├── git
 
 | Package | Role |
 |---|---|
-| `cmd/server` | Load env, open SQLite, rotate secrets if asked, bootstrap admin, serve HTTP, start the runner |
-| `internal/api` | Routes, session/CSRF, HTML and JSON from the same handlers |
-| `internal/web` | Server-rendered templ + copied shadcn-templ components; Tailwind compiled into `assets/css/output.css` |
-| `internal/store` | SQLite (`modernc.org/sqlite`), migrations, bindings, jobs |
-| `internal/secret` | Seal/open secret columns |
-| `internal/config` | Process env only: listen addr, dirs, `CI_SECRET_KEY`, `CI_DOCKER_HOST` |
-| `internal/queue` | Claim queued jobs, concurrency cap, prune logs |
-| `internal/githubapp` | App JWT, installation tokens, Check Runs |
-| `internal/coolify` | Team-scoped Coolify API (inventory, repo picker, install-worker) |
-| `internal/webhook` | HMAC and payload shape |
-| `internal/pipeline` | Resolve install/test/build and `runtime` |
-| `internal/workspace` | Per-job checkout |
-| `internal/executor` | Run a step as a process or `docker run` |
-| `internal/logs` | Per-job log files under `DATA_DIR/logs` |
+| `cmd/server` | Loads the environment, opens SQLite, rotates the secrets if necessary, makes the first admin, serves HTTP and starts the runner |
+| `internal/api` | Routes, sessions and CSRF. The same handlers give HTML and JSON. |
+| `internal/web` | Server-rendered templ and copied shadcn-templ components. Tailwind compiles into `assets/css/output.css`. |
+| `internal/store` | SQLite (`modernc.org/sqlite`), migrations, bindings and jobs |
+| `internal/secret` | Encrypts and decrypts the secret columns |
+| `internal/config` | The environment of the server only: listen address, directories, `CI_SECRET_KEY`, `CI_DOCKER_HOST` |
+| `internal/queue` | Claims queued jobs, applies the concurrency limit and deletes the logs after `log_retention_days` |
+| `internal/githubapp` | App JWT, installation tokens and Check Runs |
+| `internal/coolify` | The Coolify API for one team (inventory, repository picker, install-worker) |
+| `internal/webhook` | HMAC and the payload shape |
+| `internal/pipeline` | Resolves `install`, `test`, `build` and `runtime` |
+| `internal/workspace` | The checkout of each job |
+| `internal/executor` | Runs a step as a process or with `docker run` |
+| `internal/logs` | One log file for each job, in `DATA_DIR/logs` |
 
-Everything a GitHub App or Coolify host needs to know lives in the database,
-edited in the UI. Env vars are only what the process needs before it can open
-that database. See [configuration.md](/reference/configuration/).
+The database contains all data about the GitHub Apps and the Coolify hosts.
+You change this data in the UI. The environment variables contain only the
+values that the server must have before it opens the database. Refer to
+[Configuration](/reference/configuration/).
 
-## How a run happens
+## How a job runs
 
-1. `POST /webhook/{slug}` must return 2xx within GitHub's ~10s window.
-2. HMAC is verified with that App's webhook secret.
-3. Fork PRs are dropped unless `skip_fork_prs` is off, Docker is reachable, and
-   `default_runtime` is set. A repo with no enabled binding is acknowledged and
-   dropped. Delivery ids still in-flight are deduped.
-4. One live run per commit is enforced: a `requested` delivery for a
-   `(app, repo, sha)` already in flight is answered `already queued`, while a
-   `rerequested` one cancels that run first. An older in-flight job for the same
-   repo+ref on a *different* SHA is then cancelled, the new SHA is enqueued, and
-   the handler returns 202.
-5. The runner mints an installation token from the payload's installation id,
-   creates the Check Run, fetches that commit (fork PRs fall back to
-   `refs/pull/N/head`), detaches, strips the remote, runs the pipeline under a
-   timeout: `docker run` when `runtime` is set or the job is a fork, otherwise
-   a local process. It completes the Check Run and keeps the full log locally.
+1. `POST /webhook/{slug}` must return 2xx in GitHub's window of approximately 10 seconds.
+2. The server examines the HMAC with the webhook secret of that App.
+3. The server ignores a repository with no binding or a binding that is off. It also ignores a branch that is not in the list.
+4. A fork pull request that the settings do not let run gets a job that reports `skipped`.
+5. The server ignores a delivery id that has a job that is not complete.
+6. The server keeps one live job for each commit. Refer to the list below.
+7. The server queues the job for the new SHA, and the handler returns 202.
+8. The runner gets an installation token and makes the Check Run.
+9. The runner fetches the commit, detaches it and removes the remote.
+10. A fork pull request falls back to `refs/pull/N/head` for the fetch.
+11. The runner runs the pipeline with a timeout, with `docker run` or as a process.
+12. The runner completes the Check Run and keeps the full log on the host.
 
-`GET /runs/{id}` is the Check Run `details_url`. GitHub never fetches it. The
-reader's browser does, so it needs a session unless the binding opted into
-shareable logs. See [Logs](/use/logs/).
+These rules keep one live job for each commit:
 
-GitHub's **Redeliver** button reuses the delivery id, so dedup applies only
-while a job is in flight; redelivering a finished delivery starts a new job,
-which is what makes it useful for debugging. `check_run.rerequested` is
-honoured only for this App's own checks.
+- A `requested` delivery for an `(app, repo, sha)` with a job that is not complete gets the answer `already queued`.
+- A `rerequested` delivery cancels that job first.
+- The server cancels an older job that is not complete for the same repository and ref on a different SHA.
+
+A job uses `docker run` if `runtime` is set or if the job is a fork job.
+Other jobs run as a process on the host.
+
+`GET /runs/{id}` is the `details_url` of the Check Run. GitHub does not fetch
+it. The browser of the reader fetches it. Thus, the reader must have a session,
+or the binding must have shareable logs. Refer to
+[Shareable logs](/use/logs/#shareable-logs).
+
+GitHub's **Redeliver** button sends the same delivery id. Thus, the server
+ignores a delivery only while its job is not complete. A delivery of a finished
+job starts a new job, and you can use this to debug. The server accepts
+`check_run.rerequested` only for the Check Runs of its own App.
 
 ## Why this shape
 
-- [ADR 001](/reference/decisions/001-database/): SQLite in-process, secrets encrypted at rest.
-- [ADR 002](/reference/decisions/002-authentication/): local admin + opaque sessions, not GitHub OAuth.
-- [ADR 003](/reference/decisions/003-github-app/): our GitHub App, not Coolify's GitHub connector.
-- [ADR 004](/reference/decisions/004-docker-executor/): `runtime:` is `docker run`; fork PRs stay off until that works.
-- [ADR 005](/reference/decisions/005-check-suite-gating/): `check_suite`/`check_run` only, one Check Run per job, one live run per commit.
+- [ADR 001](/reference/decisions/001-database/): SQLite in the server, with the secrets encrypted at rest.
+- [ADR 002](/reference/decisions/002-authentication/): a local admin and opaque sessions, not GitHub OAuth.
+- [ADR 003](/reference/decisions/003-github-app/): our GitHub App, not the GitHub connector of Coolify.
+- [ADR 004](/reference/decisions/004-docker-executor/): `runtime:` is `docker run`. Fork pull requests stay off until Docker works.
+- [ADR 005](/reference/decisions/005-check-suite-gating/): `check_suite` and `check_run` only, one Check Run for each job, one live job for each commit.
 
 ### Prior art
 
-The trigger model is Zuul's, at a single server's scale: gate on the commit,
-queue against an immutable SHA, attach logs to the run, write the result back to
-the forge. Zuul's architecture (ZooKeeper, Nodepool, Ansible, a scheduler apart
-from its executors) is explicitly not adopted. [ADR 005](/reference/decisions/005-check-suite-gating/)
-records what is borrowed, what is rejected, and where the ceiling is.
+The trigger model comes from Zuul, at the scale of one server. The server gates
+on the commit and queues against an immutable SHA. It attaches the logs to the
+job and writes the result back to the forge. openpreflight does not use the
+architecture of Zuul (ZooKeeper, Nodepool, Ansible, a scheduler apart from its
+executors). [ADR 005](/reference/decisions/005-check-suite-gating/) records what
+the design uses from Zuul, what it does not use, and the limits.

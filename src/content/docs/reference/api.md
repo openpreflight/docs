@@ -1,83 +1,86 @@
 ---
 title: "API"
-description: "JSON API routes for setup, settings, Coolify, GitHub Apps, bindings, and jobs, plus the public webhook and health endpoints."
+description: "The JSON API routes for setup, settings, Coolify, GitHub Apps, bindings and jobs, and the public webhook and health routes."
 sidebar:
   order: 3
 ---
+This page gives the routes of the JSON API, with the method and the purpose of each.
 
-Everything except `/health`, `/webhook/{slug}` and a shareable `/runs/{id}`
-needs a session cookie (UI) or `Authorization: Bearer <token>` (CLI). Get a
-token by posting JSON to `/api/v1/login`.
+## Authentication
 
-Routes below match the registrations in `internal/api/server.go`. Form-POST
-aliases that mirror `PATCH` / `DELETE` for the HTML UI are omitted.
+All routes must have a session, but `/health`, `/webhook/{slug}` and a
+shareable `/runs/{id}` do not. The UI sends a session cookie. The CLI sends
+`Authorization: Bearer <token>`. To get a token, send JSON to `/api/v1/login`.
+For the expiry of sessions and the CSRF rules, refer to
+[Sessions](/reference/security-model/#sessions).
+
+The routes match the registrations in `internal/api/server.go`. The HTML UI
+also has form-POST aliases for `PATCH` and `DELETE`. This page does not include
+them.
 
 ## Auth and setup
 
 | Method | Path | Purpose |
 |---|---|---|
-| `POST` | `/api/v1/setup` | First-run wizard; needs `setup_token` from the startup log |
-| `POST` | `/api/v1/login` | Returns `{ token }`; `429` + `Retry-After` past 5 attempts a minute |
-| `POST` | `/api/v1/logout` | End session |
+| `POST` | `/api/v1/setup` | First-run wizard. Send the `setup_token` from the startup log. |
+| `POST` | `/api/v1/login` | Returns `{ token }`. After 5 tries in a minute, returns `429` and `Retry-After`. |
+| `POST` | `/api/v1/logout` | Ends the session |
 
 ## Settings
 
 | Method | Path | Purpose |
 |---|---|---|
-| `GET` | `/api/v1/settings` | Read settings row |
-| `PATCH` | `/api/v1/settings` | Update settings |
-| `POST` | `/api/v1/password` | Change admin password |
+| `GET` | `/api/v1/settings` | Read the settings row |
+| `PATCH` | `/api/v1/settings` | Change the settings |
+| `POST` | `/api/v1/password` | Change the admin password |
+
+For the fields, refer to [Settings](/reference/configuration/#settings).
 
 ## Coolify
 
 | Method | Path | Purpose |
 |---|---|---|
-| `GET` | `/api/v1/coolify` | List Coolify instances |
-| `POST` | `/api/v1/coolify` | Create (`{ name, base_url, api_token }`) |
-| `PATCH` | `/api/v1/coolify/{id}` | Update instance |
-| `POST` | `/api/v1/coolify/{id}/test` | Probe `teams/current` + servers |
-| `GET` | `/api/v1/coolify/{id}/servers` | Server inventory |
-| `GET` | `/api/v1/coolify/{id}/github-apps` | Coolify's deploy connectors |
-| `GET` | `/api/v1/coolify/{id}/repos` | Connector repositories (picker source) |
-| `POST` | `/api/v1/coolify/{id}/install-worker` | Compose app (`instant_deploy: false`) |
-| `DELETE` | `/api/v1/coolify/{id}` | Remove instance |
+| `GET` | `/api/v1/coolify` | List the Coolify instances |
+| `POST` | `/api/v1/coolify` | Add an instance (`{ name, base_url, api_token }`) |
+| `PATCH` | `/api/v1/coolify/{id}` | Change an instance |
+| `POST` | `/api/v1/coolify/{id}/test` | Test `teams/current` and the servers |
+| `GET` | `/api/v1/coolify/{id}/servers` | List the servers of the instance |
+| `GET` | `/api/v1/coolify/{id}/github-apps` | List the deploy connectors of Coolify |
+| `GET` | `/api/v1/coolify/{id}/repos` | List the repositories of the connectors (the source for the picker) |
+| `POST` | `/api/v1/coolify/{id}/install-worker` | Make a Compose app (`instant_deploy: false`) |
+| `DELETE` | `/api/v1/coolify/{id}` | Remove an instance |
 
 ## GitHub Apps
 
 | Method | Path | Purpose |
 |---|---|---|
-| `GET` | `/api/v1/github-apps` | List Apps |
-| `POST` | `/api/v1/github-apps` | Create (`{ name, slug, app_id, pem, webhook_secret }`) |
-| `POST` | `/api/v1/github-apps/manifest/start` | Start GitHub App manifest (session + CSRF) |
-| `GET` | `/api/v1/github-apps/manifest/callback` | Manifest redirect (`code` + `state`) |
-| `PATCH` | `/api/v1/github-apps/{id}` | Update App |
-| `POST` | `/api/v1/github-apps/{id}/test` | App JWT + installations |
-| `GET` | `/api/v1/github-apps/{id}/repos` | Installations + repositories |
-| `DELETE` | `/api/v1/github-apps/{id}` | Remove App |
+| `GET` | `/api/v1/github-apps` | List the Apps |
+| `POST` | `/api/v1/github-apps` | Add an App (`{ name, slug, app_id, pem, webhook_secret }`) |
+| `POST` | `/api/v1/github-apps/manifest/start` | Start the GitHub App manifest (session and CSRF) |
+| `GET` | `/api/v1/github-apps/manifest/callback` | The manifest redirect (`code` and `state`) |
+| `PATCH` | `/api/v1/github-apps/{id}` | Change an App |
+| `POST` | `/api/v1/github-apps/{id}/test` | Test the App JWT and the installations |
+| `GET` | `/api/v1/github-apps/{id}/repos` | List the installations and their repositories |
+| `DELETE` | `/api/v1/github-apps/{id}` | Remove an App |
 
 ## Bindings
 
 | Method | Path | Purpose |
 |---|---|---|
-| `GET` | `/api/v1/bindings` | List bindings |
-| `PUT` | `/api/v1/bindings` | Upsert one repo binding (`paths`, `on_empty_pipeline` optional) |
-| `POST` | `/api/v1/bindings/bulk` | Picker checkboxes |
-| `POST` | `/api/v1/bindings/{id}/toggle` | Enable / disable |
-| `POST` | `/api/v1/bindings/{id}/resolve` | Dry run: what this repo would do on a ref (`?ref=`) |
-| `DELETE` | `/api/v1/bindings/{id}` | Remove binding |
+| `GET` | `/api/v1/bindings` | List the bindings |
+| `PUT` | `/api/v1/bindings` | Add or change one binding (`paths` and `on_empty_pipeline` are optional) |
+| `POST` | `/api/v1/bindings/bulk` | Set the bindings from the picker checkboxes |
+| `POST` | `/api/v1/bindings/{id}/toggle` | Turn a binding on or off |
+| `POST` | `/api/v1/bindings/{id}/resolve` | Dry run: the plan for a ref (`?ref=`) |
+| `DELETE` | `/api/v1/bindings/{id}` | Remove a binding |
+
+For the fields, refer to [Binding fields](/reference/configuration/#binding-fields).
 
 ### Dry run
 
-`POST /api/v1/bindings/{id}/resolve` answers "what would this repository run?"
-without pushing a commit. `?ref=` is a branch, tag or SHA; omit it for the
-repository's default branch. It resolves the ref to an immutable SHA, checks
-that commit out, resolves the plan exactly as the worker would, evaluates the
-path filter against the same changed-file list a webhook would deliver, and
-deletes the checkout.
-
-**It writes nothing**: no Check Run on the commit, no job row, nothing queued,
-so it is safe against a production instance. A `200` means the dry run
-completed, not that the configuration is valid: read `decision` and `errors`.
+`POST /api/v1/bindings/{id}/resolve` returns the plan for a commit, without a
+job. `?ref=` is a branch, a tag or a SHA. If you do not give a ref, the server
+uses the default branch.
 
 ```json
 {
@@ -92,74 +95,48 @@ completed, not that the configuration is valid: read `decision` and `errors`.
 }
 ```
 
-`decision` is `run`, `skip` (with a `skip_reason`) or `fail`. `origins` names
-the layer that supplied each resolved value. `errors` are things that would fail
-or skip a real run, and **all of them are reported at once**, while a real run
-stops at the first. `warnings` are legal but probably unintended.
-
-A `400` means the dry run could not be attempted at all: no such binding, App
-credentials GitHub rejected, no installation that can see the repository, no
-commit at that ref, or a clone that failed. Those are infrastructure problems,
-not configuration ones, which is why they are a status code and not an `errors`
-entry.
-
-Full reference: [How configuration resolves](/reference/resolution/).
+A `200` means that the dry run is complete. It does not mean that the
+configuration is correct: read `decision` and `errors`. A `400` means a problem
+with the infrastructure, not with the configuration. For the meaning of each field, refer to
+[Dry run](/configure/dry-run/).
 
 ## Jobs
 
 | Method | Path | Purpose |
 |---|---|---|
-| `GET` | `/api/v1/jobs` | List jobs (`repo`, `status`, `limit`, `offset`) |
-| `GET` | `/api/v1/jobs/{id}` | Job detail |
-| `GET` | `/api/v1/jobs/{id}/logs` | Full log (session, or shareable opt-in) |
-| `GET` | `/api/v1/jobs/{id}/logs/stream` | Live log (SSE; session, or shareable opt-in) |
-| `POST` | `/api/v1/jobs/{id}/rerun` | New job, new Check Run |
-| `POST` | `/api/v1/jobs/{id}/cancel` | Cancel a running job. Docker jobs are stopped engine-side, not just detached from |
+| `GET` | `/api/v1/jobs` | List the jobs (`repo`, `status`, `limit`, `offset`) |
+| `GET` | `/api/v1/jobs/{id}` | Read one job |
+| `GET` | `/api/v1/jobs/{id}/logs` | The full log (session, or shareable logs) |
+| `GET` | `/api/v1/jobs/{id}/logs/stream` | The live log (SSE; session, or shareable logs) |
+| `POST` | `/api/v1/jobs/{id}/rerun` | Start a new job with a new Check Run |
+| `POST` | `/api/v1/jobs/{id}/cancel` | Cancel a job. The Docker engine stops the container of a Docker job. |
 
-`GET /api/v1/jobs` returns `{ "jobs": [...] }`, newest first. Omit `repo` and
-`status` to list every job. `repo` is an exact `owner/name`. `status` must be
-one of `queued`, `in_progress`, `success`, `failure`, `skipped`, `cancelled`,
-`error`; any other value is `400`.
+`GET /api/v1/jobs` returns `{ "jobs": [...] }`, with the newest job first. If
+you do not give `repo` and `status`, the list contains all jobs. `repo` is an
+`owner/name` value. `status` must be one of `queued`, `in_progress`,
+`success`, `failure`, `skipped`, `cancelled` or `error`. A different value
+returns `400`.
 
-A job carries `skip_reason` when its status is `skipped`, so the kinds of skip
-are distinguishable: `path_filter` (a filter matched nothing, intentional),
-`no_pipeline` (nothing resolved to run, usually a mistake), and
-`fork_disabled` / `fork_no_docker` / `fork_no_runtime` (a fork pull request the
-current policy will not run). It is empty otherwise. `limit` defaults to 100 (max 500). `offset`
-skips that many rows.
+`limit` defaults to 100. A value above 500 also gives 100. `offset` skips that
+number of rows.
+
+If the status of a job is `skipped`, the job has a `skip_reason`. For other
+statuses, `skip_reason` is empty. For the values, refer to
+[Skip reasons](/use/runs/#skip-reasons).
 
 `GET /api/v1/jobs/{id}` returns `{ "job": {...}, "plan_origins": [...] }`.
-`plan_origins` is the per-value provenance recorded when that commit's plan was
-resolved: the same list the dry run returns, but for the run that actually
-happened. Jobs from before this was recorded have an empty list.
+`plan_origins` gives the layer that set each value of the plan for that job.
+It has the same format as `origins` in the dry run. For older jobs, the list is
+empty.
 
 ## Public
 
 | Method | Path | Purpose |
 |---|---|---|
-| `POST` | `/webhook/{slug}` | GitHub (HMAC verified) |
-| `GET` | `/runs/{id}` | Log page (session, or shareable opt-in) |
-| `GET` | `/health` | Liveness; `503` if SQLite is unreadable |
-| `GET` | `/health?verbose=1` | Component breakdown, **session or bearer only** |
+| `POST` | `/webhook/{slug}` | GitHub webhooks. The server examines the HMAC signature. |
+| `GET` | `/runs/{id}` | The run page (session, or shareable logs) |
+| `GET` | `/health` | Liveness. Returns `503` if SQLite is not readable. |
+| `GET` | `/health?verbose=1` | The status of each component, **session or bearer only** |
 
-`GET /health` is a fixed contract for container healthchecks: `{"status":"ok"}`
-with `200`, or `{"status":"error", ...}` with `503`. Adding `?verbose=1` returns
-the same report `/status` renders (components, states, and what to do about
-each), but only to an authenticated caller, because it names your public base
-URL and your configured Apps. An anonymous caller that asks for it gets the
-plain liveness body rather than an error, so a healthcheck that sends the
-parameter by accident still works. See
-[Operations](/operate/health/).
-
-Session cookies are HttpOnly, `Secure` behind HTTPS, and browser writes require
-a CSRF token. Bearer callers carry no ambient cookie and so skip CSRF.
-
-A session — cookie or bearer token — expires 24 hours after the request that
-last used it, and 7 days after it was issued whatever the traffic. The
-`expires_at` in the login response is the idle deadline, so a long-running
-client should expect to sign in again rather than treat that timestamp as
-final. `POST /api/v1/password` invalidates every session for the user.
-
-Login allows five attempts per minute per client address and a success resets
-the count. Behind a reverse proxy all clients share that budget. See
-[Security model](/reference/security-model/).
+For the `/health` responses, refer to [Health](/operate/health/). For
+shareable logs, refer to [Shareable logs](/use/logs/#shareable-logs).
