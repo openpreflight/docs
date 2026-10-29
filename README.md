@@ -4,9 +4,9 @@
 
 # openpreflight docs
 
-**A small CI provider for private repos.**
+**A small CI provider for private repositories.**
 
-One Go binary · one SQLite file · one Check Run per commit
+One Go binary · one SQLite file · one Check Run for each commit
 
 [Website](https://openpreflight.xyz) · [Docs](https://docs.openpreflight.xyz) · [Source](https://github.com/openpreflight/openpreflight)
 
@@ -30,22 +30,25 @@ generated, and nothing is synced in from
 ```text
 src/content/docs/
   index.mdx           the splash page
-  start/              quickstart, configuration
-  setup/              github-app, coolify, bindings
-  using/              pipelines, logs, api
-  understanding/      architecture, security-model, deployment
+  getting-started/    overview, quickstart, comparison
+  deploy/             deployment, networking, coolify
+  configure/          github-app, bindings, pipelines, path-filters, dry-run, fork-pull-requests
+  use/                runs, logs
+  operate/            health, backup-restore, upgrade, rotate-secret-key, troubleshooting
+  reference/          configuration, resolution, api, architecture, security-model, glossary
+    decisions/        the numbered decision records
   contributing/       development
-  adr/                the numbered decision records
 ```
 
-Each directory is a sidebar group, and every group is `autogenerate`d in
-`astro.config.mjs`. Adding a page needs no config change:
+Each directory is a sidebar group. All groups are `autogenerate`d in
+`astro.config.mjs`, except Reference, which lists its pages. To add a page:
 
-1. Drop the markdown into the right directory.
-2. Give it `title:` and `sidebar: { order: N }` frontmatter.
+1. Put the markdown in the correct directory.
+2. Give it `title:`, a unique `description:` and `sidebar: { order: N }` frontmatter.
+3. If the page is in Reference, add it to the Reference list in `astro.config.mjs`.
 
-Removing a page is a `git rm`. Renaming one changes its URL, so leave a
-redirect if the old path was linked publicly.
+To remove a page, use `git rm`. A new name changes the URL. Add a redirect in
+`astro.config.mjs` if the old URL is public.
 
 ## Local development
 
@@ -54,14 +57,18 @@ npm ci
 npm run dev
 ```
 
-`npm run build` produces `dist/`. After a build, `npm run check-links` asserts
-every splash CTA route exists and no built HTML links to a missing internal
-path. CI runs both.
+`npm run build` makes `dist/`. After a build, `npm run check-links` makes sure
+that the required routes and redirects exist, and that no page links to a
+missing internal path. `npm run check-style` checks the writing rules in
+`CONTRIBUTING.md`. CI runs all three.
 
 ## Writing
 
-- Links between pages are site routes, not file paths: `/start/quickstart/`,
-  not `../start/quickstart.md`.
+- Links between pages are site routes, not file paths:
+  `/getting-started/quickstart/`, not `../getting-started/quickstart.md`.
+- The pages use ASD-STE100 Simplified Technical English. The rules are in
+  [CONTRIBUTING.md](CONTRIBUTING.md#writing-docs), and the terms are in the
+  [glossary](https://docs.openpreflight.xyz/reference/glossary/).
 - Links to files that live in the code repo (`README.md`, `SECURITY.md`,
   `examples/.ci.yml`) are absolute GitHub URLs.
 - A doc that describes behaviour should say what the binary actually does. When
