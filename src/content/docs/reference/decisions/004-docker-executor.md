@@ -1,6 +1,6 @@
 ---
 title: "ADR 004: Docker executor, remote engine, opt-in forks"
-description: "Decision: optional docker run executor, remote engine via CI_DOCKER_HOST, and opt-in fork PRs."
+description: "Decision: an optional docker run executor, a remote engine through CI_DOCKER_HOST, and opt-in fork pull requests."
 sidebar:
   order: 4
 ---
@@ -9,43 +9,43 @@ sidebar:
 
 ## Context
 
-v1 ran every pipeline step as a child of this process. `.ci.yml` `runtime:`
-was parsed and ignored. Fork PRs were always skipped because they would
-execute untrusted code with the worker's privileges.
+v1 ran each pipeline step as a child process of the server. The server parsed
+the `.ci.yml` `runtime:` key and ignored it. The server always skipped fork pull
+requests, because their jobs execute untrusted code with the privileges of the server.
 
 Coolify's API can list servers and create applications. It cannot start an
 arbitrary `docker run` on a host: there is no "run this container on server
-UUID" job API. The remote-host path is whatever Docker already understands
+UUID" job API. The remote-host path is what Docker supports
 (`DOCKER_HOST` / a mounted socket).
 
 ## Decision
 
-- A non-empty pipeline `runtime` is a Docker image. The runner calls
-  `docker run --rm` with the checkout at `/work`, the worker uid, `--security-opt
-  no-new-privileges`, `--cap-drop ALL`. The job container never receives
-  `docker.sock`. Image names are allow-listed so `runtime` cannot become extra
-  CLI flags.
+- A non-empty pipeline `runtime` is a Docker image. The executor calls
+  `docker run --rm` with the checkout at `/work`, the uid of the server,
+  `--security-opt no-new-privileges` and `--cap-drop ALL`. The job container
+  never receives `docker.sock`. Because image names must match a
+  strict pattern, `runtime` cannot become extra CLI flags.
 - Empty `runtime` keeps the process executor (Node/git in this image).
 - If `runtime` is set (or the job is a fork) and the engine is unreachable,
   the job fails outright. There is no silent fallback to the process executor.
-- `CI_DOCKER_HOST` (else `DOCKER_HOST`) is how jobs run on another Docker
-  engine, including a Coolify server's. Installing *this* worker onto Coolify
-  is a separate call: `POST /api/v1/applications/dockercompose` with
-  `instant_deploy: false`.
-- `skip_fork_prs` stays true by default. Saving `false` requires a reachable
-  engine plus `settings.default_runtime` (the webhook has no pipeline file
-  yet). Fork jobs always use Docker.
+- With `CI_DOCKER_HOST` (else `DOCKER_HOST`), jobs run on a different Docker
+  engine. This includes the engine of a Coolify server. The installation of
+  *this* server onto Coolify is a different call:
+  `POST /api/v1/applications/dockercompose` with `instant_deploy: false`.
+- `skip_fork_prs` stays true by default. You can save `false` only with a
+  reachable engine and `settings.default_runtime`. At webhook time, the server
+  has no pipeline file. Fork jobs always use Docker.
 
 ## Consequences
 
-- The worker image ships `docker-cli`. Compose mounts `/var/run/docker.sock`
-  and adds the socket's group (`DOCKER_GID`) so uid 10001 can talk to the
-  engine. Job containers still do not see that socket. Volume sources passed
-  to `docker run` are host paths: `/proc/self/mountinfo` (or `CI_WORKSPACE_HOST`)
-  translates `WORKSPACE_DIR` when this process is a container.
-- Operators who never set `runtime:` and never enable fork PRs still run as
-  before, as a process.
-- A Coolify API token cannot replace `CI_DOCKER_HOST`. Remote jobs are Docker
-  remote API, not Coolify remote API.
+- The server image ships `docker-cli`. Compose mounts `/var/run/docker.sock`
+  and adds the group of the socket (`DOCKER_GID`). Then uid 10001 can talk to
+  the engine. Job containers do not see that socket. The volume sources for
+  `docker run` are host paths. If the server runs in a container,
+  `/proc/self/mountinfo` (or `CI_WORKSPACE_HOST`) translates `WORKSPACE_DIR`.
+- If operators never set `runtime:` and never activate fork pull requests,
+  their jobs run as before, as processes.
+- A Coolify API token cannot replace `CI_DOCKER_HOST`. Remote jobs use the
+  Docker remote API, not the Coolify remote API.
 - Fork isolation is "a sibling container with dropped caps", not a sandbox
-  VM. That is the trade-off for staying one process plus `docker run`.
+  VM. That is the trade-off to stay one server plus `docker run`.
