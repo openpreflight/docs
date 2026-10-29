@@ -2,7 +2,7 @@
 title: "Troubleshooting"
 description: "Common failure modes (process won't start, no Check Run, skipped checks, fork PRs, Docker socket errors) and the page that owns each fix."
 sidebar:
-  order: 2
+  order: 5
 ---
 
 Symptom → cause → fix, with a link to the page that owns the detail. Nothing
@@ -12,7 +12,7 @@ Before working through it, open **`/status`** in the operator UI. It reports the
 database, the webhook URL, the GitHub Apps, the enabled repositories, the worker
 and Docker, and says what to do about anything that is not ok, which is faster than
 guessing which symptom below matches. See
-[Operations](/operate/operations/#checking-on-a-running-instance).
+[Operations](/operate/health/).
 
 ## Process exits immediately on start
 
@@ -23,7 +23,7 @@ refuses to boot by design.
 secret, and restart. Keep it forever. Losing it makes stored PEMs and tokens
 unreadable.
 
-See [Configuration](/configure/configuration/).
+See [Configuration](/reference/configuration/).
 
 ## `/health` returns 503
 
@@ -59,7 +59,7 @@ deliberately not on a timer: the requeue is unconditional, so running it against
 live jobs would clobber them. `/status` shows the gap directly: "running" counts
 workers, "in flight" counts rows, and a difference is exactly this.
 
-See [Operations](/operate/operations/#checking-on-a-running-instance).
+See [Operations](/operate/health/).
 
 ## Push produces no check at all
 
@@ -78,7 +78,7 @@ See [Enable repos](/configure/bindings/) and
 overrides, and no project file that the defaults detect (`package.json`,
 `go.mod`, `Cargo.toml`, `pyproject.toml`, `requirements.txt` or `setup.py`).
 
-**Fix:** Commit a [pipeline](/use/pipelines/) (or set binding overrides).
+**Fix:** Commit a [pipeline](/configure/pipelines/) (or set binding overrides).
 Skipped means "nothing to do", not an error.
 
 ## Fork PR produces no check
@@ -103,7 +103,7 @@ the process executor.
 reachable daemon. Confirm with a binding that omits `runtime:` if you only
 need process execution.
 
-See [Pipelines](/use/pipelines/).
+See [Pipelines](/configure/pipelines/).
 
 ## `runtime:` job has an empty `/work`
 
@@ -117,7 +117,7 @@ not hold the checkout. `npm ci` then fails with a missing `package-lock.json`
 source from `/proc/self/mountinfo`, but some mount layouts hide it.
 
 See [Deployment](/deploy/deployment/) and
-[Configuration](/configure/configuration/).
+[Configuration](/reference/configuration/).
 
 ## Permission denied on the docker socket
 
@@ -146,5 +146,5 @@ See [Deployment](/deploy/deployment/).
 re-seal log line), then unset `CI_SECRET_KEY_OLD` and restart. Keep a backup
 of `/data` from before the rotate until you have logged in and tested an App.
 
-See [Configuration](/configure/configuration/) and
+See [Configuration](/reference/configuration/) and
 [Deployment](/deploy/deployment/).

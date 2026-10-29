@@ -2,7 +2,7 @@
 title: "Architecture"
 description: "One Go process is both configurator and worker: packages, the webhook-to-Check-Run path, and what is deliberately absent."
 sidebar:
-  order: 1
+  order: 4
 ---
 One Go process is both the **configurator** (HTML UI + JSON API) and the
 **worker** (webhook → queue → Check Run). There is no separate frontend, no
@@ -39,7 +39,7 @@ Browser / CLI ──session/Bearer──► api │                ├── git
 
 Everything a GitHub App or Coolify host needs to know lives in the database,
 edited in the UI. Env vars are only what the process needs before it can open
-that database. See [configuration.md](/configure/configuration/).
+that database. See [configuration.md](/reference/configuration/).
 
 ## How a run happens
 

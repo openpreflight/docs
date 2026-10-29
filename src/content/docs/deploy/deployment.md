@@ -116,4 +116,4 @@ database without the key is not enough to recover PEMs and tokens. The key
 without the database is not enough to recover configuration.
 
 Procedure, restore, upgrades, and what a redeploy does to a running job are in
-[Operations](/operate/operations/).
+[Operations](/operate/backup-restore/).

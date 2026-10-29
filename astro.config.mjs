@@ -31,22 +31,22 @@ export default defineConfig({
   // changelog, in the README and on the website.
   redirects: {
     '/start/quickstart/': '/getting-started/quickstart/',
-    '/start/faq/': '/getting-started/faq/',
+    '/start/faq/': '/getting-started/overview/',
     '/start/comparison/': '/getting-started/comparison/',
-    '/start/configuration/': '/configure/configuration/',
+    '/start/configuration/': '/reference/configuration/',
     '/setup/github-app/': '/configure/github-app/',
     '/setup/bindings/': '/configure/bindings/',
-    '/setup/resolution/': '/configure/resolution/',
+    '/setup/resolution/': '/reference/resolution/',
     '/setup/path-filters/': '/configure/path-filters/',
     '/setup/coolify/': '/deploy/coolify/',
     '/understanding/deployment/': '/deploy/deployment/',
     '/understanding/networking/': '/deploy/networking/',
-    '/understanding/operations/': '/operate/operations/',
+    '/understanding/operations/': '/operate/backup-restore/',
     '/using/troubleshooting/': '/operate/troubleshooting/',
     '/understanding/architecture/': '/reference/architecture/',
     '/understanding/security-model/': '/reference/security-model/',
     '/using/api/': '/reference/api/',
-    '/using/pipelines/': '/use/pipelines/',
+    '/using/pipelines/': '/configure/pipelines/',
     '/using/runs/': '/use/runs/',
     '/using/logs/': '/use/logs/',
     '/adr/001-database/': '/reference/decisions/001-database/',
@@ -55,6 +55,12 @@ export default defineConfig({
     '/adr/004-docker-executor/': '/reference/decisions/004-docker-executor/',
     '/adr/005-check-suite-gating/': '/reference/decisions/005-check-suite-gating/',
     '/adr/006-job-ids/': '/reference/decisions/006-job-ids/',
+    // 2.3 restructure: pages that moved or split.
+    '/getting-started/faq/': '/getting-started/overview/',
+    '/use/pipelines/': '/configure/pipelines/',
+    '/configure/configuration/': '/reference/configuration/',
+    '/configure/resolution/': '/reference/resolution/',
+    '/operate/operations/': '/operate/backup-restore/',
   },
   integrations: [
     sitemap({
@@ -131,9 +137,12 @@ export default defineConfig({
           // next to the capitalised groups above.
           label: 'Reference',
           items: [
+            'reference/configuration',
+            'reference/resolution',
+            'reference/api',
             'reference/architecture',
             'reference/security-model',
-            'reference/api',
+            'reference/glossary',
             {
               label: 'Decisions',
               collapsed: true,

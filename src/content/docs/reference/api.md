@@ -103,7 +103,7 @@ commit at that ref, or a clone that failed. Those are infrastructure problems,
 not configuration ones, which is why they are a status code and not an `errors`
 entry.
 
-Full reference: [How configuration resolves](/configure/resolution/).
+Full reference: [How configuration resolves](/reference/resolution/).
 
 ## Jobs
 
@@ -149,7 +149,7 @@ each), but only to an authenticated caller, because it names your public base
 URL and your configured Apps. An anonymous caller that asks for it gets the
 plain liveness body rather than an error, so a healthcheck that sends the
 parameter by accident still works. See
-[Operations](/operate/operations/#checking-on-a-running-instance).
+[Operations](/operate/health/).
 
 Session cookies are HttpOnly, `Secure` behind HTTPS, and browser writes require
 a CSRF token. Bearer callers carry no ambient cookie and so skip CSRF.

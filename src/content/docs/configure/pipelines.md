@@ -2,7 +2,7 @@
 title: "Pipelines"
 description: "The .ci.yml contract, runtime vs process executor, and how commands resolve from file, binding, or package.json."
 sidebar:
-  order: 1
+  order: 3
 ---
 Commit a pipeline file (default `.ci.yml`) to the repo. A sample lives in
 [`examples/.ci.yml`](https://github.com/openpreflight/openpreflight/blob/main/examples/.ci.yml)
@@ -49,7 +49,7 @@ A step that fails stops the run; later steps are reported as skipped.
 
 To see which layer won for a real commit, including the inferred commands and
 the exact image, use the dry run:
-[How configuration resolves](/configure/resolution/).
+[How configuration resolves](/reference/resolution/).
 
 Defaults for the pipeline file path, timeout, and check name live in
-[Configuration](/configure/configuration/).
+[Configuration](/reference/configuration/).

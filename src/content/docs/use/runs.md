@@ -2,7 +2,7 @@
 title: "Runs"
 description: "The run page, the per-repository page, what the executor and plan source tell you, and how to read a skipped run."
 sidebar:
-  order: 2
+  order: 1
 ---
 Three pages answer three different questions. Knowing which is which saves a
 lot of clicking around.
@@ -60,7 +60,7 @@ when the configuration has changed since. `GET /api/v1/jobs/{id}` returns the
 same list as `plan_origins`.
 
 To ask the same question about a commit that has not run, use the dry run:
-[How configuration resolves](/configure/resolution/).
+[How configuration resolves](/reference/resolution/).
 
 ## The repository page
 
@@ -71,7 +71,7 @@ the repo cards on the overview, or from **Repos**.
 `/repos/{id}/edit` is the form for changing any of it, and **Dry run**
 (`/repos/{id}/resolve`) answers what a given branch, tag or commit would do
 before anything is pushed. It writes no Check Run and queues nothing. See
-[How configuration resolves](/configure/resolution/).
+[How configuration resolves](/reference/resolution/).
 
 ## Reading a skipped run
 

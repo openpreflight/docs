@@ -2,7 +2,7 @@
 title: "Enable repos"
 description: "Enable the private repos that should receive Check Runs; the bindings table is the allow-list."
 sidebar:
-  order: 3
+  order: 2
 ---
 **Repos** is the allow-list. **Pick repositories** (`/repos/pick`) chooses the
 CI App, optionally a Coolify instance as the source of the repo list, then
@@ -29,15 +29,15 @@ Per binding you can override:
 - what an empty pipeline reports (`on_empty_pipeline`)
 
 At run time, precedence is **binding → App → settings**. See
-[How configuration resolves](/configure/resolution/) for the full order, what the
+[How configuration resolves](/reference/resolution/) for the full order, what the
 inferred defaults are, and the dry run that tells you which layer won for a
 real commit before you push one.
 
 ## After bindings are enabled
 
-Commit a [pipeline](/use/pipelines/), or rely on the defaults inferred from
+Commit a [pipeline](/configure/pipelines/), or rely on the defaults inferred from
 `package.json`, `go.mod`, `Cargo.toml` or `pyproject.toml`. Before pushing,
 **Test configuration** on the binding form runs a
-[dry run](/configure/resolution/) and shows exactly what that commit would do. Then
+[dry run](/reference/resolution/) and shows exactly what that commit would do. Then
 push to an allowed branch; the worker reports one Check Run with full
 [logs](/use/logs/).

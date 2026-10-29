@@ -2,7 +2,7 @@
 title: "Networking"
 description: "Why GitHub must reach the webhook over public HTTPS, what that means when you have no public IP, and where the privacy boundary actually falls."
 sidebar:
-  order: 3
+  order: 2
 ---
 There is one hard network requirement, and it decides whether you can deploy at
 all: **GitHub must be able to reach this worker.** Everything else

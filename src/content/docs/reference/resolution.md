@@ -2,7 +2,7 @@
 title: "How configuration resolves"
 description: "The five layers that decide what a commit runs, in the order they are checked, and the dry run that tells you which one won."
 sidebar:
-  order: 4
+  order: 2
 ---
 Five layers can decide what a commit runs. This page is the order they are
 checked in, and the endpoint that tells you which one actually won for a given
@@ -178,8 +178,8 @@ Nothing was wrong; the filter did its job. See
 
 ## Related
 
-- [Pipelines](/use/pipelines/): the `.ci.yml` contract itself
+- [Pipelines](/configure/pipelines/): the `.ci.yml` contract itself
 - [Enable repos](/configure/bindings/): the binding fields, layer 2
-- [Configuration](/configure/configuration/): the settings, layer 4
+- [Configuration](/reference/configuration/): the settings, layer 4
 - [Runs](/use/runs/): reading a run after the fact
 - [API](/reference/api/): the resolve endpoint's request and response

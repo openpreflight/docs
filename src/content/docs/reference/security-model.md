@@ -2,7 +2,7 @@
 title: "Security model"
 description: "Webhook verification, the executor trust model and its container flags, secrets at rest, clone credentials, job environments, fork PRs, and sessions."
 sidebar:
-  order: 2
+  order: 5
 ---
 What is encrypted, what a job can see, what a clone credential is allowed to
 touch, and what a link to a log page grants. For reporting a vulnerability, see
@@ -59,7 +59,7 @@ own toolchain.
 Secret columns (App PEM, webhook secret, Coolify token) are AES-256-GCM
 encrypted. GET responses return a redacted marker, never the value. Key
 material is `CI_SECRET_KEY`; rotation is documented in
-[Configuration](/configure/configuration/).
+[Configuration](/reference/configuration/).
 
 ## Clone credentials
 

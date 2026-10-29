@@ -2,11 +2,11 @@
 title: "Quickstart"
 description: "Get the binary running, through the first-boot wizard, and ready for a GitHub App."
 sidebar:
-  order: 1
+  order: 2
 ---
 This is the shortest path from an empty box to a process waiting for a GitHub
 App. Full environment and settings detail lives in
-[Configuration](/configure/configuration/).
+[Configuration](/reference/configuration/).
 
 ## Requirements
 
@@ -34,7 +34,7 @@ docker compose -f compose.prod.yaml up -d
 `CI_SECRET_KEY` is the only variable you must set; the process refuses to start
 without it. Keep it forever. Losing it makes stored PEMs and tokens unreadable.
 Everything else either has a default or is asked for in the wizard. See
-[Configuration](/configure/configuration/) for the full env table and key rotation.
+[Configuration](/reference/configuration/) for the full env table and key rotation.
 
 **v2.3.1** is the current tagged release. Linux binaries are on the
 [GitHub Release](https://github.com/openpreflight/openpreflight/releases/tag/v2.3.1).
@@ -75,7 +75,7 @@ wizard. It is ignored once a user exists.
 3. Optionally [add a Coolify instance](/deploy/coolify/) as a repo-picker source
    or to install this worker.
 
-Then commit a [pipeline](/use/pipelines/) (or rely on Node defaults) and push.
+Then commit a [pipeline](/configure/pipelines/) (or rely on Node defaults) and push.
 
 ## What you should see
 
@@ -98,6 +98,6 @@ it opens `GET /runs/{job-id}` on your instance. That page requires a session
 by default; a binding can opt into shareable logs. See [Logs](/use/logs/).
 
 If nothing resolves to run, the check reports skipped rather than failed.
-That is intentional. See [Pipelines](/use/pipelines/) and
+That is intentional. See [Pipelines](/configure/pipelines/) and
 [Troubleshooting](/operate/troubleshooting/).
 

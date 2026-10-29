@@ -7,7 +7,7 @@ sidebar:
 Two layers. The process reads a handful of env vars so it can start. Everything
 else is a row in SQLite, edited in the UI or over the JSON API. For a
 procedural first run, see [Quickstart](/getting-started/quickstart/). Pipeline file
-semantics are also covered under [Pipelines](/use/pipelines/).
+semantics are also covered under [Pipelines](/configure/pipelines/).
 
 ## One job at a time, by default
 
@@ -129,7 +129,7 @@ To find out which layer won for an actual commit, without pushing one, use the
 dry run at Repos → **Dry run** or
 `POST /api/v1/bindings/{id}/resolve`. It reports every resolved value with the
 layer that supplied it. See
-[How configuration resolves](/configure/resolution/).
+[How configuration resolves](/reference/resolution/).
 
 Backups, upgrades, and what a restart does to a running job are in
-[Operations](/operate/operations/).
+[Operations](/operate/backup-restore/).

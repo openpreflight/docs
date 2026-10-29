@@ -2,7 +2,7 @@
 title: "Register a GitHub App"
 description: "Create a GitHub App with GitHub's review screen, or paste credentials. Permissions, events, and webhook URL."
 sidebar:
-  order: 2
+  order: 1
 ---
 Only a GitHub App can create Check Runs. User and OAuth tokens are refused. A
 GitHub App also has exactly one webhook URL, which is why Coolify's own GitHub

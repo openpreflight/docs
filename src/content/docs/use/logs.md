@@ -2,7 +2,7 @@
 title: "Logs"
 description: "Where full job logs live, how the run page tails them, and when a binding makes a log page shareable."
 sidebar:
-  order: 3
+  order: 2
 ---
 Full logs are written to `/data/logs/<job-id>.log`, capped by `max_log_bytes`
 (10 MiB by default) and pruned after `log_retention_days` (14 by default). The
@@ -110,4 +110,4 @@ there and not through the proxy, the proxy is still buffering.
 :::
 
 Retention and size caps are settings; see
-[Configuration](/configure/configuration/).
+[Configuration](/reference/configuration/).

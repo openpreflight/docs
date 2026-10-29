@@ -20,27 +20,34 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 [GitHub Release](https://github.com/openpreflight/openpreflight/releases/tag/v2.3.1).
 What shipped is in the
 [changelog](https://github.com/openpreflight/openpreflight/blob/v2.3.1/CHANGELOG.md);
-what this still does not include is in the [FAQ](/getting-started/faq/).
+what this still does not include is in the [overview](/getting-started/overview/).
 v1.0.0 was 29 August 2026.
 
 <CardGrid>
   <Card title="Getting started" icon="rocket">
-    [Quickstart](/getting-started/quickstart/) gets the binary running and through the
-    first-boot wizard. [Configuration](/configure/configuration/) is the full
-    environment reference.
+    The [overview](/getting-started/overview/) tells you what openpreflight does and
+    what it does not do. The [quickstart](/getting-started/quickstart/) goes from an
+    empty host to the first Check Run.
+  </Card>
+  <Card title="Deploy" icon="laptop">
+    [Deployment](/deploy/deployment/) gives the Compose file and the Docker engine
+    access. [Networking](/deploy/networking/) tells you how GitHub reaches the webhook.
   </Card>
   <Card title="Configure" icon="setting">
-    [Register a GitHub App](/configure/github-app/). Only an App can create Check
-    Runs. Then [enable repos](/configure/bindings/); the bindings table is the
-    allow-list.
+    [Register a GitHub App](/configure/github-app/), [enable
+    repositories](/configure/bindings/), and write a [pipeline](/configure/pipelines/).
   </Card>
   <Card title="Use" icon="document">
-    [Pipelines](/use/pipelines/) is the `.ci.yml` contract and its resolution
-    order. [Logs](/use/logs/) and the [API](/reference/api/) cover the rest.
+    [Runs](/use/runs/) shows what each job did and why. [Logs](/use/logs/) shows
+    the full output of each job.
+  </Card>
+  <Card title="Operate" icon="approve-check">
+    [Health](/operate/health/), [backup and restore](/operate/backup-restore/),
+    [upgrade](/operate/upgrade/) and [troubleshooting](/operate/troubleshooting/).
   </Card>
   <Card title="Reference" icon="open-book">
-    [Architecture](/reference/architecture/) explains the one-process shape.
-    The [decisions](/reference/decisions/005-check-suite-gating/) record why it gates on the
-    check suite rather than on push.
+    [Configuration](/reference/configuration/), the [API](/reference/api/), the
+    [architecture](/reference/architecture/) and the
+    [decisions](/reference/decisions/001-database/).
   </Card>
 </CardGrid>

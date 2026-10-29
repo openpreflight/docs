@@ -62,7 +62,7 @@ the marketplace, or want GitHub to own the scheduling.
 Pick openpreflight if you do not want Actions minutes involved at all, do
 not want a runner registered against your org, and would rather the whole CI
 surface be a thing you can read in an afternoon. The scope note in
-[what is out of scope](/getting-started/faq/#what-is-out-of-scope) is the boundary.
+[what is out of scope](/getting-started/overview/#what-is-out-of-scope) is the boundary.
 
 ## Jenkins
 
@@ -85,7 +85,7 @@ These are the things that will bite:
   process or in a sibling container on the same Docker engine. Every one of the
   tools above scales horizontally; this one does not.
 - One job runs at a time by default. `max_concurrent_jobs` is 1 and can only be
-  raised after first boot. See [Configuration](/configure/configuration/).
+  raised after first boot. See [Configuration](/reference/configuration/).
 - Three steps, `install`, `test`, `build`, in that order. No stages, no
   `needs:`, no fan-out, no conditional steps.
 - Every job is a fresh shallow clone. There are no caches and no artifacts, so
@@ -101,7 +101,7 @@ These are the things that will bite:
 
 - It is operationally small: one container, one SQLite file, one process.
   There is no broker to run, no agent to register, and no database server.
-  Backups are a file and a key; see [Operations](/operate/operations/).
+  Backups are a file and a key; see [Operations](/operate/backup-restore/).
 - Check Runs are native rather than a shim over the status API. Runs gate on
   the check suite and hold to one live run per commit, which is what makes
   required checks behave under force-pushes and rapid pushes. See

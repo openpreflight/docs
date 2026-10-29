@@ -1,8 +1,8 @@
 ---
-title: "FAQ"
+title: "Overview"
 description: "Short answers on the current release, GitHub Apps, Coolify, check-suite gating, GitHub Enterprise, monorepos, whether the project checks itself, and what is out of scope."
 sidebar:
-  order: 2
+  order: 1
 ---
 
 Positioning questions the homepage raises, and the ones people ask before

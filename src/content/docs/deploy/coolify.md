@@ -2,7 +2,7 @@
 title: "Optional: Coolify"
 description: "Add Coolify as an optional deployment target and repository picker. Not required for checks to work."
 sidebar:
-  order: 2
+  order: 3
 ---
 Coolify is a supported deployment target and an optional repo source. It is
 not the product, and checks do not need it. Add a team-scoped API token and you

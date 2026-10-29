@@ -2,7 +2,7 @@
 title: "Path filters"
 description: "Pattern syntax, what `**` does, why exclusions are not supported, the fail-open rule, the diagnostics in the log, and a monorepo example."
 sidebar:
-  order: 5
+  order: 4
 ---
 A binding's **paths** field limits which commits get checked. Empty means every
 path, which is the default and the behaviour every install had before filters
