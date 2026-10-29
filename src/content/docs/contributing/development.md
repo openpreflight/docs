@@ -66,10 +66,10 @@ Do not add HTMX, Alpine, React, Vue or DaisyUI.
 
 If you edit a `*.templ` file or `internal/web/assets/css/globals.css`, do these steps:
 
-1. Generate the templ code:
+1. Generate the templ code. The generator is a `go tool` in `go.mod`. It is the same version as the library:
 
    ```bash
-   templ generate ./internal/web/...
+   go tool templ generate ./internal/web/...
    ```
 
 2. Build the CSS:
@@ -78,7 +78,7 @@ If you edit a `*.templ` file or `internal/web/assets/css/globals.css`, do these 
    cd internal/web && npm ci && npm run css
    ```
 
-The Dockerfile always builds the CSS again in a Node stage, and runs `templ generate` in the Go stage. A missing local generate thus cannot put previous markup in the image.
+The Dockerfile always builds the CSS again in a Node stage, and runs `go tool templ generate` in the Go stage. A missing local generate thus cannot put previous markup in the image.
 Local `go run` uses the current `assets/css/output.css` and the committed `*_templ.go` files.
 
 ## Package layout
