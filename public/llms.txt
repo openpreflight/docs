@@ -8,7 +8,7 @@ The pages use ASD-STE100 Simplified Technical English; the glossary gives one te
 Docs: https://docs.openpreflight.xyz
 Marketing: https://openpreflight.xyz
 Source: https://github.com/openpreflight/openpreflight
-Release: https://github.com/openpreflight/openpreflight/releases/tag/v2.3.1 (v2.3.1, 27 September 2026)
+Release: https://github.com/openpreflight/openpreflight/releases/tag/v2.3.2 (v2.3.2, 29 October 2026)
 License: Apache-2.0
 
 ## Getting started

@@ -12,16 +12,16 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/starlight": "^0.41.8",
+    "@astrojs/starlight": "^0.42.7",
     "@tailwindcss/vite": "^4.3.3",
-    "astro": "^7.2.6",
-    "sharp": "^0.35.4",
+    "astro": "^7.4.4",
+    "sharp": "^0.35.5",
     "tailwindcss": "^4.3.3"
   },
   "allowScripts": {
     "esbuild": true
   },
   "engines": {
-    "node": ">=22.12.0"
+    "node": ">=22.23.4"
   }
 }
