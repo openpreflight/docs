@@ -32,6 +32,28 @@ connection is HTTPS. Behind a reverse proxy, the server reads this from the
 `X-Forwarded-Proto` header. Configure the proxy to send
 `X-Forwarded-Proto: https`. The Traefik proxy of Coolify sends it.
 
+## Client IP behind a proxy
+
+Sign-in accepts five tries each minute from one client. Behind a reverse
+proxy, each request comes from the proxy. Thus all clients share one limit,
+and one person who types a wrong password can block all others for a minute.
+
+From 2.4.0, set `CI_CLIENT_IP_HEADER` to the header that has the client IP:
+
+| Proxy | Value |
+|---|---|
+| Cloudflare (tunnel or proxied DNS) | `CF-Connecting-IP` |
+| Caddy, nginx, Traefik | `X-Forwarded-For` |
+
+For `X-Forwarded-For`, the server uses the last address in the list. The
+nearest proxy adds that address. The client can write the addresses before it.
+
+:::caution
+Set `CI_CLIENT_IP_HEADER` only if the proxy sets the header on each request.
+If a client can get to the server without the proxy, the client can send the
+header and change its address.
+:::
+
 ## If you have no public IP
 
 A datacentre is not necessary, but a component must terminate a public name:
